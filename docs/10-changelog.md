@@ -22,6 +22,17 @@
 | Discovery row CSS  | `app/[locale]/(pages)/homeDiscovery.module.css`                            | margins + غلاف لمنع padding من `_reboot`                                                            |
 | Docs               | `docs/*`                                                                   | إنشاء توثيق متعدد الملفات (هذا الملف)                                                                |
 
+## تمييز الإعلانات المدفوع (PayPal) — 2026-07-05/06
+
+توثيق شامل في [`14-featured-posts-promotion.md`](./14-featured-posts-promotion.md).
+
+| النطاق | أبرز الملفات | التغيير |
+|--------|--------------|---------|
+| Backend | migrations, Models, Services, PromotionController, Filament ×3, Jobs ×3 | نظام تمييز كامل + PayPal Orders v2 |
+| Frontend | FeaturePostModal, FeaturedPopupAd, FeaturedPostsStrip, my-posts, statistics | UI شراء + عرض + إحصائيات |
+| API BFF | `app/api/promotion/*` | proxies لـ quote/checkout/packages/popup |
+| إصلاحات | Filament `$navigationGroup`, webpack/`.next`, layout popup | استقرار dev + لوحة التحكم |
+
 ## Backend
 
 | الملف                                                                  | التغيير                                                                  |

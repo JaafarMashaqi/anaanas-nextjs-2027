@@ -6,6 +6,7 @@ import {
   BsChatFill,
   BsGraphUp,
   BsShare,
+  BsStars,
   BsTelephoneFill,
 } from 'react-icons/bs'
 import { t } from '@/lib/translations'
@@ -34,6 +35,8 @@ const REACTIONS: ReactionItem[] = [
 type PostActionsProps = {
   locale?: SupportedLocale
   isOwner?: boolean
+  showFeature?: boolean
+  onFeature?: () => void
   // Like button props
   postLikedByMe: boolean
   reactionTypeByMe?: ReactionKey | null
@@ -78,6 +81,8 @@ export default function PostActions({
   userMobile,
   locale = 'ar',
   isOwner = false,
+  showFeature = false,
+  onFeature,
 }: PostActionsProps) {
   const HIDE_DELAY_MS = 220
   const LONG_PRESS_MS = 320
@@ -285,7 +290,21 @@ export default function PostActions({
       </button>
 
       {isOwner ? (
-        <a
+        <>
+          {showFeature && (
+            <button
+              type="button"
+              className={`${styles.action} ${styles.feature}`}
+              onClick={() => onFeature?.()}
+              title={locale === 'ar' ? 'تمييز الإعلان' : 'Feature ad'}
+            >
+              <span className={styles.iconWrap}>
+                <BsStars size={18} aria-hidden />
+              </span>
+              <span className={styles.label}>{locale === 'ar' ? 'تمييز' : 'Feature'}</span>
+            </button>
+          )}
+          <a
           href={statisticsHref || '#'}
           className={`${styles.action} ${styles.stats} ${!statisticsHref ? styles.actionDisabled : ''}`}
           title={t('post.statistics', locale)}
@@ -299,6 +318,7 @@ export default function PostActions({
           </span>
           <span className={styles.label}>{t('post.statistics', locale)}</span>
         </a>
+        </>
       ) : (
         <>
           <button

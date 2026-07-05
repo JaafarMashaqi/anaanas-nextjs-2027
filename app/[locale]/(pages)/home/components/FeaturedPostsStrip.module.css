@@ -1,0 +1,73 @@
+.strip {
+  border: 1px solid rgba(224, 144, 61, 0.25);
+  border-radius: 16px;
+  padding: 0.85rem;
+  background: linear-gradient(180deg, rgba(254, 203, 1, 0.08), rgba(255, 255, 255, 0.95));
+}
+
+.header {
+  margin-bottom: 0.65rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.scroller {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.card {
+  flex: 0 0 220px;
+  display: flex;
+  gap: 0.55rem;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 0.5rem;
+  background: #fff;
+}
+
+.thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.thumbPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  background: #f1f3f5;
+}
+
+.cardBody {
+  min-width: 0;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #9a5b00;
+  margin-bottom: 0.2rem;
+}
+
+.cardTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

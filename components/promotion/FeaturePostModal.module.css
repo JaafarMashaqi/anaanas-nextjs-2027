@@ -1,0 +1,99 @@
+.packageGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.packageCard {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: #fff;
+  text-align: start;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.packageCardActive {
+  border-color: #e0903d;
+  box-shadow: 0 0 0 2px rgba(224, 144, 61, 0.2);
+}
+
+.packageName {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.packagePrice {
+  color: #e0903d;
+  font-weight: 700;
+}
+
+.packagePrice span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.packageWeight {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.featureList {
+  margin: 0 0 1rem;
+  padding-inline-start: 1.2rem;
+  color: #495057;
+}
+
+.daysWrap {
+  margin-bottom: 1rem;
+}
+
+.daysLabel {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 0.35rem;
+  max-height: 140px;
+  overflow: auto;
+}
+
+.dayBtn {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 0.35rem 0;
+  background: #fff;
+  font-size: 0.85rem;
+}
+
+.dayBtnActive {
+  background: #e0903d;
+  border-color: #e0903d;
+  color: #fff;
+  font-weight: 700;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(224, 144, 61, 0.08);
+}
+
+@media (max-width: 768px) {
+  .packageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .daysGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}

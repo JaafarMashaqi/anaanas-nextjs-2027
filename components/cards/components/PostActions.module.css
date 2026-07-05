@@ -151,6 +151,15 @@
   color: #b0b3b8;
 }
 
+.feature {
+  color: #b45309;
+}
+
+.feature:hover:not(:disabled):not(.actionDisabled) {
+  color: #92400e;
+  background: rgba(251, 191, 36, 0.14);
+}
+
 /* موبايل وشاشات ضيقة: أيقونات فقط لتفادي السكرول الأفقي */
 @media (max-width: 767.98px) {
   .bar {

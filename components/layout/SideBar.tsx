@@ -178,6 +178,7 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
   const normalizedPath = pathname?.replace(/\/$/, '')
   const homeHref = `/${currentLocale}`
   const profileHref = `/${currentLocale}/profile/feed`
+  const myPostsHref = `/${currentLocale}/my-posts`
 
   const isHomeActive =
     normalizedPath === homeHref ||
@@ -314,6 +315,10 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
         <div className={styles.footer}>
           <Link href={`/${currentLocale}/contact`} className={styles.profileLink}>
             {t('sidebar.contactUs', currentLocale)}
+          </Link>
+
+          <Link href={myPostsHref} className={styles.profileLink}>
+            {currentLocale === 'ar' ? 'منشوراتي' : 'My posts'}
           </Link>
 
           <Link href={profileHref} className={styles.profileLink}>

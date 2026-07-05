@@ -16,6 +16,7 @@ import {
   BsGearFill,
   BsPersonFill,
   BsPower,
+  BsStars,
 } from 'react-icons/bs'
 
 import defaultUserAvatar from '@/assets/images/avatar/user-default.svg'
@@ -173,6 +174,15 @@ const ProfileDropdown = ({ locale = 'ar' }: { locale?: SupportedLocale }) => {
         >
           <BsPersonFill aria-hidden />
           <span>{t.viewProfile}</span>
+        </DropdownItem>
+
+        <DropdownItem
+          as={Link}
+          href={`/${locale}/my-posts`}
+          className={styles.item}
+        >
+          <BsStars aria-hidden />
+          <span>{locale === 'ar' ? 'منشوراتي' : 'My posts'}</span>
         </DropdownItem>
 
         <div className={styles.list}>

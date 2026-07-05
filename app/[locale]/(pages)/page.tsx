@@ -23,6 +23,8 @@ import MobileAiPromoGrid from './home/components/MobileAiPromoGrid'
 import MobileAIDashboard from './home/components/MobileAIDashboard'
 import MobileLatestAdsSection from './home/components/MobileLatestAdsSection'
 import HomeInsightsSkeleton from './home/components/HomeInsightsSkeleton'
+import FeaturedPostsStrip from './home/components/FeaturedPostsStrip'
+import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import CreatePostCardLazyClient from './home/components/CreatePostCardLazyClient'
 import homeDiscoveryStyles from './homeDiscovery.module.css'
 import { getServerSession } from 'next-auth'
@@ -72,9 +74,10 @@ const Home = async ({
   const canonicalPath = `/${uiLocale}`
   const jsonLd = buildHomeWebSiteJsonLd({ origin, uiLocale, countryLabel, path: canonicalPath })
 
-  const [session, sections] = await Promise.all([
+  const [session, sections, countryId] = await Promise.all([
     getServerSession(authOptions),
     fetchSections(locale, { revalidateSeconds: 300 }),
+    resolveCountryIdFromHeaders(),
   ])
   const showMobileAiDashboard =   session?.user?.id === MOBILE_AI_PREVIEW_USER_ID
   const sp = (await searchParams) ?? {}
@@ -109,6 +112,8 @@ const Home = async ({
           </Row>
 
           <MobileLatestAdsSection locale={uiLocale} />
+
+          <FeaturedPostsStrip locale={uiLocale} countryId={countryId} />
 
           <div className="vstack mt-3 gap-4">
             <Feeds
@@ -214,7 +219,7 @@ const Home = async ({
           </div>
         </aside>
       </Col>
-    </FeedLayoutClient>
+      </FeedLayoutClient>
     </>
   )
 }

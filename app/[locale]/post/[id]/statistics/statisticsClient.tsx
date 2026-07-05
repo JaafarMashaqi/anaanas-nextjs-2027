@@ -14,6 +14,7 @@ import {
   LineChart,
   Pie,
   PieChart,
+  ReferenceArea,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -57,6 +58,17 @@ type StatsData = {
       angry: number
     }>
   }
+  promotion_periods?: Array<{
+    id: number
+    status: string
+    is_active: boolean
+    starts_at?: string
+    ends_at?: string
+    appearance_weight?: number
+    package?: { id: number; slug: string; name: string } | null
+  }>
+  promotion_totals?: Record<string, number>
+  promotion_daily?: Array<Record<string, string | number>>
 }
 
 function todayISO() {
@@ -209,6 +221,71 @@ export default function PostStatisticsClient({
   const reactionByTypeForChart = useMemo(() => {
     return reactionByType.filter((x) => x.count > 0).map((x) => ({ name: `${x.emoji} ${x.name}`, value: x.count, color: x.color }))
   }, [reactionByType])
+
+  const promotionPeriods = useMemo(() => {
+    return Array.isArray(data?.promotion_periods) ? data!.promotion_periods! : []
+  }, [data])
+
+  const promotionKpis = useMemo(() => {
+    const totals = data?.promotion_totals ?? {}
+    const labels: Record<string, { ar: string; en: string; color: string }> = {
+      featured_impressions: { ar: 'ظهور مميز', en: 'Featured impressions', color: '#f59e0b' },
+      homepage_pin_views: { ar: 'مشاهدات الرئيسية', en: 'Homepage pin views', color: '#d97706' },
+      popup_shown: { ar: 'عرض منبثق', en: 'Popup views', color: '#b45309' },
+      popup_click: { ar: 'نقرات منبثق', en: 'Popup clicks', color: '#92400e' },
+      listing_boost_impressions: { ar: 'تعزيز القوائم', en: 'Listing boost', color: '#ca8a04' },
+    }
+    return Object.entries(labels).map(([key, meta]) => ({
+      key,
+      label: locale === 'ar' ? meta.ar : meta.en,
+      value: Number(totals[key] ?? 0),
+      color: meta.color,
+    }))
+  }, [data, locale])
+
+  const promotionRanges = useMemo(() => {
+    const fromDay = from
+    const toDay = to
+    return promotionPeriods
+      .map((p) => {
+        const start = p.starts_at ? p.starts_at.slice(0, 10) : ''
+        const end = p.ends_at ? p.ends_at.slice(0, 10) : ''
+        if (!start || !end) return null
+        if (end < fromDay || start > toDay) return null
+        return {
+          id: p.id,
+          x1: start < fromDay ? fromDay : start,
+          x2: end > toDay ? toDay : end,
+          label: p.package?.name ?? (locale === 'ar' ? 'تمييز' : 'Featured'),
+          active: p.is_active,
+        }
+      })
+      .filter(Boolean) as Array<{ id: number; x1: string; x2: string; label: string; active: boolean }>
+  }, [promotionPeriods, from, to, locale])
+
+  const boostLift = useMemo(() => {
+    const dailyRows = Array.isArray(data?.daily) ? data!.daily : []
+    if (!dailyRows.length || !promotionRanges.length) return null
+    const promoDays = new Set<string>()
+    promotionRanges.forEach((r) => {
+      dailyRows.forEach((row) => {
+        const d = String(row.date)
+        if (d >= r.x1 && d <= r.x2) promoDays.add(d)
+      })
+    })
+    if (!promoDays.size) return null
+    const promoViews = dailyRows
+      .filter((row) => promoDays.has(String(row.date)))
+      .reduce((sum, row) => sum + Number(row.views ?? 0), 0)
+    const otherViews = dailyRows
+      .filter((row) => !promoDays.has(String(row.date)))
+      .reduce((sum, row) => sum + Number(row.views ?? 0), 0)
+    const promoAvg = promoViews / promoDays.size
+    const otherDays = dailyRows.length - promoDays.size
+    const otherAvg = otherDays > 0 ? otherViews / otherDays : 0
+    if (otherAvg <= 0) return null
+    return Math.round(((promoAvg - otherAvg) / otherAvg) * 100)
+  }, [data, promotionRanges])
 
   const reactionDaily = useMemo(() => {
     const src = Array.isArray(data?.reactions?.daily_by_type) ? data!.reactions!.daily_by_type! : []
@@ -364,6 +441,52 @@ export default function PostStatisticsClient({
           </Card>
         </motion.div>
 
+        {promotionPeriods.length > 0 && (
+          <Card className={`border-0 shadow-none mb-3 ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.promoStrip}`}>
+            <Card.Body>
+              <div className="fw-bold mb-2" style={{ color: '#151515' }}>
+                {locale === 'ar' ? 'فترات التمييز' : 'Promotion periods'}
+              </div>
+              <div className={styles.promoPeriodList}>
+                {promotionPeriods.map((p) => {
+                  const start = p.starts_at ? p.starts_at.slice(0, 10) : '—'
+                  const end = p.ends_at ? p.ends_at.slice(0, 10) : '—'
+                  const pkg = p.package?.name ?? (locale === 'ar' ? 'باقة' : 'Package')
+                  return (
+                    <div
+                      key={p.id}
+                      className={`${styles.promoPeriodChip} ${p.is_active ? styles.promoPeriodActive : ''}`}
+                    >
+                      <span className={styles.promoPeriodName}>{pkg}</span>
+                      <span className={styles.promoPeriodDates}>
+                        {start} → {end}
+                      </span>
+                      <span className={styles.promoPeriodStatus}>
+                        {p.is_active
+                          ? locale === 'ar'
+                            ? 'نشط'
+                            : 'Active'
+                          : p.status === 'expired'
+                            ? locale === 'ar'
+                              ? 'منتهي'
+                              : 'Expired'
+                            : String(p.status)}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+              {boostLift != null && (
+                <div className="small text-muted mt-2">
+                  {locale === 'ar'
+                    ? `متوسط المشاهدات أثناء التمييز أعلى بنسبة ${boostLift}% مقارنة بالفترة العادية.`
+                    : `Average views during promotion are ${boostLift}% higher than the baseline period.`}
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        )}
+
         <Row className="g-3 mb-3">
           {(loading && !data ? Array.from({ length: 6 }).map((_, idx) => ({ key: `skeleton-${idx}` })) : kpis).map((k: any, idx) => (
             <Col key={k.key} xs={12} sm={6} lg={4} xl={2} className={styles.kpiCol}>
@@ -391,6 +514,31 @@ export default function PostStatisticsClient({
           ))}
         </Row>
 
+        {promotionKpis.some((k) => k.value > 0) && (
+          <Row className="g-3 mb-3">
+            {promotionKpis.map((k, idx) => (
+              <Col key={k.key} xs={12} sm={6} lg={4} xl={2} className={styles.kpiCol}>
+                <motion.div
+                  custom={idx}
+                  variants={listItem}
+                  initial="hidden"
+                  animate="show"
+                  style={{ height: '100%' }}
+                >
+                  <Card className={`border-0 shadow-none h-100 ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.kpiCard} ${styles.promoKpiCard}`}>
+                    <Card.Body>
+                      <div className="small text-muted">{k.label}</div>
+                      <div className={`fs-4 fw-bold ${styles.kpiValue}`} style={{ color: k.color }}>
+                        {formatNum(k.value)}
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </motion.div>
+              </Col>
+            ))}
+          </Row>
+        )}
+
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.5 }}>
           <Card className={`border-0 shadow-none ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.chartsShell}`}>
             <Card.Body>
@@ -416,6 +564,21 @@ export default function PostStatisticsClient({
                                 <YAxis tick={{ fontSize: 12 }} stroke="#64748b" />
                                 <Tooltip />
                                 <Legend />
+                                {promotionRanges.map((range) => (
+                                  <ReferenceArea
+                                    key={range.id}
+                                    x1={range.x1}
+                                    x2={range.x2}
+                                    strokeOpacity={0}
+                                    fill={range.active ? 'rgba(251, 191, 36, 0.22)' : 'rgba(251, 191, 36, 0.12)'}
+                                    label={{
+                                      value: range.label,
+                                      position: 'insideTop',
+                                      fill: '#92400e',
+                                      fontSize: 11,
+                                    }}
+                                  />
+                                ))}
                                 <Line type="monotone" dataKey="impressions" name={t('stats.kpi.impressions', locale)} stroke="#0d6efd" strokeWidth={2} dot={false} />
                                 <Line type="monotone" dataKey="unique_impressions" name={t('stats.kpi.uniqueImpressions', locale)} stroke="#6610f2" strokeWidth={2} dot={false} />
                                 <Line type="monotone" dataKey="views" name={t('stats.kpi.views', locale)} stroke="#151515" strokeWidth={2} dot={false} />

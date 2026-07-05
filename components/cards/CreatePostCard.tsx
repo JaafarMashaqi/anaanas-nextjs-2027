@@ -167,14 +167,7 @@ function CreatePostHeroShell({
 
   return (
     <div className={styles.composerHeroShell} dir={shellDir}>
-      <div className={styles.composerHeroDots} aria-hidden>
-        {[0, 1, 2, 3, 4].map((i) => (
-          <span
-            key={i}
-            className={clsx(styles.composerHeroDot, i === 1 && styles.composerHeroDotActive)}
-          />
-        ))}
-      </div>
+    
 
       <div className={styles.composerHeroTop} dir={rowDir}>
         <div className={styles.composerHeroCopy}>

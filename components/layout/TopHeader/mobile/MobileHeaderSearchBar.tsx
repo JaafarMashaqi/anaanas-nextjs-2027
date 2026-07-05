@@ -6,7 +6,7 @@ import { useState, type FormEvent } from 'react'
 import { IoMicOutline, IoScanOutline } from 'react-icons/io5'
 import { BsSearch } from 'react-icons/bs'
 
-import searchAvatar from '@/assets/images/icon/image.png'
+import searchAvatar from '@/assets/images/icon/s200.png'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './MobileHeaderSearchBar.module.css'
@@ -30,8 +30,8 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
   const isArabic = locale === 'ar'
 
   const placeholder = isArabic
-    ? 'ماذا تريد أن تبيع أو تشتري اليوم؟'
-    : "What would you like to buy or sell today?"
+    ? 'ما الذي تبحث عنه؟'
+    : 'What are you looking for?'
 
   const submitLabel = isArabic ? 'بحث' : 'Search'
   const micLabel = isArabic ? 'بحث صوتي' : 'Voice search'
@@ -61,7 +61,7 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
         autoComplete="off"
       />
 
-      <button
+      {/* <button
         type="button"
         className={styles.iconBtn}
         aria-label={scanLabel}
@@ -69,9 +69,9 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
         onClick={() => router.push(`/${locale}/search`)}
       >
         <IoScanOutline aria-hidden />
-      </button>
+      </button> */}
 
-      <button
+      {/* <button
         type="button"
         className={styles.iconBtn}
         aria-label={micLabel}
@@ -79,7 +79,7 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
         onClick={() => router.push(`/${locale}/search`)}
       >
         <IoMicOutline aria-hidden />
-      </button>
+      </button> */}
 
       <span className={styles.avatar} aria-hidden>
         <Image

@@ -32,6 +32,7 @@ import {
   BsSendFill,
   BsShare,
   BsSlashCircle,
+  BsStars,
   BsTelephoneFill,
   BsThreeDots,
   BsXCircle,
@@ -40,6 +41,7 @@ import GlightBox from '../GlightBox'
 import LoadContentButton from '../LoadContentButton'
 import CommentItem from './components/CommentItem'
 import PostActions from './components/PostActions'
+import FeaturePostModal from '@/components/promotion/FeaturePostModal'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import LoginRequiredDialog from '@/components/dialogs/LoginRequiredDialog'
@@ -272,6 +274,8 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
     status === 'authenticated' &&
     Number((session as any)?.user?.id) > 0 &&
     Number((session as any)?.user?.id) === Number((post as any)?.user_id)
+  const isFeaturedActive = Boolean((post as any)?.is_featured_active || (post as any)?.promotion?.is_active)
+  const [showFeatureModal, setShowFeatureModal] = useState(false)
   const initialPostLikesCount = post?.likes_count ?? post?.likesCount ?? 0
   const initialPostLikedByMe = Boolean((post as any)?.liked_by_me)
   const initialReactionTypeByMe =
@@ -992,7 +996,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   }
 
   return (
-    <Card ref={cardRef as any}  className={styles.fbCard} style={{ cursor: isDetailsPage ? 'default' : 'pointer' }}>
+    <Card ref={cardRef as any} className={clsx(styles.fbCard, isFeaturedActive && styles.fbCardFeatured)} style={{ cursor: isDetailsPage ? 'default' : 'pointer' }}>
       {!isDetailsPage && (
         <CardHeader className={styles.fbHeader}>
           <div className="d-flex align-items-center justify-content-between">
@@ -1022,6 +1026,12 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                 </h6>
                 <div className={styles.metaRow}>
                   {createdAtDate && <span>{timeSince(createdAtDate)}</span>}
+                  {isFeaturedActive && (
+                    <span className={styles.featuredBadge}>
+                      <BsStars size={12} aria-hidden />
+                      {locale === 'ar' ? 'مميز' : 'Featured'}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1266,7 +1276,20 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
           userMobile={user?.mobile}
           locale={locale}
           isOwner={isOwner}
+          showFeature={isOwner && !isFeaturedActive}
+          onFeature={() => setShowFeatureModal(true)}
         />
+
+        {isOwner && (
+          <FeaturePostModal
+            show={showFeatureModal}
+            onHide={() => setShowFeatureModal(false)}
+            postId={Number(post?.id)}
+            locale={locale}
+            accessToken={(session as any)?.accessToken ?? ''}
+            origin={typeof window !== 'undefined' ? window.location.origin : ''}
+          />
+        )}
 
 
         <SharePostModal

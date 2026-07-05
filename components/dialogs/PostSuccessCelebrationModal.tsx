@@ -50,7 +50,7 @@ export default function PostSuccessCelebrationModal({
   const locSegment = locale || 'ar'
   const postHref =
     postId != null && postId !== '' ? `/${locSegment}/post/${postId}` : null
-  const myAdsHref = `/${locSegment}/profile/my-posts`
+  const myAdsHref = `/${locSegment}/my-posts`
 
   if (typeof document === 'undefined') return null
 

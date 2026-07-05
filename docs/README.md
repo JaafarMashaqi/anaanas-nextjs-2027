@@ -17,7 +17,8 @@
 | [`08-create-post-mobile-order.md`](./08-create-post-mobile-order.md) | نقل `CreatePostCardLazyClient` على الموبايل |
 | [`09-api-posts-500-fix.md`](./09-api-posts-500-fix.md) | إصلاح خطأ `/api/posts` 500 (`post_type` / `publish_date`) |
 | [`10-changelog.md`](./10-changelog.md) | سجل تغييرات الجلسة كاملاً |
-| [`11-qa-checklist.md`](./11-qa-checklist.md) | قائمة فحص يدوي قبل الإطلاق |
+| [`13-seo-sitemap-schema.md`](./13-seo-sitemap-schema.md) | Sitemaps + JSON-LD + robots |
+| [`14-featured-posts-promotion.md`](./14-featured-posts-promotion.md) | **تمييز الإعلانات المدفوع (PayPal)** — توثيق شامل Backend + Frontend |
 
 ## كيفية القراءة
 

@@ -112,8 +112,59 @@
   overflow: hidden;
 }
 
+.messageTrack {
+  display: inline-flex;
+  align-items: center;
+}
+
+.messageScroll {
+  text-align: start;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 10px,
+    #000 calc(100% - 10px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 10px,
+    #000 calc(100% - 10px),
+    transparent 100%
+  );
+}
+
+[dir='rtl'] .messageScroll {
+  -webkit-mask-image: linear-gradient(
+    to left,
+    transparent 0,
+    #000 10px,
+    #000 calc(100% - 10px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to left,
+    transparent 0,
+    #000 10px,
+    #000 calc(100% - 10px),
+    transparent 100%
+  );
+}
+
+.messageScroll .messageTrack {
+  --ticker-duration: 16s;
+  animation: messageTickerLtr var(--ticker-duration, 16s) linear infinite;
+  will-change: transform;
+}
+
+[dir='rtl'] .messageScroll .messageTrack {
+  animation-name: messageTickerRtl;
+}
+
 .messageInner {
   display: inline-block;
+  flex: 0 0 auto;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -134,6 +185,13 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: textShimmer 4.6s linear infinite;
+}
+
+.messageScroll .messageInner {
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+  padding-inline-end: 2.75rem;
 }
 
 /* ===== "New" pill ===== */
@@ -468,6 +526,24 @@
   }
 }
 
+@keyframes messageTickerLtr {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes messageTickerRtl {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 @keyframes sparkFloat {
   0% {
     opacity: 0;
@@ -624,6 +700,7 @@
   .badge,
   .badgeDot,
   .messageInner,
+  .messageScroll .messageTrack,
   .spark,
   .orbit {
     animation: none !important;
@@ -632,9 +709,17 @@
   .actionIconTarget {
     animation: none !important;
   }
+  .messageScroll .messageTrack {
+    transform: none;
+  }
   .messageInner {
     background: none;
     -webkit-text-fill-color: inherit;
     color: var(--m-ink);
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    max-width: none;
+    padding-inline-end: 0;
   }
 }

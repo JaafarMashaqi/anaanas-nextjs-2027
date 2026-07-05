@@ -10,6 +10,25 @@
   overflow: hidden;
 }
 
+.fbCardFeatured {
+  border-color: rgba(224, 144, 61, 0.45);
+  box-shadow:
+    0 16px 40px rgba(224, 144, 61, 0.12),
+    0 0 0 1px rgba(224, 144, 61, 0.18) inset;
+}
+
+.featuredBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fecb01 0%, #e0903d 100%);
+  color: #151515;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
 .fbHeader {
   padding: 0.62rem 0.85rem 0.48rem;
   border: 0;

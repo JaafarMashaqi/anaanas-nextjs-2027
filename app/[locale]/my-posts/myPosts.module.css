@@ -1,0 +1,35 @@
+.wrap {
+  padding-bottom: 2rem;
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.subtitle {
+  margin: 0;
+  color: #6c757d;
+}
+
+.filters {
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.rowCard {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-inline: 0.25rem 0.25rem;
+}

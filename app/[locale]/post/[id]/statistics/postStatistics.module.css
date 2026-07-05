@@ -49,6 +49,53 @@
   opacity: 0.72;
 }
 
+.promoStrip :global(.card-body) {
+  padding-top: 1.2rem;
+}
+
+.promoPeriodList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.promoPeriodChip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(255, 251, 235, 0.65);
+  min-width: 10rem;
+}
+
+.promoPeriodActive {
+  border-color: rgba(217, 119, 6, 0.55);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.2);
+}
+
+.promoPeriodName {
+  font-weight: 800;
+  color: #92400e;
+  font-size: 0.88rem;
+}
+
+.promoPeriodDates {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.promoPeriodStatus {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #b45309;
+}
+
+.promoKpiCard {
+  border: 1px solid rgba(251, 191, 36, 0.25) !important;
+}
+
 .chartsShell :global(.card-body) {
   padding-top: 1.35rem;
 }

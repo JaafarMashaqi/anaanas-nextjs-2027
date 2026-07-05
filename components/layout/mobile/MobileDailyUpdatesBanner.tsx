@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { BsBag, BsHeart, BsMegaphone } from 'react-icons/bs'
@@ -116,6 +117,40 @@ const MobileDailyUpdatesBanner = ({ locale: localeOverride, className = '' }: Pr
     return fromParams && isSupportedLocale(fromParams) ? fromParams : DEFAULT_LOCALE
   })()
   const t = COPY[locale]
+  const messageRef = useRef<HTMLSpanElement>(null)
+  const trackRef = useRef<HTMLSpanElement>(null)
+  const [shouldScrollMessage, setShouldScrollMessage] = useState(false)
+
+  useEffect(() => {
+    const messageEl = messageRef.current
+    const trackEl = trackRef.current
+    if (!messageEl || !trackEl) return
+
+    const syncTicker = () => {
+      const primary = trackEl.querySelector('[data-ticker-copy="primary"]') as HTMLElement | null
+      if (!primary) return
+
+      const overflow = primary.scrollWidth > messageEl.clientWidth + 1
+      setShouldScrollMessage(overflow)
+
+      if (overflow) {
+        const seconds = Math.max(10, Math.min(28, primary.scrollWidth / 28))
+        trackEl.style.setProperty('--ticker-duration', `${seconds}s`)
+      } else {
+        trackEl.style.removeProperty('--ticker-duration')
+      }
+    }
+
+    syncTicker()
+
+    const resizeObserver = new ResizeObserver(syncTicker)
+    resizeObserver.observe(messageEl)
+
+    const fontsReady = typeof document !== 'undefined' ? document.fonts?.ready : undefined
+    fontsReady?.then(syncTicker).catch(() => undefined)
+
+    return () => resizeObserver.disconnect()
+  }, [t.message])
 
   // Preview gate: actions row appears only for the internal preview user, same
   // as the mobile AI dashboard on the home page. Everyone else sees the banner
@@ -163,8 +198,20 @@ const MobileDailyUpdatesBanner = ({ locale: localeOverride, className = '' }: Pr
             <span className={styles.iconHalo} aria-hidden />
           </span>
 
-          <span className={styles.message}>
-            <span className={styles.messageInner}>{t.message}</span>
+          <span
+            ref={messageRef}
+            className={`${styles.message} ${shouldScrollMessage ? styles.messageScroll : ''}`.trim()}
+          >
+            <span ref={trackRef} className={styles.messageTrack}>
+              <span className={styles.messageInner} data-ticker-copy="primary">
+                {t.message}
+              </span>
+              {shouldScrollMessage ? (
+                <span className={styles.messageInner} aria-hidden data-ticker-copy="duplicate">
+                  {t.message}
+                </span>
+              ) : null}
+            </span>
           </span>
 
           <span className={styles.badge} aria-hidden>
