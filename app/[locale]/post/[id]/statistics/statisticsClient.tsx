@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ComponentType, type CSSProperties } from 'react'
 import Link from 'next/link'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { Button, Card, Col, Container, Form, Placeholder, Row, Tab, Tabs } from 'react-bootstrap'
 import {
   Bar,
@@ -20,12 +20,31 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { BsArrowLeft, BsBarChartLineFill } from 'react-icons/bs'
+import {
+  BsArrowLeft,
+  BsBarChartLineFill,
+  BsBinoculars,
+  BsChatDots,
+  BsChatLeftText,
+  BsCursor,
+  BsEye,
+  BsHandThumbsDown,
+  BsHeart,
+  BsHouseDoor,
+  BsLightningCharge,
+  BsPersonCheck,
+  BsShare,
+  BsStar,
+  BsTelephone,
+  BsWindow,
+} from 'react-icons/bs'
 import { t } from '@/lib/translations'
 import type { SupportedLocale } from '@/lib/localization'
 import wizardStyles from '@/components/cards/CreatePostCard.module.css'
+import AnanasStatsMascot from '@/components/statistics/AnanasStatsMascot'
+import { PROMOTION_KPI_META, formatStatNum, listItemVariants } from '@/components/statistics/statsUtils'
+import theme from '@/components/statistics/statsTheme.module.css'
 import styles from './postStatistics.module.css'
-import AnanasStatsMascot from './AnanasStatsMascot'
 
 type StatsData = {
   post_id: number
@@ -112,13 +131,37 @@ function eventLabel(ev: string, locale: SupportedLocale) {
   }
 }
 
-const listItem = {
-  hidden: { opacity: 0, y: 14 },
-  show: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: 0.04 * i, type: 'spring' as const, stiffness: 380, damping: 28 },
-  }),
+const listItem = listItemVariants
+
+type KpiIcon = ComponentType<{ className?: string; style?: CSSProperties }>
+
+type PostKpi = {
+  key: string
+  label: string
+  value: number
+  color: string
+  icon: KpiIcon
+}
+
+const POST_KPI_ICONS: Record<string, KpiIcon> = {
+  impressions: BsEye,
+  unique_impressions: BsPersonCheck,
+  views: BsBinoculars,
+  interactions: BsLightningCharge,
+  calls: BsTelephone,
+  shares: BsShare,
+  chats: BsChatDots,
+  likes: BsHeart,
+  comments: BsChatLeftText,
+  unlikes: BsHandThumbsDown,
+}
+
+const PROMO_KPI_ICONS: Record<string, KpiIcon> = {
+  featured_impressions: BsStar,
+  homepage_pin_views: BsHouseDoor,
+  popup_shown: BsWindow,
+  popup_click: BsCursor,
+  listing_boost_impressions: BsLightningCharge,
 }
 
 type ReactionTypeKey = 'like' | 'love' | 'care' | 'haha' | 'wow' | 'sad' | 'angry'
@@ -190,17 +233,35 @@ export default function PostStatisticsClient({
       .map((x) => ({ name: eventLabel(x.event, locale), value: Number(x.count ?? 0) }))
   }, [data, locale])
 
-  const kpis = useMemo(() => {
+  const reducedMotion = useReducedMotion()
+  const rangeHint = `${from} → ${to}`
+
+  const kpis = useMemo((): PostKpi[] => {
     const totals = data?.totals ?? {}
-    return [
-      { key: 'impressions', label: t('stats.kpi.impressions', locale), value: Number(totals.impressions ?? 0), color: '#0d6efd' },
-      { key: 'unique_impressions', label: t('stats.kpi.uniqueImpressions', locale), value: Number(totals.unique_impressions ?? 0), color: '#6610f2' },
-      { key: 'views', label: t('stats.kpi.views', locale), value: Number(totals.views ?? 0), color: '#0b1f3a' },
-      { key: 'interactions', label: t('stats.kpi.interactions', locale), value: Number((totals.calls ?? 0) + (totals.shares ?? 0) + (totals.chats ?? 0) + (totals.likes ?? 0) + (totals.comments ?? 0)), color: '#c9a227' },
-      { key: 'calls', label: t('stats.kpi.calls', locale), value: Number(totals.calls ?? 0), color: '#dc3545' },
-      { key: 'shares', label: t('stats.kpi.shares', locale), value: Number(totals.shares ?? 0), color: '#0dcaf0' },
-      { key: 'chats', label: t('stats.kpi.chats', locale), value: Number(totals.chats ?? 0), color: '#ffc107' },
+    const defs: Array<Omit<PostKpi, 'value'>> = [
+      { key: 'impressions', label: t('stats.kpi.impressions', locale), color: '#177dc1', icon: POST_KPI_ICONS.impressions },
+      { key: 'unique_impressions', label: t('stats.kpi.uniqueImpressions', locale), color: '#ba7bff', icon: POST_KPI_ICONS.unique_impressions },
+      { key: 'views', label: t('stats.kpi.views', locale), color: '#151515', icon: POST_KPI_ICONS.views },
+      {
+        key: 'interactions',
+        label: t('stats.kpi.interactions', locale),
+        color: '#fecb01',
+        icon: POST_KPI_ICONS.interactions,
+      },
+      { key: 'calls', label: t('stats.kpi.calls', locale), color: '#e76f51', icon: POST_KPI_ICONS.calls },
+      { key: 'shares', label: t('stats.kpi.shares', locale), color: '#4f9ef8', icon: POST_KPI_ICONS.shares },
+      { key: 'chats', label: t('stats.kpi.chats', locale), color: '#f59e0b', icon: POST_KPI_ICONS.chats },
+      { key: 'likes', label: t('stats.event.likes', locale), color: '#1877f2', icon: POST_KPI_ICONS.likes },
+      { key: 'comments', label: t('stats.event.comments', locale), color: '#6610f2', icon: POST_KPI_ICONS.comments },
+      { key: 'unlikes', label: t('stats.event.unlikes', locale), color: '#64748b', icon: POST_KPI_ICONS.unlikes },
     ]
+    return defs.map((d) => ({
+      ...d,
+      value:
+        d.key === 'interactions'
+          ? Number((totals.calls ?? 0) + (totals.shares ?? 0) + (totals.chats ?? 0) + (totals.likes ?? 0) + (totals.comments ?? 0))
+          : Number(totals[d.key] ?? 0),
+    }))
   }, [data, locale])
 
   const reactionByType = useMemo(() => {
@@ -226,22 +287,30 @@ export default function PostStatisticsClient({
     return Array.isArray(data?.promotion_periods) ? data!.promotion_periods! : []
   }, [data])
 
-  const promotionKpis = useMemo(() => {
+  const promotionKpis = useMemo((): PostKpi[] => {
     const totals = data?.promotion_totals ?? {}
-    const labels: Record<string, { ar: string; en: string; color: string }> = {
-      featured_impressions: { ar: 'ظهور مميز', en: 'Featured impressions', color: '#f59e0b' },
-      homepage_pin_views: { ar: 'مشاهدات الرئيسية', en: 'Homepage pin views', color: '#d97706' },
-      popup_shown: { ar: 'عرض منبثق', en: 'Popup views', color: '#b45309' },
-      popup_click: { ar: 'نقرات منبثق', en: 'Popup clicks', color: '#92400e' },
-      listing_boost_impressions: { ar: 'تعزيز القوائم', en: 'Listing boost', color: '#ca8a04' },
-    }
-    return Object.entries(labels).map(([key, meta]) => ({
+    return Object.entries(PROMOTION_KPI_META).map(([key, meta]) => ({
       key,
       label: locale === 'ar' ? meta.ar : meta.en,
       value: Number(totals[key] ?? 0),
       color: meta.color,
+      icon: PROMO_KPI_ICONS[key] ?? BsStar,
     }))
   }, [data, locale])
+
+  const promotionDaily = useMemo(() => {
+    const src = Array.isArray(data?.promotion_daily) ? data!.promotion_daily! : []
+    return src.map((row) => ({
+      date: String(row.date ?? ''),
+      featured_impression: Number(row.featured_impression ?? 0),
+      homepage_pin_view: Number(row.homepage_pin_view ?? 0),
+      popup_shown: Number(row.popup_shown ?? 0),
+      popup_click: Number(row.popup_click ?? 0),
+      listing_boost_impression: Number(row.listing_boost_impression ?? 0),
+    }))
+  }, [data])
+
+  const hasPromotionData = promotionKpis.some((k) => k.value > 0) || promotionPeriods.length > 0
 
   const promotionRanges = useMemo(() => {
     const fromDay = from
@@ -359,15 +428,66 @@ export default function PostStatisticsClient({
 
   const pieColors = ['#0d6efd', '#6610f2', '#fecb01', '#0dcaf0', '#dc3545', '#198754', '#0b1f3a', '#6c757d']
 
+  const renderKpiGrid = (items: PostKpi[], opts?: { promo?: boolean; showRange?: boolean; skeletonCount?: number }) => {
+    const promo = opts?.promo ?? false
+    const showRange = opts?.showRange ?? false
+    const skeletonCount = opts?.skeletonCount ?? 6
+    const list = loading && !data ? Array.from({ length: skeletonCount }).map((_, i) => ({ key: `sk-${i}` })) : items
+
+    return (
+      <div className={styles.kpiGrid}>
+        {list.map((k: PostKpi | { key: string }, idx) => {
+          const isSkeleton = !('label' in k)
+          const Icon = !isSkeleton ? k.icon : null
+          return (
+            <motion.div
+              key={k.key}
+              className={`${styles.kpiCard} ${promo ? styles.kpiCardPromo : ''}`}
+              style={!isSkeleton ? ({ ['--kpi-accent' as string]: k.color } as CSSProperties) : undefined}
+              custom={idx}
+              variants={listItem}
+              initial={reducedMotion ? false : 'hidden'}
+              animate="show"
+              whileHover={reducedMotion ? undefined : { y: -3, transition: { type: 'spring', stiffness: 420, damping: 22 } }}
+            >
+              <div className={styles.kpiCardTop}>
+                <div className={styles.kpiIconWrap} aria-hidden={isSkeleton}>
+                  {isSkeleton ? <span className={styles.kpiIconSkeleton} /> : Icon ? <Icon /> : null}
+                </div>
+                {!isSkeleton && k.value > 0 && <span className={styles.kpiSpark} aria-hidden />}
+              </div>
+              <div className={styles.kpiLabel}>
+                {isSkeleton ? <Placeholder xs={6} /> : k.label}
+              </div>
+              <div className={styles.kpiValue}>
+                {isSkeleton ? <Placeholder xs={4} /> : formatStatNum(k.value, locale)}
+              </div>
+              {showRange && !isSkeleton && <div className={styles.kpiRange}>{rangeHint}</div>}
+            </motion.div>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
-    <div className={styles.pageRoot}>
-      <Container className="py-4">
+    <div className={`${styles.pageRoot} ${theme.pageRoot}`}>
+      <div className={theme.container}>
+      <Container className="py-2 px-0" fluid>
         <motion.div
-          className={styles.hero}
+          className={`${theme.shell} px-0`}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.38 }}
+        >
+        <motion.div
+          className={theme.hero}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
+          <div className={theme.heroMesh} aria-hidden />
+          <div className={theme.heroInner}>
           <div className={styles.heroCopy}>
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
               <div className="d-flex align-items-center gap-2">
@@ -376,12 +496,12 @@ export default function PostStatisticsClient({
                   {t('stats.title', locale)}
                 </h4>
               </div>
-              <Link className={`btn btn-outline-secondary btn-sm ${styles.backBtn}`} href={`/${locale}/post/${postId}`}>
+              <Link className={theme.backBtn} href={`/${locale}/post/${postId}`}>
                 <BsArrowLeft className="me-1" />
                 {t('stats.backToPost', locale)}
               </Link>
             </div>
-            <div className="text-muted small mt-2" style={{ maxWidth: '42rem' }}>
+            <div className={theme.heroSubtitle}>
               {t('stats.subtitle', locale)}:{' '}
               {postLoading ? (
                 <Placeholder as="span" animation="glow">
@@ -392,13 +512,11 @@ export default function PostStatisticsClient({
               )}
             </div>
           </div>
+          <AnanasStatsMascot />
+          </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.08, duration: 0.4 }}
-        >
+        <div className={theme.body}>
           <Card className={`border-0 shadow-none mb-3 ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.toolbarCard}`}>
             <Card.Body>
               <Row className="g-2 align-items-end">
@@ -436,10 +554,9 @@ export default function PostStatisticsClient({
                 </Col>
               </Row>
 
-              {error && <div className="alert alert-danger mt-3 mb-0">{error}</div>}
+              {error && <div className={`alert alert-danger mt-3 mb-0 ${theme.errorBanner}`}>{error}</div>}
             </Card.Body>
           </Card>
-        </motion.div>
 
         {promotionPeriods.length > 0 && (
           <Card className={`border-0 shadow-none mb-3 ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.promoStrip}`}>
@@ -487,60 +604,17 @@ export default function PostStatisticsClient({
           </Card>
         )}
 
-        <Row className="g-3 mb-3">
-          {(loading && !data ? Array.from({ length: 6 }).map((_, idx) => ({ key: `skeleton-${idx}` })) : kpis).map((k: any, idx) => (
-            <Col key={k.key} xs={12} sm={6} lg={4} xl={2} className={styles.kpiCol}>
-              <motion.div
-                custom={idx}
-                variants={listItem}
-                initial="hidden"
-                animate="show"
-                whileHover={{ y: -4, transition: { type: 'spring', stiffness: 400, damping: 18 } }}
-                style={{ height: '100%' }}
-              >
-                <Card className={`border-0 shadow-none h-100 ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.kpiCard}`}>
-                  <Card.Body>
-                    <div className="small text-muted">{loading && !data ? <Placeholder xs={5} /> : k.label}</div>
-                    <div className={`fs-4 fw-bold ${styles.kpiValue}`} style={{ color: k.color ?? '#64748b' }}>
-                      {loading && !data ? <Placeholder xs={4} /> : formatNum(k.value)}
-                    </div>
-                    <div className={`text-muted ${styles.kpiRange}`}>
-                      {from} → {to}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </motion.div>
-            </Col>
-          ))}
-        </Row>
+        {renderKpiGrid(kpis, { showRange: true, skeletonCount: 10 })}
 
         {promotionKpis.some((k) => k.value > 0) && (
-          <Row className="g-3 mb-3">
-            {promotionKpis.map((k, idx) => (
-              <Col key={k.key} xs={12} sm={6} lg={4} xl={2} className={styles.kpiCol}>
-                <motion.div
-                  custom={idx}
-                  variants={listItem}
-                  initial="hidden"
-                  animate="show"
-                  style={{ height: '100%' }}
-                >
-                  <Card className={`border-0 shadow-none h-100 ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.kpiCard} ${styles.promoKpiCard}`}>
-                    <Card.Body>
-                      <div className="small text-muted">{k.label}</div>
-                      <div className={`fs-4 fw-bold ${styles.kpiValue}`} style={{ color: k.color }}>
-                        {formatNum(k.value)}
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </motion.div>
-              </Col>
-            ))}
-          </Row>
+          <>
+            <h2 className={theme.sectionTitle}>{locale === 'ar' ? 'إحصائيات التمييز' : 'Promotion analytics'}</h2>
+            {renderKpiGrid(promotionKpis.filter((k) => k.value > 0), { promo: true })}
+          </>
         )}
 
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.5 }}>
-          <Card className={`border-0 shadow-none ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.chartsShell}`}>
+          <Card className={`border-0 shadow-none ${wizardStyles.wizardCard} ${wizardStyles.smartCard} ${styles.chartsShell} ${theme.tabsShell}`}>
             <Card.Body>
               <Tabs defaultActiveKey="overview" className="mb-3">
                 <Tab eventKey="overview" title={t('stats.tabs.overview', locale)}>
@@ -711,13 +785,47 @@ export default function PostStatisticsClient({
                   </Row>
                 </Tab>
 
+                {hasPromotionData && (
+                  <Tab eventKey="promotion" title={locale === 'ar' ? 'التمييز' : 'Promotion'}>
+                    <div className={`${styles.chartPanel} ${theme.chartPanel}`}>
+                      <div className="fw-bold mb-2" style={{ color: '#151515' }}>
+                        {locale === 'ar' ? 'أحداث التمييز اليومية' : 'Daily promotion events'}
+                      </div>
+                      <div style={{ width: '100%', height: 360 }}>
+                        {loading && !data ? (
+                          <div className={styles.panelSkeleton} />
+                        ) : promotionDaily.every((d) =>
+                          d.featured_impression + d.homepage_pin_view + d.popup_shown + d.popup_click + d.listing_boost_impression === 0,
+                        ) ? (
+                          <p className={theme.emptyText}>{t('stats.noData', locale)}</p>
+                        ) : (
+                          <ResponsiveContainer>
+                            <BarChart data={promotionDaily}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(21,21,21,0.08)" />
+                              <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#64748b" />
+                              <YAxis tick={{ fontSize: 12 }} stroke="#64748b" />
+                              <Tooltip />
+                              <Legend />
+                              <Bar dataKey="featured_impression" name={locale === 'ar' ? 'ظهور مميز' : 'Featured'} fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                              <Bar dataKey="homepage_pin_view" name={locale === 'ar' ? 'الرئيسية' : 'Homepage pin'} fill="#d97706" radius={[4, 4, 0, 0]} />
+                              <Bar dataKey="popup_shown" name={locale === 'ar' ? 'عرض منبثق' : 'Popup views'} fill="#b45309" radius={[4, 4, 0, 0]} />
+                              <Bar dataKey="popup_click" name={locale === 'ar' ? 'نقرات منبثق' : 'Popup clicks'} fill="#92400e" radius={[4, 4, 0, 0]} />
+                              <Bar dataKey="listing_boost_impression" name={locale === 'ar' ? 'تعزيز القوائم' : 'Listing boost'} fill="#ca8a04" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        )}
+                      </div>
+                    </div>
+                  </Tab>
+                )}
+
                 <Tab eventKey="audience" title={t('stats.tabs.audience', locale)}>
-                  <div className={styles.chartPanel}>
+                  <div className={`${styles.chartPanel} ${theme.chartPanel}`}>
                     <div className="fw-bold mb-2" style={{ color: '#151515' }}>
                       {t('stats.top.userAgents', locale)}
                     </div>
                     <div className="table-responsive">
-                      <table className="table table-sm mb-0">
+                      <table className={`table table-sm mb-0 ${theme.audienceTable}`}>
                         <thead>
                           <tr>
                             <th>{t('stats.ua', locale)}</th>
@@ -758,7 +866,10 @@ export default function PostStatisticsClient({
             </Card.Body>
           </Card>
         </motion.div>
+          </div>
+        </motion.div>
       </Container>
+      </div>
     </div>
   )
 }

@@ -26,8 +26,12 @@ import {
   BsBookmark,
   BsChatFill,
   BsChatDots,
+  BsEyeFill,
+  BsFire,
   BsFlag,
+  BsGeoAltFill,
   BsHandThumbsUpFill,
+  BsPatchCheckFill,
   BsPersonX,
   BsSendFill,
   BsShare,
@@ -37,6 +41,7 @@ import {
   BsThreeDots,
   BsXCircle,
 } from 'react-icons/bs'
+import { resolveCurrencyForCountry } from '@/lib/seo/countryCurrency'
 import GlightBox from '../GlightBox'
 import LoadContentButton from '../LoadContentButton'
 import CommentItem from './components/CommentItem'
@@ -68,6 +73,8 @@ type PostCardProps = {
   banner?: any
   attributesAndOptions?: any
   onDelete?: (postId: number | string) => void
+  /** On details page: full intro, or actions menu only when title/chips render in page shell */
+  detailsIntroMode?: 'full' | 'actionsOnly'
 }
 
 type ApiComment = {
@@ -159,6 +166,51 @@ const normalizeReactionCounts = (input?: Partial<Record<ReactionKey, number>> | 
     result[key] = Number.isFinite(value) && value > 0 ? Math.floor(value) : 0
   }
   return result
+}
+
+function formatCompactCount(value: number): string {
+  const n = Math.max(0, Math.floor(value))
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(/\.0$/, '')}K`
+  return String(n)
+}
+
+function formatListingPrice(
+  price: unknown,
+  currency: string | null,
+  locale: SupportedLocale,
+): string | null {
+  if (price == null || price === '') return null
+  const n = typeof price === 'number' ? price : Number(String(price).replace(/,/g, ''))
+  if (!Number.isFinite(n) || n <= 0) return null
+
+  const formatted = new Intl.NumberFormat(locale === 'ar' ? 'ar-JO' : 'en-US', {
+    maximumFractionDigits: 0,
+  }).format(n)
+
+  if (currency === 'JOD') return locale === 'ar' ? `${formatted} د.أ` : `${formatted} JOD`
+  if (currency) return `${formatted} ${currency}`
+  return formatted
+}
+
+function extractAttributeChips(post: Record<string, unknown>, max = 3): string[] {
+  const postData = post.post_data as Record<string, unknown> | undefined
+  const rows = postData?.attributes_and_options
+  if (!Array.isArray(rows)) return []
+
+  const chips: string[] = []
+  for (const row of rows) {
+    if (!row || typeof row !== 'object') continue
+    const record = row as Record<string, unknown>
+    const option = record.option as Record<string, unknown> | undefined
+    const options = record.options as Array<Record<string, unknown>> | undefined
+    const value = record.value ?? option?.name ?? options?.[0]?.name
+    if (value != null && String(value).trim() !== '') {
+      chips.push(String(value).trim())
+      if (chips.length >= max) break
+    }
+  }
+  return chips
 }
 
 const ActionMenu = ({
@@ -258,7 +310,7 @@ const ActionMenu = ({
   )
 }
 
-const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallback }: PostCardProps) => {
+const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallback, detailsIntroMode = 'full' }: PostCardProps) => {
   const { status, data: session } = useSession()
   const pathname = usePathname()
   const params = useParams<{ locale?: string }>()
@@ -292,6 +344,12 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   const cityName = (post as any)?.city?.name ?? ''
   const sectionSlug = (post as any)?.section?.slug ?? ''
   const categorySlug = (post as any)?.category?.slug ?? ''
+  const countryIso2 = String((post as any)?.country?.iso2 ?? (post as any)?.country?.iso_code ?? '').toLowerCase()
+  const currencyCode = resolveCurrencyForCountry(countryIso2)
+  const priceLabel = formatListingPrice((post as any)?.price, currencyCode, locale)
+  const attributeChips = extractAttributeChips(post as Record<string, unknown>)
+  const isUserVerified = Boolean((user as any)?.is_account_verified)
+  const viewsCount = Number((post as any)?.views_count ?? (post as any)?.views ?? 0) || 0
 
 
 
@@ -432,11 +490,9 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
     }
   }
 
-  const shouldTruncateCaption = !isDetailsPage
-  const MAX_CAPTION_CHARS = 160
   const normalizedCaption = String(caption ?? '')
-  const hasLongCaption = normalizedCaption.length > MAX_CAPTION_CHARS
-  const shortCaption = hasLongCaption ? `${normalizedCaption.slice(0, MAX_CAPTION_CHARS).trim()}…` : normalizedCaption
+  const hasCaption = normalizedCaption.trim().length > 0
+  const showListingHero = Boolean(image && !banner)
 
   const [showLoginAlert, setShowLoginAlert] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
@@ -995,398 +1051,672 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
     }
   }
 
+  const postActionsBlock = (
+    <PostActions
+      layout={isDetailsPage ? 'default' : 'marketplace'}
+      postLikedByMe={postLikedByMe}
+      reactionTypeByMe={postReactionTypeByMe}
+      postLikesCount={postLikesCount}
+      onToggleLikePost={onToggleLikePost}
+      commentsCount={commentsCount}
+      onShowComments={() => {
+        setShowComments(true)
+        window.requestAnimationFrame(() => {
+          setTimeout(() => {
+            const el = document.getElementById(`comments-${post?.id}`)
+            el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            commentInputRef.current?.focus({ preventScroll: true })
+          }, 50)
+        })
+      }}
+      onShowShare={() => setShowShareModal(true)}
+      onOpenChat={onOpenChat}
+      isAuthenticated={status === 'authenticated'}
+      postId={post?.id}
+      onContact={onContact}
+      contactHref={contactHref}
+      contactLabel={contactLabel}
+      userMobile={user?.mobile}
+      locale={locale}
+      isOwner={isOwner}
+      showFeature={isOwner && !isFeaturedActive}
+      onFeature={() => setShowFeatureModal(true)}
+    />
+  )
+
+  const modalsAndCommentsBlock = (
+    <>
+      {isOwner && (
+        <FeaturePostModal
+          show={showFeatureModal}
+          onHide={() => setShowFeatureModal(false)}
+          postId={Number(post?.id)}
+          locale={locale}
+          accessToken={(session as any)?.accessToken ?? ''}
+          origin={typeof window !== 'undefined' ? window.location.origin : ''}
+        />
+      )}
+
+      <SharePostModal
+        show={showShareModal}
+        onHide={() => setShowShareModal(false)}
+        postId={String(post?.id ?? '')}
+        postUrl={postDetailsHref}
+        title={title}
+        defaultMessage={`${t('post.watchOnAnanas', locale)}: ${title || (locale === 'ar' ? 'منشور' : 'Post')}`}
+      />
+
+      {showComments && isDetailsPage && (
+        <div className={styles.commentsSection}>
+          <div id={`comments-${post?.id}`} className={styles.commentsComposer}>
+            <div className={styles.commentsAvatarWrap}>
+              <span role="button">
+                <Image
+                  key={currentUserAvatar || 'default'}
+                  unoptimized
+                  className={styles.commentsAvatar}
+                  src={
+                    (currentUserAvatar ||
+                      resolveMediaUrl((session as any)?.user?.image || '') ||
+                      defaultUserAvatar.src) as any
+                  }
+                  alt={(session as any)?.user?.name || 'avatar'}
+                  width={30}
+                  height={30}
+                />
+              </span>
+            </div>
+
+            <form
+              className={styles.commentsFormWrap}
+              onSubmit={(e) => {
+                e.preventDefault()
+                void onSendComment()
+              }}
+            >
+              {status !== 'authenticated' && (
+                <div
+                  className="cursor-pointer"
+                  style={{ position: 'absolute', zIndex: 1, left: 0, right: 0, top: 0, bottom: 0 }}
+                  onClick={() => setShowLoginAlert(true)}
+                />
+              )}
+              <textarea
+                ref={commentInputRef}
+                data-autoresize
+                className={styles.commentsInput}
+                rows={1}
+                placeholder={status === 'authenticated' ? t('post.addComment', locale) : t('post.loginToComment', locale)}
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                disabled={status !== 'authenticated' || sending}
+              />
+              <button
+                className={styles.sendBtn}
+                type="submit"
+                disabled={status !== 'authenticated' || sending || !commentText.trim()}
+                aria-label={t('post.send', locale)}
+              >
+                <BsSendFill size={14} />
+              </button>
+            </form>
+          </div>
+
+          {uiComments.length > 0 && (
+            <ul className={styles.commentsList}>
+              {uiComments.map((comment) => (
+                <CommentItem
+                  {...(comment as any)}
+                  key={comment.id}
+                  onToggleLike={onToggleLikeComment}
+                  onReplyClick={onReplyClick}
+                  onViewRepliesClick={onViewRepliesClick}
+                  onLoadMoreReplies={onLoadMoreReplies}
+                  showReplyBox={openReplyForId === String(comment.id)}
+                  replyValue={replyValueById[String(comment.id)] ?? ''}
+                  onReplyValueChange={(id, value) => setReplyValueById((p) => ({ ...p, [id]: value }))}
+                  onSubmitReply={onSubmitReply}
+                  loadingReplies={loadingRepliesById[String(comment.id)] ?? false}
+                  hasMoreReplies={hasMoreRepliesById[String(comment.id)] ?? false}
+                  locale={locale}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      <LoginRequiredDialog
+        show={showLoginAlert}
+        onHide={() => setShowLoginAlert(false)}
+        locale={locale}
+      />
+    </>
+  )
+
+  const listingSubtitleParts = [categoryName, cityName].filter(Boolean)
+
   return (
-    <Card ref={cardRef as any} className={clsx(styles.fbCard, isFeaturedActive && styles.fbCardFeatured)} style={{ cursor: isDetailsPage ? 'default' : 'pointer' }}>
-      {!isDetailsPage && (
-        <CardHeader className={styles.fbHeader}>
-          <div className="d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center">
-              <div className="me-2">
+    <Card
+      ref={cardRef as any}
+      className={clsx(
+        styles.fbCard,
+        isFeaturedActive && styles.fbCardFeatured,
+        !isDetailsPage && styles.listingCard,
+        isDetailsPage && styles.detailsShell,
+      )}
+      style={{ cursor: isDetailsPage ? 'default' : 'pointer' }}
+    >
+      {!isDetailsPage ? (
+        <>
+          <CardHeader className={styles.listingHeader}>
+            <div className={styles.listingHeaderRow}>
+              <div className={styles.listingAuthor}>
                 {avatarSrc ? (
-                  <span role="button">
-                    <Image
-                      unoptimized
-                      width={42}
-                      height={42}
-                      className={styles.avatar}
-                      src={avatarSrc}
-                      alt={userName}
-                    />
-                  </span>
+                  <Image
+                    unoptimized
+                    width={44}
+                    height={44}
+                    className={styles.avatar}
+                    src={avatarSrc}
+                    alt={userName}
+                  />
                 ) : (
                   <div className={`${styles.avatar} bg-light d-flex align-items-center justify-content-center text-uppercase small`}>
                     {userName?.slice(0, 1) || '?'}
                   </div>
                 )}
+                <div className={styles.listingAuthorMeta}>
+                  <h6 className={styles.userName}>
+                    <span>{userName}</span>
+                    {isUserVerified && (
+                      <BsPatchCheckFill className={styles.verifiedIcon} size={14} aria-label={locale === 'ar' ? 'موثّق' : 'Verified'} />
+                    )}
+                  </h6>
+                  <div className={styles.metaRow}>
+                    {cityName && (
+                      <>
+                        <BsGeoAltFill size={11} aria-hidden />
+                        <span>{cityName}</span>
+                      </>
+                    )}
+                    {cityName && createdAtDate && <span className={styles.metaDot} aria-hidden>•</span>}
+                    {createdAtDate && <span>{timeSince(createdAtDate)}</span>}
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <h6 className={styles.userName}>
-                  <span role="button">{userName}</span>
-                </h6>
-                <div className={styles.metaRow}>
-                  {createdAtDate && <span>{timeSince(createdAtDate)}</span>}
+              <div className={styles.listingHeaderEnd}>
+                <div className={styles.listingHeaderBadges}>
                   {isFeaturedActive && (
-                    <span className={styles.featuredBadge}>
-                      <BsStars size={12} aria-hidden />
-                      {locale === 'ar' ? 'مميز' : 'Featured'}
+                    <span className={styles.listingFeaturedPill}>
+                      <BsFire size={12} aria-hidden />
+                      {locale === 'ar' ? 'عرض مميز' : 'Featured'}
                     </span>
                   )}
+                  {sectionName && (
+                    sectionSlug ? (
+                      <Link
+                        href={localeFromParams ? `/${localeFromParams}/sections/${sectionSlug}` : `/sections/${sectionSlug}`}
+                        className={styles.listingCategoryPill}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {sectionName}
+                      </Link>
+                    ) : (
+                      <span className={styles.listingCategoryPill}>{sectionName}</span>
+                    )
+                  )}
                 </div>
-              </div>
-            </div>
-
-            <ActionMenu
-              name={userName}
-              canEdit={canEdit}
-              editHref={postEditHref}
-              canDelete={canDelete}
-              onDelete={handleDelete}
-              locale={locale}
-            />
-          </div>
-        </CardHeader>
-      )}
-
-
-      {/* تفاصيل tags — مخفية في صفحة المنشور لتفادي التكرار مع شريط العنوان فوق البطاقة */}
-      {!isDetailsPage && (sectionName || categoryName || cityName) && (
-        <CardBody className={styles.tags}>
-          <div className="d-flex flex-wrap gap-2">
-            {sectionName && sectionSlug ? (
-              <Link
-                href={localeFromParams ? `/${localeFromParams}/sections/${sectionSlug}` : `/sections/${sectionSlug}`}
-                className={clsx(styles.chip, styles.chipSection)}
-              >
-                {sectionName}
-              </Link>
-            ) : (
-              sectionName && (
-                <span className={clsx(styles.chip, styles.chipSection)}>
-                  {sectionName}
-                </span>
-              )
-            )}
-
-            {categoryName && sectionSlug && categorySlug ? (
-              <Link
-                href={localeFromParams ? `/${localeFromParams}/sections/${sectionSlug}/${categorySlug}` : `/sections/${sectionSlug}/${categorySlug}`}
-                className={clsx(styles.chip, styles.chipCategory)}
-              >
-                {categoryName}
-              </Link>
-            ) : (
-              categoryName && (
-                <span className={clsx(styles.chip, styles.chipCategory)}>
-                  {categoryName}
-                </span>
-              )
-            )}
-            {cityName && (
-              <span className={clsx(styles.chip, styles.chipCity)}>
-                {cityName}
-              </span>
-            )}
-          </div>
-        </CardBody>
-      )}
-
-      <CardBody className={styles.content}>
-        {isDetailsPage && (
-          <div className={styles.detailsPageIntro}>
-            <div className={styles.detailsPageIntroTop}>
-              <h1 className={styles.detailH1}>
-                {title || (locale === 'ar' ? `إعلان ${post?.id}` : `Listing ${post?.id}`)}
-              </h1>
-              {(canEdit || canDelete) && (
-                <div className={styles.detailsPageActions}>
-                  <ActionMenu
-                    name={userName}
-                    canEdit={canEdit}
-                    editHref={postEditHref}
-                    canDelete={canDelete}
-                    onDelete={handleDelete}
-                    locale={locale}
-                  />
-                </div>
-              )}
-            </div>
-            {(sectionName || categoryName || cityName) && (
-              <div className={styles.detailsPageChips}>
-                {sectionName && sectionSlug ? (
-                  <Link
-                    href={localeFromParams ? `/${localeFromParams}/sections/${sectionSlug}` : `/sections/${sectionSlug}`}
-                    className={clsx(styles.chip, styles.chipSection)}
-                  >
-                    {sectionName}
-                  </Link>
-                ) : (
-                  sectionName && <span className={clsx(styles.chip, styles.chipSection)}>{sectionName}</span>
-                )}
-                {categoryName && sectionSlug && categorySlug ? (
-                  <Link
-                    href={
-                      localeFromParams
-                        ? `/${localeFromParams}/sections/${sectionSlug}/${categorySlug}`
-                        : `/sections/${sectionSlug}/${categorySlug}`
-                    }
-                    className={clsx(styles.chip, styles.chipCategory)}
-                  >
-                    {categoryName}
-                  </Link>
-                ) : (
-                  categoryName && <span className={clsx(styles.chip, styles.chipCategory)}>{categoryName}</span>
-                )}
-                {cityName && <span className={clsx(styles.chip, styles.chipCity)}>{cityName}</span>}
-              </div>
-            )}
-          </div>
-        )}
-        {!isDetailsPage && title && (
-          <h3 className={styles.title}>
-            <Link href={postDetailsHref} className="text-decoration-none text-reset">
-              {title}
-            </Link>
-          </h3>
-        )}
-        {normalizedCaption && (
-          <p className={clsx(styles.caption, isDetailsPage && styles.captionDetails)}>
-            {linkifyPlainText(
-              shouldTruncateCaption ? shortCaption : normalizedCaption,
-              styles.captionLink,
-            )}{' '}
-            {shouldTruncateCaption && hasLongCaption && (
-              <Link href={postDetailsHref} className="ms-1">
-                {t('post.readMore', locale)}
-              </Link>
-            )}
-          </p>
-        )}
-
-
-
-
-        {image && !banner && (
-          <Link href={postDetailsHref} className={`${styles.mediaLink} text-decoration-none`}>
-            <div className={styles.mediaWrap}>
-              <Image
-                unoptimized
-                fill
-                className={styles.mainImage}
-                src={image}
-                alt={title || 'Post'}
-                sizes="(max-width: 576px) 100vw, (max-width: 1200px) 92vw, 720px"
-              />
-              {imageCount > 1 && (
-                <span className={styles.imageCount}>
-                  +{imageCount}
-                </span>
-              )}
-            </div>
-          </Link>
-        )}
-
-
-<div  onClick={handleCardOpenDetails}>
-
-
-      {banner }
-
-      {attributesAndOptions && attributesAndOptions}
-
-
-
-        {photos && (
-          <div className="d-flex justify-content-between">
-            <Row className="g-3">
-              <Col xs={6}>
-                <GlightBox className="h-100" href={postImg3.src} data-gallery="image-popup">
-                  <Image className="rounded img-fluid" src={postImg3} alt="Image" />
-                </GlightBox>
-              </Col>
-              <Col xs={6}>
-                <GlightBox href={postImg1.src} data-glightbox data-gallery="image-popup">
-                  <Image className="rounded img-fluid" src={postImg1} alt="Image" />
-                </GlightBox>
-                <div className="position-relative bg-dark mt-3 rounded">
-                  <div className="hover-actions-item position-absolute top-50 start-50 translate-middle z-index-9">
-                    <Link className="btn btn-link text-white" href="#">
-                      {' '}
-                      {t('post.viewAll', locale)}{' '}
-                    </Link>
-                  </div>
-                  <GlightBox href={postImg2.src} data-glightbox data-gallery="image-popup">
-                    <Image className="img-fluid opacity-50 rounded" src={postImg2} alt="image" />
-                  </GlightBox>
-                </div>
-              </Col>
-            </Row>
-          </div>
-        )}
-        {isVideo && <VideoPlayer />}
-
-
-        </div>
-
-        <div className={styles.reactionSummaryBar}>
-          <div className={styles.reactionSummaryLeft}>
-            {topReactionKeys.length > 0 && (
-              <span className={styles.reactionPills} aria-label={locale === 'ar' ? 'التفاعلات' : 'Reactions'}>
-                {topReactionKeys.map((key) => (
-                  <span key={key} className={styles.reactionPill}>
-                    {REACTION_EMOJI[key]}
-                  </span>
-                ))}
-              </span>
-            )}
-            <span className={styles.reactionCountText}>{postLikesCount}</span>
-          </div>
-          {postReactionTypeByMe && (
-            <div className={styles.myReactionBadge}>
-              <span className={styles.myReactionEmoji}>{REACTION_EMOJI[postReactionTypeByMe]}</span>
-              <span>{locale === 'ar' ? `تفاعلك: ${myReactionLabel}` : `Your reaction: ${myReactionLabel}`}</span>
-            </div>
-          )}
-        </div>
-
-
-        <PostActions
-          postLikedByMe={postLikedByMe}
-          reactionTypeByMe={postReactionTypeByMe}
-          postLikesCount={postLikesCount}
-          onToggleLikePost={onToggleLikePost}
-          commentsCount={commentsCount}
-          onShowComments={() => {
-            setShowComments(true)
-            window.requestAnimationFrame(() => {
-              setTimeout(() => {
-                const el = document.getElementById(`comments-${post?.id}`)
-                el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                commentInputRef.current?.focus({ preventScroll: true })
-              }, 50)
-            })
-          }}
-          onShowShare={() => setShowShareModal(true)}
-          onOpenChat={onOpenChat}
-          isAuthenticated={status === 'authenticated'}
-          postId={post?.id}
-          onContact={onContact}
-          contactHref={contactHref}
-          contactLabel={contactLabel}
-          userMobile={user?.mobile}
-          locale={locale}
-          isOwner={isOwner}
-          showFeature={isOwner && !isFeaturedActive}
-          onFeature={() => setShowFeatureModal(true)}
-        />
-
-        {isOwner && (
-          <FeaturePostModal
-            show={showFeatureModal}
-            onHide={() => setShowFeatureModal(false)}
-            postId={Number(post?.id)}
-            locale={locale}
-            accessToken={(session as any)?.accessToken ?? ''}
-            origin={typeof window !== 'undefined' ? window.location.origin : ''}
-          />
-        )}
-
-
-        <SharePostModal
-          show={showShareModal}
-          onHide={() => setShowShareModal(false)}
-          postId={String(post?.id ?? '')}
-          postUrl={postDetailsHref}
-          title={title}
-          defaultMessage={`${t('post.watchOnAnanas', locale)}: ${title || (locale === 'ar' ? 'منشور' : 'Post')}`}
-        />
-
-        {showComments && (
-          <div className={styles.commentsSection}>
-            <div id={`comments-${post?.id}`} className={styles.commentsComposer}>
-              <div className={styles.commentsAvatarWrap}>
-                <span role="button">
-                  <Image
-                    key={currentUserAvatar || 'default'}
-                    unoptimized
-                    className={styles.commentsAvatar}
-                    src={
-                      (currentUserAvatar ||
-                        resolveMediaUrl((session as any)?.user?.image || '') ||
-                        defaultUserAvatar.src) as any
-                    }
-                    alt={(session as any)?.user?.name || 'avatar'}
-                    width={30}
-                    height={30}
-                  />
-                </span>
-              </div>
-
-              <form
-                className={styles.commentsFormWrap}
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  void onSendComment()
-                }}
-              >
-                {status !== 'authenticated' && (
-                  <div
-                    className="cursor-pointer"
-                    style={{ position: 'absolute', zIndex: 1, left: 0, right: 0, top: 0, bottom: 0 }}
-                    onClick={() => setShowLoginAlert(true)}
-                  />
-                )}
-                <textarea
-                  ref={commentInputRef}
-                  data-autoresize
-                  className={styles.commentsInput}
-                  rows={1}
-                  placeholder={status === 'authenticated' ? t('post.addComment', locale) : t('post.loginToComment', locale)}
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  disabled={status !== 'authenticated' || sending}
+                <ActionMenu
+                  name={userName}
+                  canEdit={canEdit}
+                  editHref={postEditHref}
+                  canDelete={canDelete}
+                  onDelete={handleDelete}
+                  locale={locale}
                 />
-                <button
-                  className={styles.sendBtn}
-                  type="submit"
-                  disabled={status !== 'authenticated' || sending || !commentText.trim()}
-                  aria-label={t('post.send', locale)}
-                >
-                  <BsSendFill size={14} />
-                </button>
-              </form>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardBody className={styles.listingBody}>
+            <div className={clsx(styles.listingLayout, !showListingHero && styles.listingLayoutStacked)}>
+              <div className={styles.listingMediaCol}>
+                {showListingHero ? (
+                  <Link href={postDetailsHref} className={styles.listingHeroLink} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.listingHero}>
+                      <Image
+                        unoptimized
+                        fill
+                        className={styles.mainImage}
+                        src={image}
+                        alt={title || 'Post'}
+                        sizes="(max-width: 576px) 100vw, (max-width: 992px) 92vw, 520px"
+                      />
+                      <div className={styles.listingHeroGradient} aria-hidden />
+                      <div className={styles.listingHeroTop}>
+                        <div className={styles.listingHeroBadges}>
+                          {isFeaturedActive && (
+                            <span className={styles.listingOverlayBadge}>
+                              <BsStars size={11} aria-hidden />
+                              {locale === 'ar' ? 'موصى به' : 'Recommended'}
+                            </span>
+                          )}
+                          {postLikesCount >= 5 && (
+                            <span className={styles.listingOverlayBadge}>
+                              <BsFire size={11} aria-hidden />
+                              {locale === 'ar' ? 'طلب مرتفع' : 'High demand'}
+                            </span>
+                          )}
+                        </div>
+                        {imageCount > 1 && (
+                          <span className={styles.listingImageCounter}>1/{imageCount}</span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  (title || hasCaption || priceLabel) && (
+                    <div className={styles.listingTextFallback}>
+                      {title && <h3 className={styles.title}>{title}</h3>}
+                      {hasCaption && (
+                        <p className={styles.listingFallbackCaption}>
+                          {linkifyPlainText(normalizedCaption, styles.captionLink)}
+                        </p>
+                      )}
+                      {priceLabel && <span className={styles.listingPriceTagInline}>{priceLabel}</span>}
+                    </div>
+                  )
+                )}
+
+                <div onClick={handleCardOpenDetails}>
+                  {banner}
+                  {attributesAndOptions && attributesAndOptions}
+                  {photos && (
+                    <div className="d-flex justify-content-between">
+                      <Row className="g-3">
+                        <Col xs={6}>
+                          <GlightBox className="h-100" href={postImg3.src} data-gallery="image-popup">
+                            <Image className="rounded img-fluid" src={postImg3} alt="Image" />
+                          </GlightBox>
+                        </Col>
+                        <Col xs={6}>
+                          <GlightBox href={postImg1.src} data-glightbox data-gallery="image-popup">
+                            <Image className="rounded img-fluid" src={postImg1} alt="Image" />
+                          </GlightBox>
+                          <div className="position-relative bg-dark mt-3 rounded">
+                            <div className="hover-actions-item position-absolute top-50 start-50 translate-middle z-index-9">
+                              <Link className="btn btn-link text-white" href="#">
+                                {t('post.viewAll', locale)}
+                              </Link>
+                            </div>
+                            <GlightBox href={postImg2.src} data-glightbox data-gallery="image-popup">
+                              <Image className="img-fluid opacity-50 rounded" src={postImg2} alt="image" />
+                            </GlightBox>
+                          </div>
+                        </Col>
+                      </Row>
+                    </div>
+                  )}
+                  {isVideo && <VideoPlayer />}
+                </div>
+              </div>
+
+              <div className={styles.listingAside}>
+                {showListingHero &&
+                  (title ||
+                    listingSubtitleParts.length > 0 ||
+                    hasCaption ||
+                    priceLabel ||
+                    attributeChips.length > 0) && (
+                    <div className={styles.listingInfoBlock}>
+                      {title && (
+                        <Link
+                          href={postDetailsHref}
+                          className={styles.listingInfoTitleLink}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <h3 className={styles.listingInfoTitle}>{title}</h3>
+                        </Link>
+                      )}
+                      {listingSubtitleParts.length > 0 && (
+                        <p className={styles.listingInfoSubtitle}>{listingSubtitleParts.join(' • ')}</p>
+                      )}
+                      {hasCaption && (
+                        <p className={styles.listingInfoCaption}>
+                          {linkifyPlainText(normalizedCaption, styles.captionLink)}
+                        </p>
+                      )}
+                      <div className={styles.listingInfoFooter}>
+                        {priceLabel && <span className={styles.listingPriceTagInline}>{priceLabel}</span>}
+                        {attributeChips.length > 0 && (
+                          <div className={styles.listingSpecRowInline}>
+                            {attributeChips.map((chip) => (
+                              <span key={chip} className={styles.listingSpecChipInline}>
+                                {chip}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                <div className={styles.statsStrip} aria-label={locale === 'ar' ? 'إحصائيات الإعلان' : 'Listing stats'}>
+                  <div className={styles.statItem}>
+                    <span className={clsx(styles.statIcon, styles.statIconGreen)}>
+                      <BsHandThumbsUpFill size={14} aria-hidden />
+                    </span>
+                    <span className={styles.statValue}>{formatCompactCount(postLikesCount)}</span>
+                    <span className={styles.statLabel}>{locale === 'ar' ? 'تفاعل' : 'Reactions'}</span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={clsx(styles.statIcon, styles.statIconOrange)}>
+                      <BsFire size={14} aria-hidden />
+                    </span>
+                    <span className={styles.statValue}>{isFeaturedActive ? (locale === 'ar' ? 'مميز' : 'Featured') : formatCompactCount(commentsCount)}</span>
+                    <span className={styles.statLabel}>
+                      {isFeaturedActive
+                        ? locale === 'ar'
+                          ? 'عرض مميز'
+                          : 'Featured offer'
+                        : locale === 'ar'
+                          ? 'استفسار'
+                          : 'Inquiries'}
+                    </span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={clsx(styles.statIcon, styles.statIconBlue)}>
+                      <BsChatFill size={14} aria-hidden />
+                    </span>
+                    <span className={styles.statValue}>{formatCompactCount(commentsCount)}</span>
+                    <span className={styles.statLabel}>{locale === 'ar' ? 'تعليق' : 'Comments'}</span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={clsx(styles.statIcon, styles.statIconViolet)}>
+                      <BsEyeFill size={14} aria-hidden />
+                    </span>
+                    <span className={styles.statValue}>
+                      {viewsCount > 0 ? formatCompactCount(viewsCount) : formatCompactCount(postLikesCount)}
+                    </span>
+                    <span className={styles.statLabel}>{locale === 'ar' ? 'اهتمام' : 'Interest'}</span>
+                  </div>
+                </div>
+
+                {(topReactionKeys.length > 0 || postLikesCount > 0) && (
+                  <div className={styles.socialProofBar}>
+                    <div className={styles.socialProofLeft}>
+                      {topReactionKeys.length > 0 && (
+                        <span className={styles.reactionPills} aria-hidden>
+                          {topReactionKeys.map((key) => (
+                            <span key={key} className={styles.reactionPill}>
+                              {REACTION_EMOJI[key]}
+                            </span>
+                          ))}
+                        </span>
+                      )}
+                      <span className={styles.socialProofText}>
+                        {locale === 'ar'
+                          ? `${formatCompactCount(postLikesCount)} ${postLikesCount === 1 ? 'مهتم' : 'مهتمون'}`
+                          : `${formatCompactCount(postLikesCount)} interested`}
+                      </span>
+                    </div>
+                    {postReactionTypeByMe && (
+                      <div className={styles.myReactionBadge}>
+                        <span className={styles.myReactionEmoji}>{REACTION_EMOJI[postReactionTypeByMe]}</span>
+                        <span>{locale === 'ar' ? myReactionLabel : myReactionLabel}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {postActionsBlock}
+
+                {showComments && (
+                  <div className={styles.listingCommentsWrap}>
+                    <div className={styles.commentsSection}>
+                      <div id={`comments-${post?.id}`} className={styles.commentsComposer}>
+                        <div className={styles.commentsAvatarWrap}>
+                          <span role="button">
+                            <Image
+                              key={currentUserAvatar || 'default'}
+                              unoptimized
+                              className={styles.commentsAvatar}
+                              src={
+                                (currentUserAvatar ||
+                                  resolveMediaUrl((session as any)?.user?.image || '') ||
+                                  defaultUserAvatar.src) as any
+                              }
+                              alt={(session as any)?.user?.name || 'avatar'}
+                              width={30}
+                              height={30}
+                            />
+                          </span>
+                        </div>
+                        <form
+                          className={styles.commentsFormWrap}
+                          onSubmit={(e) => {
+                            e.preventDefault()
+                            void onSendComment()
+                          }}
+                        >
+                          {status !== 'authenticated' && (
+                            <div
+                              className="cursor-pointer"
+                              style={{ position: 'absolute', zIndex: 1, left: 0, right: 0, top: 0, bottom: 0 }}
+                              onClick={() => setShowLoginAlert(true)}
+                            />
+                          )}
+                          <textarea
+                            ref={commentInputRef}
+                            data-autoresize
+                            className={styles.commentsInput}
+                            rows={1}
+                            placeholder={
+                              status === 'authenticated' ? t('post.addComment', locale) : t('post.loginToComment', locale)
+                            }
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            disabled={status !== 'authenticated' || sending}
+                          />
+                          <button
+                            className={styles.sendBtn}
+                            type="submit"
+                            disabled={status !== 'authenticated' || sending || !commentText.trim()}
+                            aria-label={t('post.send', locale)}
+                          >
+                            <BsSendFill size={14} />
+                          </button>
+                        </form>
+                      </div>
+                      {uiComments.length > 0 && (
+                        <ul className={styles.commentsList}>
+                          {uiComments.map((comment) => (
+                            <CommentItem
+                              {...(comment as any)}
+                              key={comment.id}
+                              onToggleLike={onToggleLikeComment}
+                              onReplyClick={onReplyClick}
+                              onViewRepliesClick={onViewRepliesClick}
+                              onLoadMoreReplies={onLoadMoreReplies}
+                              showReplyBox={openReplyForId === String(comment.id)}
+                              replyValue={replyValueById[String(comment.id)] ?? ''}
+                              onReplyValueChange={(id, value) => setReplyValueById((p) => ({ ...p, [id]: value }))}
+                              onSubmitReply={onSubmitReply}
+                              loadingReplies={loadingRepliesById[String(comment.id)] ?? false}
+                              hasMoreReplies={hasMoreRepliesById[String(comment.id)] ?? false}
+                              locale={locale}
+                            />
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <Link href={postDetailsHref} className={styles.viewAdBtn} onClick={(e) => e.stopPropagation()}>
+                  <BsEyeFill size={16} aria-hidden />
+                  {locale === 'ar' ? 'مشاهدة الإعلان' : 'View listing'}
+                </Link>
+              </div>
             </div>
 
-            {uiComments.length > 0 && (
-              <ul className={styles.commentsList}>
-                {uiComments.map((comment) => (
-                  <CommentItem
-                    {...(comment as any)}
-                    key={comment.id}
-                    onToggleLike={onToggleLikeComment}
-                    onReplyClick={onReplyClick}
-                    onViewRepliesClick={onViewRepliesClick}
-                    onLoadMoreReplies={onLoadMoreReplies}
-                    showReplyBox={openReplyForId === String(comment.id)}
-                    replyValue={replyValueById[String(comment.id)] ?? ''}
-                    onReplyValueChange={(id, value) => setReplyValueById((p) => ({ ...p, [id]: value }))}
-                    onSubmitReply={onSubmitReply}
-                    loadingReplies={loadingRepliesById[String(comment.id)] ?? false}
-                    hasMoreReplies={hasMoreRepliesById[String(comment.id)] ?? false}
-                    locale={locale}
-                  />
-                ))}
-              </ul>
+            {modalsAndCommentsBlock}
+          </CardBody>
+        </>
+      ) : (
+        <>
+          <CardBody className={clsx(styles.content, styles.detailsContent)}>
+            {detailsIntroMode === 'actionsOnly' && (canEdit || canDelete) && (
+              <div className={styles.detailsPageActionsBar}>
+                <ActionMenu
+                  name={userName}
+                  canEdit={canEdit}
+                  editHref={postEditHref}
+                  canDelete={canDelete}
+                  onDelete={handleDelete}
+                  locale={locale}
+                />
+              </div>
             )}
-          </div>
-        )}
 
-        <LoginRequiredDialog
-          show={showLoginAlert}
-          onHide={() => setShowLoginAlert(false)}
-          locale={locale}
-        />
-      </CardBody>
+            {detailsIntroMode === 'full' && (
+              <div className={styles.detailsPageIntro}>
+                <div className={styles.detailsPageIntroTop}>
+                  <h1 className={styles.detailH1}>
+                    {title || (locale === 'ar' ? `إعلان ${post?.id}` : `Listing ${post?.id}`)}
+                  </h1>
+                  {(canEdit || canDelete) && (
+                    <div className={styles.detailsPageActions}>
+                      <ActionMenu
+                        name={userName}
+                        canEdit={canEdit}
+                        editHref={postEditHref}
+                        canDelete={canDelete}
+                        onDelete={handleDelete}
+                        locale={locale}
+                      />
+                    </div>
+                  )}
+                </div>
+                {(sectionName || categoryName || cityName) && (
+                  <div className={styles.detailsPageChips}>
+                    {sectionName && sectionSlug ? (
+                      <Link
+                        href={localeFromParams ? `/${localeFromParams}/sections/${sectionSlug}` : `/sections/${sectionSlug}`}
+                        className={clsx(styles.chip, styles.chipSection)}
+                      >
+                        {sectionName}
+                      </Link>
+                    ) : (
+                      sectionName && <span className={clsx(styles.chip, styles.chipSection)}>{sectionName}</span>
+                    )}
+                    {categoryName && sectionSlug && categorySlug ? (
+                      <Link
+                        href={
+                          localeFromParams
+                            ? `/${localeFromParams}/sections/${sectionSlug}/${categorySlug}`
+                            : `/sections/${sectionSlug}/${categorySlug}`
+                        }
+                        className={clsx(styles.chip, styles.chipCategory)}
+                      >
+                        {categoryName}
+                      </Link>
+                    ) : (
+                      categoryName && <span className={clsx(styles.chip, styles.chipCategory)}>{categoryName}</span>
+                    )}
+                    {cityName && <span className={clsx(styles.chip, styles.chipCity)}>{cityName}</span>}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {normalizedCaption && (
+              <div className={styles.detailsDescriptionBlock}>
+                <h2 className={styles.detailsDescriptionLabel}>
+                  {locale === 'ar' ? 'الوصف' : 'Description'}
+                </h2>
+                <p className={clsx(styles.caption, styles.captionDetails)}>
+                  {linkifyPlainText(normalizedCaption, styles.captionLink)}
+                </p>
+              </div>
+            )}
+
+            {image && !banner && (
+              <Link href={postDetailsHref} className={`${styles.mediaLink} text-decoration-none`}>
+                <div className={styles.mediaWrap}>
+                  <Image
+                    unoptimized
+                    fill
+                    className={styles.mainImage}
+                    src={image}
+                    alt={title || 'Post'}
+                    sizes="(max-width: 576px) 100vw, (max-width: 1200px) 92vw, 720px"
+                  />
+                  {imageCount > 1 && <span className={styles.imageCount}>+{imageCount}</span>}
+                </div>
+              </Link>
+            )}
+
+            <div onClick={handleCardOpenDetails}>
+              {banner}
+              {attributesAndOptions && attributesAndOptions}
+              {photos && (
+                <div className="d-flex justify-content-between">
+                  <Row className="g-3">
+                    <Col xs={6}>
+                      <GlightBox className="h-100" href={postImg3.src} data-gallery="image-popup">
+                        <Image className="rounded img-fluid" src={postImg3} alt="Image" />
+                      </GlightBox>
+                    </Col>
+                    <Col xs={6}>
+                      <GlightBox href={postImg1.src} data-glightbox data-gallery="image-popup">
+                        <Image className="rounded img-fluid" src={postImg1} alt="Image" />
+                      </GlightBox>
+                      <div className="position-relative bg-dark mt-3 rounded">
+                        <div className="hover-actions-item position-absolute top-50 start-50 translate-middle z-index-9">
+                          <Link className="btn btn-link text-white" href="#">
+                            {t('post.viewAll', locale)}
+                          </Link>
+                        </div>
+                        <GlightBox href={postImg2.src} data-glightbox data-gallery="image-popup">
+                          <Image className="img-fluid opacity-50 rounded" src={postImg2} alt="image" />
+                        </GlightBox>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+              )}
+              {isVideo && <VideoPlayer />}
+            </div>
+
+            <div className={styles.reactionSummaryBar}>
+              <div className={styles.reactionSummaryLeft}>
+                {topReactionKeys.length > 0 && (
+                  <span className={styles.reactionPills} aria-label={locale === 'ar' ? 'التفاعلات' : 'Reactions'}>
+                    {topReactionKeys.map((key) => (
+                      <span key={key} className={styles.reactionPill}>
+                        {REACTION_EMOJI[key]}
+                      </span>
+                    ))}
+                  </span>
+                )}
+                <span className={styles.reactionCountText}>{postLikesCount}</span>
+              </div>
+              {postReactionTypeByMe && (
+                <div className={styles.myReactionBadge}>
+                  <span className={styles.myReactionEmoji}>{REACTION_EMOJI[postReactionTypeByMe]}</span>
+                  <span>{locale === 'ar' ? `تفاعلك: ${myReactionLabel}` : `Your reaction: ${myReactionLabel}`}</span>
+                </div>
+              )}
+            </div>
+
+            {postActionsBlock}
+            {modalsAndCommentsBlock}
+          </CardBody>
+        </>
+      )}
 
       <CardFooter className={styles.cardFooter}>
         {showComments && hasMore && (

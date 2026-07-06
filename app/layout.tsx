@@ -13,6 +13,7 @@ import { getPublicSiteOrigin } from '@/lib/seo/siteUrl'
 import { SPLASH_ENABLE_DELAY_MS } from '@/lib/perf/week1HomePerf'
 
 import logo from '@/assets/images/logo/logo500.png'
+import faviconIco from '@/assets/favicon.ico'
 
 import '@/assets/scss/style.scss'
 
@@ -48,6 +49,18 @@ export const metadata: Metadata = {
   },
   formatDetection: {
     telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any', type: 'image/x-icon' },
+      {
+        url: typeof faviconIco === 'string' ? faviconIco : faviconIco.src,
+        sizes: 'any',
+        type: 'image/x-icon',
+      },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
   },
 }
 
@@ -175,6 +188,7 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
       dir={direction}
       data-locale={locale}
       data-indexing-bot={isIndexingBot ? '1' : undefined}
+
       suppressHydrationWarning
     >
       <head suppressHydrationWarning>

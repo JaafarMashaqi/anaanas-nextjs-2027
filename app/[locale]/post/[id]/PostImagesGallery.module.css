@@ -1,16 +1,12 @@
-/* مرحلة عرض الصورة — عرض كامل بدون فراغات جانبية */
+/* مرحلة عرض الصورة */
 .stage {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
-  max-height: min(72vh, 520px);
-  min-height: 200px;
-  background: linear-gradient(145deg, #f1f5f9 0%, #e8edf3 100%);
+  max-height: min(68vh, 540px);
+  min-height: 220px;
+  background: linear-gradient(145deg, #1e1812 0%, #2d2418 100%);
   overflow: hidden;
-}
-
-.stageTall {
-  max-height: min(78vh, 580px);
 }
 
 .img {
@@ -30,9 +26,9 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
-  max-height: min(72vh, 520px);
-  min-height: 200px;
-  background: linear-gradient(145deg, #f1f5f9 0%, #e8edf3 100%);
+  max-height: min(68vh, 540px);
+  min-height: 220px;
+  background: linear-gradient(145deg, #1e1812 0%, #2d2418 100%);
   overflow: hidden;
 }
 
@@ -46,30 +42,104 @@
 
 .root :global(.swiper-button-next),
 .root :global(.swiper-button-prev) {
-  color: #151515;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.92);
+  color: #1e1812;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.94);
   border-radius: 50%;
-  border: 1px solid rgba(21, 21, 21, 0.1);
-  box-shadow: 0 4px 14px rgba(21, 21, 21, 0.12);
+  border: 1px solid rgba(254, 203, 1, 0.35);
+  box-shadow: 0 4px 18px rgba(30, 24, 18, 0.18);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.root :global(.swiper-button-next:hover),
+.root :global(.swiper-button-prev:hover) {
+  background: #fecb01;
+  transform: scale(1.04);
 }
 
 .root :global(.swiper-button-next::after),
 .root :global(.swiper-button-prev::after) {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 900;
 }
 
+.root :global(.swiper-pagination) {
+  bottom: 0.55rem !important;
+}
+
+.root :global(.swiper-pagination-bullet) {
+  width: 7px;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.45);
+  opacity: 1;
+}
+
 .root :global(.swiper-pagination-bullet-active) {
+  background: #fecb01;
+  width: 18px;
+  border-radius: 999px;
+}
+
+/* صفحة التفاصيل — صور أوضح، بدون نص فوقها */
+.stageDetails,
+.slideBoxDetails {
+  background: #0a0a0a;
+}
+
+.rootDetails .img,
+.imgDetails {
+  filter: brightness(1.1) contrast(1.04) saturate(1.06);
+}
+
+.rootDetails :global(.swiper-button-next),
+.rootDetails :global(.swiper-button-prev) {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(30, 24, 18, 0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+}
+
+.rootDetails :global(.swiper-pagination) {
+  bottom: 0.65rem !important;
+  padding: 0.28rem 0.55rem;
+  width: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(4px);
+}
+
+.rootDetails :global(.swiper-pagination-bullet) {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.rootDetails :global(.swiper-pagination-bullet-active) {
   background: #fecb01;
 }
 
 @media (max-width: 575.98px) {
   .stage,
-  .slideBox {
+  .slideBox,
+  .stageDetails,
+  .slideBoxDetails {
     aspect-ratio: 4 / 3;
     max-height: none;
-    min-height: 220px;
+    min-height: 240px;
+  }
+
+  .root :global(.swiper-button-next),
+  .root :global(.swiper-button-prev) {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (min-width: 992px) {
+  .stage,
+  .slideBox,
+  .stageDetails,
+  .slideBoxDetails {
+    max-height: min(62vh, 580px);
   }
 }

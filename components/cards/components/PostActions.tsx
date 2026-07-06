@@ -34,6 +34,7 @@ const REACTIONS: ReactionItem[] = [
 
 type PostActionsProps = {
   locale?: SupportedLocale
+  layout?: 'default' | 'marketplace'
   isOwner?: boolean
   showFeature?: boolean
   onFeature?: () => void
@@ -80,6 +81,7 @@ export default function PostActions({
   contactLabel,
   userMobile,
   locale = 'ar',
+  layout = 'default',
   isOwner = false,
   showFeature = false,
   onFeature,
@@ -200,152 +202,231 @@ export default function PostActions({
     clearLongPressTimer()
   }
 
+  const isMarketplace = layout === 'marketplace'
+  const interestLabel = locale === 'ar' ? 'اهتمام' : 'Interested'
+  const shareLabel = t('post.share', locale)
+  const contactActionLabel = t('post.contact', locale)
+  const statsLabel = t('post.statistics', locale)
+  const featureLabel = locale === 'ar' ? 'تمييز' : 'Feature'
+
+  const likeButton = (
+    <button
+      type="button"
+      className={`${styles.action} ${postLikedByMe ? styles.likeActive : styles.like} ${isMarketplace ? styles.marketplaceAction : ''}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        if (longPressTriggeredRef.current) {
+          longPressTriggeredRef.current = false
+          return
+        }
+        onPrimaryLikeClick()
+      }}
+      onTouchStart={onTouchLikeStart}
+      onTouchEnd={onTouchLikeEnd}
+      onTouchCancel={onTouchLikeEnd}
+      data-bs-container="body"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      data-bs-html="true"
+      data-bs-custom-class="tooltip-text-start"
+      data-bs-title={
+        likeTooltipTitle ||
+        'Frances Guerrero<br> Lori Stevens<br> Billy Vasquez<br> Judy Nguyen<br> Larry Lawson<br> Amanda Reed<br> Louis Crawford'
+      }
+    >
+      <span className={styles.iconWrap} key={postLikedByMe ? 'liked' : 'not'}>
+        <span className={styles.reactionEmoji} aria-hidden>
+          {selectedReactionItem?.emoji ?? '👍'}
+        </span>
+      </span>
+      <span className={styles.label}>
+        {isMarketplace
+          ? interestLabel
+          : `${postLikedByMe ? selectedLabel : t('post.like', locale)} (${postLikesCount})`}
+      </span>
+    </button>
+  )
+
+  const commentButton = (
+    <button
+      type="button"
+      className={`${styles.action} ${styles.comment} ${isMarketplace ? styles.marketplaceAction : ''}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        onShowComments()
+      }}
+    >
+      <span className={styles.iconWrap}>
+        <BsChatFill size={18} aria-hidden />
+      </span>
+      <span className={styles.label}>
+        {isMarketplace
+          ? `${locale === 'ar' ? 'تعليق' : 'Comment'}${commentsCount > 0 ? ` (${commentsCount})` : ''}`
+          : `${t('post.comment', locale)} (${commentsCount})`}
+      </span>
+    </button>
+  )
+
+  const chatButton = (
+    <button
+      type="button"
+      className={`${styles.action} ${chatReady ? styles.chat : styles.chatMuted} ${isMarketplace ? styles.marketplaceAction : ''}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        void onOpenChat()
+      }}
+      disabled={!chatReady}
+      title={isAuthenticated ? t('post.openChat', locale) : t('post.loginToChat', locale)}
+    >
+      <span className={styles.iconWrap}>
+        <BsChatDots size={18} aria-hidden />
+      </span>
+      <span className={styles.label}>{isMarketplace ? (locale === 'ar' ? 'دردشة' : 'Chat') : t('post.chat', locale)}</span>
+    </button>
+  )
+
+  const shareButton = (
+    <button
+      type="button"
+      className={`${styles.action} ${styles.share} ${isMarketplace ? styles.marketplaceAction : ''}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        onShowShare()
+      }}
+      title={shareLabel}
+    >
+      <span className={styles.iconWrap}>
+        <BsShare size={18} aria-hidden />
+      </span>
+      <span className={styles.label}>{shareLabel}</span>
+    </button>
+  )
+
+  const featureButton = showFeature ? (
+    <button
+      type="button"
+      className={`${styles.action} ${styles.feature} ${isMarketplace ? styles.marketplaceAction : ''}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        onFeature?.()
+      }}
+      title={locale === 'ar' ? 'تمييز الإعلان' : 'Feature ad'}
+    >
+      <span className={styles.iconWrap}>
+        <BsStars size={16} aria-hidden />
+      </span>
+      <span className={styles.label}>{featureLabel}</span>
+    </button>
+  ) : null
+
+  const statsLink = (
+    <a
+      href={statisticsHref || '#'}
+      className={`${styles.action} ${styles.stats} ${!statisticsHref ? styles.actionDisabled : ''} ${isMarketplace ? styles.marketplaceAction : ''}`}
+      title={statsLabel}
+      aria-disabled={!statisticsHref}
+      onClick={(e) => {
+        e.stopPropagation()
+        if (!statisticsHref) e.preventDefault()
+      }}
+    >
+      <span className={styles.iconWrap}>
+        <BsGraphUp size={16} aria-hidden />
+      </span>
+      <span className={styles.label}>{statsLabel}</span>
+    </a>
+  )
+
+  const contactButton = (
+    <button
+      type="button"
+      className={`${styles.action} ${contactHref ? styles.contact : styles.contactMuted} ${isMarketplace ? styles.marketplaceContact : ''}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        void onContact()
+      }}
+      disabled={!contactHref}
+      title={contactLabel}
+    >
+      <span className={styles.iconWrap}>
+        <BsTelephoneFill size={16} aria-hidden />
+      </span>
+      <span className={styles.label}>{contactActionLabel}</span>
+    </button>
+  )
+
+  const reactionAnchor = (
+    <div
+      className={styles.reactionAnchor}
+      ref={reactionWrapRef}
+      onMouseEnter={() => {
+        if (!isTouchDevice) openReactions()
+      }}
+      onMouseLeave={() => {
+        if (!isTouchDevice) scheduleHideReactions()
+      }}
+    >
+      {showReactions && (
+        <div
+          className={styles.reactionsPopover}
+          role="menu"
+          aria-label={locale === 'ar' ? 'اختيار تفاعل' : 'Choose reaction'}
+          onMouseEnter={clearHideTimer}
+          onMouseLeave={scheduleHideReactions}
+        >
+          {REACTIONS.map((reaction) => (
+            <button
+              key={reaction.key}
+              type="button"
+              className={`${styles.reactionOption} ${selectedReaction === reaction.key ? styles.reactionOptionActive : ''}`}
+              onClick={() => onSelectReaction(reaction.key)}
+              title={locale === 'ar' ? reaction.labelAr : reaction.labelEn}
+              aria-label={locale === 'ar' ? reaction.labelAr : reaction.labelEn}
+            >
+              <span aria-hidden>{reaction.emoji}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      {likeButton}
+    </div>
+  )
+
+  if (isMarketplace) {
+    return (
+      <div className={styles.marketplaceBar}>
+        {reactionAnchor}
+        {commentButton}
+        {shareButton}
+        {isOwner ? (
+          <>
+            {featureButton}
+            {statsLink}
+          </>
+        ) : (
+          <>
+            {chatButton}
+            {contactButton}
+          </>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className={styles.bar}>
-      <div
-        className={styles.reactionAnchor}
-        ref={reactionWrapRef}
-        onMouseEnter={() => {
-          if (!isTouchDevice) openReactions()
-        }}
-        onMouseLeave={() => {
-          if (!isTouchDevice) scheduleHideReactions()
-        }}
-      >
-        {showReactions && (
-          <div
-            className={styles.reactionsPopover}
-            role="menu"
-            aria-label={locale === 'ar' ? 'اختيار تفاعل' : 'Choose reaction'}
-            onMouseEnter={clearHideTimer}
-            onMouseLeave={scheduleHideReactions}
-          >
-            {REACTIONS.map((reaction) => (
-              <button
-                key={reaction.key}
-                type="button"
-                className={`${styles.reactionOption} ${selectedReaction === reaction.key ? styles.reactionOptionActive : ''}`}
-                onClick={() => onSelectReaction(reaction.key)}
-                title={locale === 'ar' ? reaction.labelAr : reaction.labelEn}
-                aria-label={locale === 'ar' ? reaction.labelAr : reaction.labelEn}
-              >
-                <span aria-hidden>{reaction.emoji}</span>
-              </button>
-            ))}
-          </div>
-        )}
-        <button
-          type="button"
-          className={`${styles.action} ${postLikedByMe ? styles.likeActive : styles.like}`}
-          onClick={() => {
-            if (longPressTriggeredRef.current) {
-              longPressTriggeredRef.current = false
-              return
-            }
-            onPrimaryLikeClick()
-          }}
-          onTouchStart={onTouchLikeStart}
-          onTouchEnd={onTouchLikeEnd}
-          onTouchCancel={onTouchLikeEnd}
-          data-bs-container="body"
-          data-bs-toggle="tooltip"
-          data-bs-placement="top"
-          data-bs-html="true"
-          data-bs-custom-class="tooltip-text-start"
-          data-bs-title={
-            likeTooltipTitle ||
-            'Frances Guerrero<br> Lori Stevens<br> Billy Vasquez<br> Judy Nguyen<br> Larry Lawson<br> Amanda Reed<br> Louis Crawford'
-          }
-        >
-          <span className={styles.iconWrap} key={postLikedByMe ? 'liked' : 'not'}>
-            <span className={styles.reactionEmoji} aria-hidden>
-              {selectedReactionItem?.emoji ?? '👍'}
-            </span>
-          </span>
-          <span className={styles.label}>
-            {postLikedByMe ? selectedLabel : t('post.like', locale)} ({postLikesCount})
-          </span>
-        </button>
-      </div>
-
-      <button type="button" className={`${styles.action} ${styles.comment}`} onClick={onShowComments}>
-        <span className={styles.iconWrap}>
-          <BsChatFill size={18} aria-hidden />
-        </span>
-        <span className={styles.label}>
-          {t('post.comment', locale)} ({commentsCount})
-        </span>
-      </button>
-
-      <button
-        type="button"
-        className={`${styles.action} ${styles.share}`}
-        onClick={onShowShare}
-        title={t('post.share', locale)}
-      >
-        <span className={styles.iconWrap}>
-          <BsShare size={18} aria-hidden />
-        </span>
-        <span className={styles.label}>{t('post.share', locale)}</span>
-      </button>
-
+      {reactionAnchor}
+      {commentButton}
+      {shareButton}
       {isOwner ? (
         <>
-          {showFeature && (
-            <button
-              type="button"
-              className={`${styles.action} ${styles.feature}`}
-              onClick={() => onFeature?.()}
-              title={locale === 'ar' ? 'تمييز الإعلان' : 'Feature ad'}
-            >
-              <span className={styles.iconWrap}>
-                <BsStars size={18} aria-hidden />
-              </span>
-              <span className={styles.label}>{locale === 'ar' ? 'تمييز' : 'Feature'}</span>
-            </button>
-          )}
-          <a
-          href={statisticsHref || '#'}
-          className={`${styles.action} ${styles.stats} ${!statisticsHref ? styles.actionDisabled : ''}`}
-          title={t('post.statistics', locale)}
-          aria-disabled={!statisticsHref}
-          onClick={(e) => {
-            if (!statisticsHref) e.preventDefault()
-          }}
-        >
-          <span className={styles.iconWrap}>
-            <BsGraphUp size={18} aria-hidden />
-          </span>
-          <span className={styles.label}>{t('post.statistics', locale)}</span>
-        </a>
+          {featureButton}
+          {statsLink}
         </>
       ) : (
         <>
-          <button
-            type="button"
-            className={`${styles.action} ${chatReady ? styles.chat : styles.chatMuted}`}
-            onClick={() => void onOpenChat()}
-            disabled={!chatReady}
-            title={isAuthenticated ? t('post.openChat', locale) : t('post.loginToChat', locale)}
-          >
-            <span className={styles.iconWrap}>
-              <BsChatDots size={18} aria-hidden />
-            </span>
-            <span className={styles.label}>{t('post.chat', locale)}</span>
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.action} ${contactHref ? styles.contact : styles.contactMuted}`}
-            onClick={() => void onContact()}
-            disabled={!contactHref}
-            title={contactLabel}
-          >
-            <span className={styles.iconWrap}>
-              <BsTelephoneFill size={18} aria-hidden />
-            </span>
-            <span className={styles.label}>{t('post.contact', locale)}</span>
-          </button>
+          {chatButton}
+          {contactButton}
         </>
       )}
     </div>

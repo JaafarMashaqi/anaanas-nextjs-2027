@@ -15,10 +15,12 @@ export default function PostImagesGallery({
   images,
   title,
   isRtl = false,
+  variant = 'default',
 }: {
   images: Array<{ url: string; alt?: string }>
   title?: string
   isRtl?: boolean
+  variant?: 'default' | 'details'
 }) {
   const galleryId = useId().replace(/:/g, '-')
 
@@ -49,6 +51,11 @@ export default function PostImagesGallery({
 
   if (!Array.isArray(images) || images.length === 0) return null
 
+  const rootClass = variant === 'details' ? `${gstyles.root} ${gstyles.rootDetails}` : gstyles.root
+  const stageClass = variant === 'details' ? `${gstyles.stage} ${gstyles.stageDetails}` : gstyles.stage
+  const slideClass = variant === 'details' ? `${gstyles.slideBox} ${gstyles.slideBoxDetails}` : gstyles.slideBox
+  const imgClass = variant === 'details' ? `${gstyles.img} ${gstyles.imgDetails}` : gstyles.img
+
   const sizes = '(max-width: 576px) 100vw, (max-width: 1200px) 92vw, 860px'
 
   if (images.length === 1) {
@@ -61,10 +68,10 @@ export default function PostImagesGallery({
         data-glightbox-gallery={galleryId}
         data-gallery="post-images"
       >
-        <div className={gstyles.stage}>
+        <div className={stageClass}>
           <Image
             fill
-            className={gstyles.img}
+            className={imgClass}
             src={src}
             alt={img.alt ?? title ?? 'post image'}
             sizes={sizes}
@@ -78,7 +85,7 @@ export default function PostImagesGallery({
   }
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} className={`post-images-swiper ${gstyles.root}`}>
+    <div dir={isRtl ? 'rtl' : 'ltr'} className={`post-images-swiper ${rootClass}`}>
       <Swiper
         modules={[Navigation, Pagination, Keyboard]}
         navigation
@@ -98,10 +105,10 @@ export default function PostImagesGallery({
                 data-glightbox-gallery={galleryId}
                 data-gallery="post-images"
               >
-                <div className={gstyles.slideBox}>
+                <div className={slideClass}>
                   <Image
                     fill
-                    className={gstyles.img}
+                    className={imgClass}
                     src={src}
                     alt={img.alt ?? title ?? 'post image'}
                     sizes={sizes}

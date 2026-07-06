@@ -160,8 +160,103 @@
   background: rgba(251, 191, 36, 0.14);
 }
 
-/* موبايل وشاشات ضيقة: أيقونات فقط لتفادي السكرول الأفقي */
+/* Marketplace listing layout — compact equal actions */
+.marketplaceBar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0;
+  padding: 0.28rem 0;
+  border-top: 1px solid rgba(21, 21, 21, 0.08);
+  border-bottom: 0;
+}
+
+.marketplaceBar > *:not(:first-child) {
+  border-inline-start: 1px solid rgba(21, 21, 21, 0.08);
+  padding-inline-start: 0.35rem;
+  margin-inline-start: 0.28rem;
+}
+
+.marketplaceBar .reactionAnchor {
+  flex: 1;
+  min-width: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.marketplaceAction {
+  padding: 0.36rem 0.22rem;
+  font-size: 0.72rem;
+  gap: 0.22rem;
+  border-radius: 8px;
+}
+
+.marketplaceAction:hover:not(:disabled):not(.actionDisabled) {
+  background: rgba(254, 203, 1, 0.1);
+}
+
+.marketplaceAction.likeActive {
+  color: #1877f2;
+  background: rgba(24, 119, 242, 0.06);
+}
+
+.marketplaceContact {
+  padding: 0.36rem 0.22rem;
+  font-size: 0.72rem;
+  gap: 0.22rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fecb01 0%, #e8a317 100%);
+  color: #151515;
+  font-weight: 700;
+}
+
+.marketplaceContact:hover:not(:disabled):not(.actionDisabled) {
+  background: linear-gradient(135deg, #ffe566 0%, #fecb01 100%);
+  color: #151515;
+}
+
+.marketplaceContact.contactMuted {
+  background: rgba(21, 21, 21, 0.06);
+  color: rgba(21, 21, 21, 0.45);
+}
+
 @media (max-width: 767.98px) {
+  .marketplaceBar {
+    padding: 0.2rem 0;
+  }
+
+  .marketplaceBar > *:not(:first-child) {
+    padding-inline-start: 0.2rem;
+    margin-inline-start: 0.15rem;
+  }
+
+  .marketplaceAction,
+  .marketplaceContact {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.32rem 0.12rem;
+    font-size: 0.68rem;
+    gap: 0;
+  }
+
+  .marketplaceBar .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .marketplaceBar .action {
+    position: relative;
+  }
+
   .bar {
     justify-content: space-between;
     padding: 0.2rem 0;

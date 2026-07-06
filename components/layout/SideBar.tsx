@@ -198,7 +198,7 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
           <span className={`${styles.orb} ${styles.orb3}`} />
         </div>
 
-        <header className={styles.panelHeader}>
+        <div className={styles.panelHeader}>
           <div className={styles.header}>
             <h2 id="sidebar-sections-heading" className={styles.title}>
               <span className={styles.liveDot} aria-hidden />
@@ -212,7 +212,7 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
             </div>
           </div>
           <p className={styles.panelHint}>{t('sidebar.panelHint', currentLocale)}</p>
-        </header>
+        </div>
 
         <nav className={styles.nav} aria-labelledby="sidebar-sections-heading">
           <Link

@@ -197,6 +197,10 @@ function CreatePostHeroShell({
               aria-invalid={errorText ? true : undefined}
               aria-describedby={errorText ? 'create-post-hero-title-err' : undefined}
             />
+
+
+{
+  !title && 
             <span
               className={styles.composerHeroInlineAffix}
               onClick={onAddAdClick}
@@ -209,9 +213,12 @@ function CreatePostHeroShell({
               tabIndex={0}
               title={t('createPost.heroAddAd', locale as any)}
             >
-              <BsPlus size={18} strokeWidth={1} aria-hidden />
+              <BsPlus size={15} strokeWidth={1} aria-hidden />
               <span>{t('createPost.heroAddAd', locale as any)}</span>
             </span>
+          }
+
+
           </div>
           {errorText ? (
             <div id="create-post-hero-title-err" className="text-danger small mt-1">

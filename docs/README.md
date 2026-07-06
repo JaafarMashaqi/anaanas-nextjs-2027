@@ -19,6 +19,11 @@
 | [`10-changelog.md`](./10-changelog.md) | سجل تغييرات الجلسة كاملاً |
 | [`13-seo-sitemap-schema.md`](./13-seo-sitemap-schema.md) | Sitemaps + JSON-LD + robots |
 | [`14-featured-posts-promotion.md`](./14-featured-posts-promotion.md) | **تمييز الإعلانات المدفوع (PayPal)** — توثيق شامل Backend + Frontend |
+| [`15-favicon-setup.md`](./15-favicon-setup.md) | **Favicon** — `assets/` + `public/` + `metadata.icons` في `layout.tsx` |
+| [`16-search-page-redesign.md`](./16-search-page-redesign.md) | **صفحة البحث** — ثيم Ananas + motion + فلاتر (UI فقط) |
+| [`16-post-card-listing-ui.md`](./16-post-card-listing-ui.md) | **PostCard listing UI** — الخلاصة + التفاصيل + PostActions + إصلاحات |
+| [`17-my-posts-ui.md`](./17-my-posts-ui.md) | **My Posts** — لوحة منشوراتي + Motion + MyPostListItem |
+| [`18-statistics-ui.md`](./18-statistics-ui.md) | **الإحصائيات** — ملف شخصي + إعلان + ثيم مشترك + Backend API |
 
 ## كيفية القراءة
 

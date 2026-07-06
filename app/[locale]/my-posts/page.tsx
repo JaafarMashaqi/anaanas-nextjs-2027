@@ -9,7 +9,7 @@ import MyPostsClient from './MyPostsClient'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'My posts',
+  title: 'My posts | منشوراتي',
 }
 
 async function loadMyPosts(locale: string) {
@@ -34,7 +34,7 @@ export default async function MyPostsPage({ params }: { params: Promise<{ locale
 
   return (
     <FeedLayoutClient locale={locale} sidebar={<SideBar sections={sections} locale={locale} />}>
-      <Col md={8} lg={6}>
+      <Col xs={12} lg={9} xl={8} className="mx-auto px-0">
         <MyPostsClient locale={locale} initialPosts={posts} />
       </Col>
     </FeedLayoutClient>

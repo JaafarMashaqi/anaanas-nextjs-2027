@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import {
   BsSearch,
   BsSliders,
@@ -54,6 +54,8 @@ type Copy = {
   searchingFor: (q: string) => string
   allSections: string
   allCategories: string
+  searchBtn: string
+  kicker: string
 }
 
 const COPY: Record<SupportedLocale, Copy> = {
@@ -89,6 +91,8 @@ const COPY: Record<SupportedLocale, Copy> = {
     searchingFor: (q: string) => `نتائج البحث عن «${q}»`,
     allSections: 'كل الأقسام',
     allCategories: 'كل الفئات',
+    searchBtn: 'بحث',
+    kicker: 'اكتشف',
   },
   en: {
     heroTitle: 'Search listings',
@@ -122,6 +126,8 @@ const COPY: Record<SupportedLocale, Copy> = {
     searchingFor: (q: string) => `Search results for “${q}”`,
     allSections: 'All sections',
     allCategories: 'All categories',
+    searchBtn: 'Search',
+    kicker: 'Discover',
   },
 }
 
@@ -149,6 +155,7 @@ const toSort = (value: string | null | undefined): SortKey => {
 
 const SearchClient = ({ locale, sections }: Props) => {
   const copy = COPY[locale] ?? COPY.ar
+  const reduceMotion = useReducedMotion()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -438,6 +445,19 @@ const SearchClient = ({ locale, sections }: Props) => {
   const showResultsSkeleton =
     posts.length === 0 && (loading || !hasSearched)
 
+  const heroMotion = reduceMotion
+    ? { initial: false, animate: { opacity: 1, y: 0 } }
+    : { initial: { opacity: 0, y: 18 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const } }
+
+  const resultItemMotion = (idx: number) =>
+    reduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 12 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.25, delay: Math.min(idx, 6) * 0.03 },
+        }
+
   /* ------------------------------------------------------------------
      Render
      ------------------------------------------------------------------ */
@@ -445,24 +465,30 @@ const SearchClient = ({ locale, sections }: Props) => {
     <div className="col-md-8 col-lg-6">
       <div className={styles.wrapper}>
         {/* ---------- Hero / Search bar ---------- */}
-        <motion.section
-          className={styles.heroCard}
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <motion.section className={styles.heroCard} {...heroMotion}>
+          <div className={styles.heroMesh} aria-hidden />
+          <div className={`${styles.heroOrb} ${styles.heroOrbA}`} aria-hidden />
+          <div className={`${styles.heroOrb} ${styles.heroOrbB}`} aria-hidden />
           <div className={styles.heroTopBar} aria-hidden />
 
+          <div className={styles.heroInner}>
           <div className={styles.heroHead}>
             <motion.div
-              className={styles.heroIcon}
-              initial={{ rotate: -10, scale: 0.9 }}
+              className={styles.heroIconWrap}
+              initial={reduceMotion ? false : { rotate: -8, scale: 0.92 }}
               animate={{ rotate: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 220, damping: 14 }}
             >
-              <BsSearch />
+              <span className={styles.heroIconRing} aria-hidden />
+              <span className={styles.heroIcon}>
+                <BsSearch />
+              </span>
             </motion.div>
             <div>
+              <p className={styles.heroKicker}>
+                <span className={styles.heroKickerDot} aria-hidden />
+                {copy.kicker}
+              </p>
               <h1 className={styles.heroTitle}>{copy.heroTitle}</h1>
               <p className={styles.heroSubtitle}>
                 {searchedQuery ? copy.searchingFor(searchedQuery) : copy.heroSubtitle}
@@ -494,27 +520,39 @@ const SearchClient = ({ locale, sections }: Props) => {
               )}
             </div>
 
-            <button
+            <motion.button
               type="button"
               className={`${styles.filtersToggle} ${filtersOpen ? styles.filtersToggleActive : ''}`}
               onClick={() => setFiltersOpen((v) => !v)}
               aria-expanded={filtersOpen}
+              whileTap={reduceMotion ? undefined : { scale: 0.97 }}
             >
               <BsSliders />
               <span>{copy.filters}</span>
               {activeFiltersCount > 0 && (
                 <span className={styles.filterBadge}>{activeFiltersCount}</span>
               )}
-            </button>
+            </motion.button>
 
-            <button type="submit" className={styles.applyBtn}>
-              {copy.heroTitle}
-            </button>
+            <motion.button
+              type="submit"
+              className={styles.searchSubmitBtn}
+              whileHover={reduceMotion ? undefined : { y: -2 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+            >
+              <BsSearch aria-hidden />
+              <span>{copy.searchBtn}</span>
+            </motion.button>
           </form>
 
           {/* Active filter pills */}
           {(searchedQuery || activeFiltersCount > 0) && (
-            <div className={styles.activePills}>
+            <motion.div
+              className={styles.activePills}
+              initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.22 }}
+            >
               {searchedQuery && (
                 <span className={styles.pill}>
                   «{searchedQuery}»
@@ -558,7 +596,7 @@ const SearchClient = ({ locale, sections }: Props) => {
               <button className={styles.clearAll} onClick={onResetAll} type="button">
                 {copy.clearAll}
               </button>
-            </div>
+            </motion.div>
           )}
 
           {/* ---------- Filters panel ---------- */}
@@ -668,11 +706,17 @@ const SearchClient = ({ locale, sections }: Props) => {
               </motion.div>
             )}
           </AnimatePresence>
+          </div>
         </motion.section>
 
         {/* ---------- Summary + Sort ---------- */}
-        <div className={styles.summaryBar}>
-          <BsFilterCircle aria-hidden />
+        <motion.div
+          className={styles.summaryCard}
+          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, delay: 0.05 }}
+        >
+          <BsFilterCircle className={styles.summaryIcon} aria-hidden />
           <span>
             {showResultsSkeleton ? (
               <span className={styles.summaryLoading} aria-busy="true">
@@ -700,7 +744,7 @@ const SearchClient = ({ locale, sections }: Props) => {
               <option value="price_desc">{copy.sortPriceDesc}</option>
             </select>
           </div>
-        </div>
+        </motion.div>
 
         {/* ---------- Results ---------- */}
         <section className={styles.resultsStack} aria-labelledby="search-results-heading">
@@ -725,25 +769,26 @@ const SearchClient = ({ locale, sections }: Props) => {
           ) : !loading && hasSearched && posts.length === 0 ? (
             <motion.div
               className={styles.emptyCard}
-              initial={{ opacity: 0, y: 10 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25 }}
             >
-              <div className={styles.emptyIcon}>
-                <BsSearch />
+              <div className={styles.emptyIconWrap}>
+                <span className={styles.emptyIconRing} aria-hidden />
+                <div className={styles.emptyIcon}>
+                  <BsSearch />
+                </div>
               </div>
               <div className={styles.emptyTitle}>{copy.emptyTitle}</div>
-              <div>{copy.emptyBody}</div>
+              <p className={styles.emptyHint}>{copy.emptyBody}</p>
             </motion.div>
           ) : (
             <AnimatePresence initial={false}>
               {posts.map((post, idx) => (
                 <motion.div
                   key={post?.id ?? `post-${idx}`}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25, delay: Math.min(idx, 6) * 0.03 }}
+                  exit={reduceMotion ? undefined : { opacity: 0 }}
+                  {...resultItemMotion(idx)}
                 >
                   <PostCard post={post} onDelete={handlePostDelete} />
                 </motion.div>
@@ -753,11 +798,21 @@ const SearchClient = ({ locale, sections }: Props) => {
         </section>
 
         {nextPageUrl && !loading && (
-          <div className={styles.loadMoreWrap}>
-            <button className={styles.loadMoreBtn} onClick={onLoadMore} disabled={loadingMore}>
+          <motion.div
+            className={styles.loadMoreWrap}
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <motion.button
+              className={styles.loadMoreBtn}
+              onClick={onLoadMore}
+              disabled={loadingMore}
+              whileHover={reduceMotion || loadingMore ? undefined : { y: -2 }}
+              whileTap={reduceMotion || loadingMore ? undefined : { scale: 0.98 }}
+            >
               {loadingMore ? copy.loading : copy.loadMore}
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         )}
       </div>
     </div>

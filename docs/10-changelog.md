@@ -43,3 +43,51 @@
 
 - `MOBILE_AI_PREVIEW_USER_ID = '28775'` في `page.tsx` يتحكم بظهور لوحات
   المعاينة (Dashboard / Promo Grid / Quick actions).
+
+## لوحة إحصائيات Filament + Favicon — 2026-07-06
+
+| النطاق | أبرز الملفات | التغيير |
+|--------|--------------|---------|
+| Backend | `Dashboard.php`, `DashboardStatisticsService.php`, `Filament/Widgets/*`, `custom.css`, `BackOfficeV1PanelProvider.php` | إحصائيات إعلانات/تفاعلات/مستخدمين + charts + فلاتر زمنية + ثيم لوحة كامل |
+| Backend docs | `anaanasBackend/docs/15-filament-analytics-dashboard.md` | توثيق شامل للميزة والثيم وإصلاح Sidebar |
+| Frontend | `app/layout.tsx`, `global.d.ts`, `app/favicon.ico`, حذف `app/icon.png` | favicon من `assets/` + `public/` |
+| Frontend docs | `docs/15-favicon-setup.md` | توثيق إعداد الأيقونة |
+
+## صفحة البحث — إعادة التصميم — 2026-07-06
+
+| النطاق | الملفات | التغيير |
+|--------|---------|---------|
+| Frontend | `app/[locale]/search/SearchClient.tsx`, `searchPage.module.css` | ثيم Ananas، mesh/orbs، motion، summary card، skeleton ذهبي |
+| Frontend docs | `docs/16-search-page-redesign.md` | توثيق UI + QA + ما لم يتغيّر |
+
+## PostCard Listing UI — 2026-07-06
+
+توثيق شامل في [`16-post-card-listing-ui.md`](./16-post-card-listing-ui.md).
+
+| النطاق | أبرز الملفات | التغيير |
+|--------|--------------|---------|
+| Listing feed | `PostCard.tsx`, `PostCard.module.css` | hero نظيف، `listingInfoBlock`، stats، تخطيط عمودي |
+| Actions | `PostActions.tsx`, `.module.css` | `layout=marketplace`، استرجاع الشات، أزرار flex متساوية |
+| Details page | `post/[id]/page.tsx`, `postDetails.module.css` | `detailsHead`، gallery، sidebar اتصال، attributes grid |
+| Gallery | `PostImagesGallery.tsx`, `.module.css` | `variant="details"` |
+
+## My Posts Dashboard — 2026-07-06
+
+توثيق شامل في [`17-my-posts-ui.md`](./17-my-posts-ui.md).
+
+| النطاق | أبرز الملفات | التغيير |
+|--------|--------------|---------|
+| Dashboard UI | `MyPostsClient.tsx`, `myPosts.module.css` | hero mesh، stat cards، filters، Motion |
+| List item | `MyPostListItem.tsx` | بطاقة مضغوطة + إجراءات + حذف |
+| Layout | `layout.tsx`, `page.tsx` | skeleton + عرض أوسع |
+
+## Statistics Dashboard — 2026-07-06
+
+توثيق شامل في [`18-statistics-ui.md`](./18-statistics-ui.md).
+
+| النطاق | أبرز الملفات | التغيير |
+|--------|--------------|---------|
+| Shared UI | `components/statistics/*` | ثيم Ananas + utils + mascot |
+| Profile stats | `profile/statistics/statisticsClient.tsx` | KPIs موسّعة + 6 tabs + top posts |
+| Post stats | `post/[id]/statistics/statisticsClient.tsx` | hero mesh + mascot + تبويب تمييز + unlikes |
+| Backend | `PostController.php` | `myStatistics` موسّع + إصلاح `promotion_totals` mapping |

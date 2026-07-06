@@ -278,7 +278,7 @@ const ProfileLayout = ({ children }: ChildrenType) => {
                         {' '}
                         <BsPencilFill size={19} className="pe-1" /> {t('profile.editProfile', locale)}{' '}
                       </Button>
-                      <Dropdown>
+                      {/* <Dropdown>
                         <DropdownToggle
                           as="a"
                           className="icon-md btn btn-light content-none"
@@ -324,7 +324,7 @@ const ProfileLayout = ({ children }: ChildrenType) => {
                             </DropdownItem>
                           </li>
                         </DropdownMenu>
-                      </Dropdown>
+                      </Dropdown> */}
                     </div>
                   </div>
                 </CardBody>

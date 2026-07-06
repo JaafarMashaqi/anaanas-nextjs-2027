@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
+import styles from './myPosts.module.css'
 
 export default function MyPostsLayout({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
@@ -22,9 +23,18 @@ export default function MyPostsLayout({ children }: { children: React.ReactNode 
 
   if (status === 'loading' || status === 'unauthenticated') {
     return (
-      <div className="d-flex justify-content-center align-items-center py-5">
-        <div className="spinner-border text-primary" role="status" aria-hidden="true" />
-      </div>
+      <main className={styles.page}>
+        <div className={styles.container}>
+          <div className={styles.shell}>
+            <div className={styles.loadingShell}>
+              <div className={styles.skeletonHero} />
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className={styles.skeletonRow} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
     )
   }
 

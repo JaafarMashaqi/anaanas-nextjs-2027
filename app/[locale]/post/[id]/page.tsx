@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
-import { Card, Col, Container, Row, Table } from 'react-bootstrap'
+import { Card, Col, Container, Row } from 'react-bootstrap'
 import Link from 'next/link'
 import PostCard from '@/components/cards/PostCard'
 import PostImagesGallery from './PostImagesGallery'
@@ -12,6 +12,9 @@ import PostNotFoundBlock from './PostNotFoundBlock'
 import PostStatusBanner from './PostStatusBanner'
 import styles from './postDetails.module.css'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
+import { resolveCurrencyForCountry } from '@/lib/seo/countryCurrency'
+import Image from 'next/image'
+import defaultUserAvatar from '@/assets/images/avatar/user-default.svg'
 import FeedLayoutClient from '@/components/layout/FeedLayoutClient'
 import SideBar from '@/components/layout/SideBar'
 import { fetchSections } from '@/lib/api/sections'
@@ -72,6 +75,22 @@ async function fetchMoreFromSection(
   } catch {
     return []
   }
+}
+
+function formatDetailsPrice(
+  price: unknown,
+  currency: string | null,
+  locale: SupportedLocale,
+): string | null {
+  if (price == null || price === '') return null
+  const n = typeof price === 'number' ? price : Number(String(price).replace(/,/g, ''))
+  if (!Number.isFinite(n) || n <= 0) return String(price)
+  const formatted = new Intl.NumberFormat(locale === 'ar' ? 'ar-JO' : 'en-US', {
+    maximumFractionDigits: 0,
+  }).format(n)
+  if (currency === 'JOD') return locale === 'ar' ? `${formatted} د.أ` : `${formatted} JOD`
+  if (currency) return `${formatted} ${currency}`
+  return formatted
 }
 
 function pickLocalizedName(value: any, locale: string): string {
@@ -304,6 +323,21 @@ export default async function PostDetailsPage({ params }: { params: Promise<{ lo
     (post as any)?.country?.iso2 || (post as any)?.country?.iso_code || '',
   ).toLowerCase()
   const countryName = pickLocalizedName((post as any)?.country?.name, safeLocale)
+  const currencyCode = resolveCurrencyForCountry(countryIso2)
+  const priceLabel = hasPrice ? formatDetailsPrice((post as any).price, currencyCode, safeLocale) : null
+  const isFeaturedActive = Boolean((post as any)?.is_featured_active || (post as any)?.promotion?.is_active)
+  const listingTitle = (post as any)?.title
+    ? String((post as any).title)
+    : safeLocale === 'ar'
+      ? `إعلان ${id}`
+      : `Listing ${id}`
+  const publisherAvatar =
+    resolveMediaUrl(
+      (post as any)?.user?.avatar_url ||
+        (post as any)?.user?.avatar ||
+        (post as any)?.user?.profile_image ||
+        '',
+    ) || defaultUserAvatar.src
 
   const headersList = await headers()
   const origin = getSiteOrigin(headersList)
@@ -404,86 +438,135 @@ export default async function PostDetailsPage({ params }: { params: Promise<{ lo
 
             <PostStatusBanner locale={safeLocale} status={(post as any)?.status} />
 
-            <div className={styles.listingTopBar}>
-              <span className={styles.adIdBadge}>
-                {safeLocale === 'ar' ? `إعلان رقم ${id}` : `Ad #${id}`}
-              </span>
-              {hasPrice ? (
-                <div className={styles.pricePill}>
-                  <span className={styles.pricePillLabel}>{safeLocale === 'ar' ? 'السعر' : 'Price'}</span>
-                  <span className={styles.pricePillValue}>{String((post as any).price)}</span>
-                </div>
-              ) : null}
-            </div>
+
+            <div className={styles.detailsHead}>
+                      <div className={styles.detailsHeadTop}>
+                        <div className={styles.detailsHeadBadges}>
+                          <span className={styles.adIdBadge}>
+                            {safeLocale === 'ar' ? `إعلان #${id}` : `Ad #${id}`}
+                          </span>
+                          {isFeaturedActive ? (
+                            <span className={styles.featuredBadge}>
+                              {safeLocale === 'ar' ? 'عرض مميز' : 'Featured'}
+                            </span>
+                          ) : null}
+                          {postImages.length > 1 ? (
+                            <span className={styles.photoCountBadge}>
+                              {postImages.length} {safeLocale === 'ar' ? 'صور' : 'photos'}
+                            </span>
+                          ) : null}
+                        </div>
+                        {priceLabel ? (
+                          <div className={styles.priceHero}>
+                            <span className={styles.priceHeroLabel}>{safeLocale === 'ar' ? 'السعر' : 'Price'}</span>
+                            <span className={styles.priceHeroValue}>{priceLabel}</span>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <h1 className={styles.listingTitle}>{listingTitle}</h1>
+
+                      {(sectionName || categoryName || cityName) && (
+                        <div className={styles.metaRow}>
+                          {sectionName && sectionSlug ? (
+                            <Link href={sectionPath} className={styles.metaChipAccent}>
+                              {sectionName}
+                            </Link>
+                          ) : (
+                            sectionName ? <span className={styles.metaChipAccent}>{sectionName}</span> : null
+                          )}
+                          {categoryName && sectionSlug && categorySlug ? (
+                            <Link href={categoryPath} className={styles.metaChip}>
+                              {categoryName}
+                            </Link>
+                          ) : (
+                            categoryName ? <span className={styles.metaChip}>{categoryName}</span> : null
+                          )}
+                          {cityName ? <span className={styles.metaChip}>{cityName}</span> : null}
+                        </div>
+                      )}
+                    </div>
+
+
 
             <article className={styles.article}>
               <Row className={`g-3 g-lg-4 ${styles.contentRow}`}>
                 <Col lg={8} xl={8} className={styles.primaryCol}>
-                  <div className={styles.listingStack}>
+                  <div className={styles.listingPanel}>
                     {postImages.length > 0 ? (
-                      <Card className={styles.galleryCard}>
-                        <PostImagesGallery images={postImages} title={(post as any)?.title} isRtl={isRtl} />
-                      </Card>
+                      <div className={styles.detailsGallery}>
+                        <PostImagesGallery
+                          images={postImages}
+                          title={(post as any)?.title}
+                          isRtl={isRtl}
+                          variant="details"
+                        />
+                      </div>
                     ) : null}
 
+              
                     <PostCard
-                    post={postForCard}
-                    attributesAndOptions={
-                      <Card className={styles.detailsCard}>
-                        <div className="card-body">
-                          <h2 className={styles.detailsTitle}>{t('post.detailsTitle', safeLocale)}</h2>
+                      post={postForCard}
+                      detailsIntroMode="actionsOnly"
+                      attributesAndOptions={
+                        <Card className={styles.detailsCard}>
+                          <div className={styles.detailsCardBody}>
+                            <h2 className={styles.detailsTitle}>{t('post.detailsTitle', safeLocale)}</h2>
 
-                          {attributesAndOptions.length === 0 ? (
-                            <div className="text-muted">{t('post.noAttributes', safeLocale)}</div>
-                          ) : (
-                            <div className="table-responsive">
-                              <Table striped bordered hover size="sm" className={`mb-0 ${styles.attrTable}`}>
-                                <thead>
-                                  <tr>
-                                    <th style={{ width: '40%' }}>{t('post.attribute', safeLocale)}</th>
-                                    <th>{t('post.value', safeLocale)}</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {attributesAndOptions.map((row: any, idx: number) => {
-                                    const attrName =
-                                      pickLocalizedName(row?.attribute?.name, locale) ||
-                                      row?.attribute?.slug ||
-                                      `#${idx + 1}`
+                            {attributesAndOptions.length === 0 ? (
+                              <p className={styles.emptyAttributes}>{t('post.noAttributes', safeLocale)}</p>
+                            ) : (
+                              <dl className={styles.attrGrid}>
+                                {attributesAndOptions.map((row: any, idx: number) => {
+                                  const attrName =
+                                    pickLocalizedName(row?.attribute?.name, locale) ||
+                                    row?.attribute?.slug ||
+                                    `#${idx + 1}`
 
-                                    const singleOptName = pickLocalizedName(row?.option?.name, locale)
-                                    const multiOptNames = Array.isArray(row?.options)
-                                      ? row.options.map((o: any) => pickLocalizedName(o?.name, locale)).filter(Boolean)
-                                      : []
+                                  const singleOptName = pickLocalizedName(row?.option?.name, locale)
+                                  const multiOptNames = Array.isArray(row?.options)
+                                    ? row.options.map((o: any) => pickLocalizedName(o?.name, locale)).filter(Boolean)
+                                    : []
 
-                                    const value = singleOptName || (multiOptNames.length ? multiOptNames.join('، ') : '')
+                                  const value = singleOptName || (multiOptNames.length ? multiOptNames.join('، ') : '')
 
-                                    return (
-                                      <tr key={idx}>
-                                        <td>{attrName}</td>
-                                        <td>{value || '-'}</td>
-                                      </tr>
-                                    )
-                                  })}
-                                </tbody>
-                              </Table>
-                            </div>
-                          )}
-                        </div>
-                      </Card>
-                    }
-                  />
+                                  return (
+                                    <div className={styles.attrRow} key={idx}>
+                                      <dt className={styles.attrName}>{attrName}</dt>
+                                      <dd className={styles.attrValue}>{value || '—'}</dd>
+                                    </div>
+                                  )
+                                })}
+                              </dl>
+                            )}
+                          </div>
+                        </Card>
+                      }
+                    />
                   </div>
                 </Col>
 
                 <Col lg={4} xl={4} className={styles.asideCol}>
                   <aside className={styles.asideSticky} aria-label={safeLocale === 'ar' ? 'الجانب' : 'Sidebar'}>
                     <Card className={styles.contactCard}>
-                      <div className={`card-body ${styles.contactBody}`}>
-                        <h2 className={styles.contactTitle}>
-                          {safeLocale === 'ar' ? 'معلومات المعلن' : 'Publisher'}
-                        </h2>
-                        <div className={styles.contactName}>{userName}</div>
+                      <div className={styles.contactBody}>
+                        <div className={styles.contactHeader}>
+                          <Image
+                            src={publisherAvatar}
+                            alt=""
+                            width={52}
+                            height={52}
+                            className={styles.contactAvatar}
+                            unoptimized
+                          />
+                          <div className={styles.contactHeaderText}>
+                            <h2 className={styles.contactTitle}>
+                              {safeLocale === 'ar' ? 'معلومات المعلن' : 'Publisher'}
+                            </h2>
+                            <div className={styles.contactName}>{userName}</div>
+                          </div>
+                        </div>
+
                         <div className={styles.contactGrid}>
                           <div className={styles.contactItem}>
                             <span className={styles.contactItemLabel}>{safeLocale === 'ar' ? 'المدينة' : 'City'}</span>
@@ -491,16 +574,34 @@ export default async function PostDetailsPage({ params }: { params: Promise<{ lo
                           </div>
                           <div className={styles.contactItem}>
                             <span className={styles.contactItemLabel}>{safeLocale === 'ar' ? 'الهاتف' : 'Phone'}</span>
-                            <span className={styles.contactItemValue}>{userPhone || '—'}</span>
+                            <span className={styles.contactItemValue}>
+                              {userPhone ? (
+                                <a href={`tel:${userPhone}`} className={styles.contactLink}>
+                                  {userPhone}
+                                </a>
+                              ) : (
+                                '—'
+                              )}
+                            </span>
                           </div>
                           <div className={styles.contactItem}>
                             <span className={styles.contactItemLabel}>{safeLocale === 'ar' ? 'البريد' : 'Email'}</span>
-                            <span className={styles.contactItemValue}>{userEmail || '—'}</span>
+                            <span className={styles.contactItemValue}>
+                              {userEmail ? (
+                                <a href={`mailto:${userEmail}`} className={styles.contactLink}>
+                                  {userEmail}
+                                </a>
+                              ) : (
+                                '—'
+                              )}
+                            </span>
                           </div>
-                          <div className={styles.contactItem}>
-                            <span className={styles.contactItemLabel}>{safeLocale === 'ar' ? 'السعر' : 'Price'}</span>
-                            <span className={styles.contactItemValue}>{hasPrice ? String((post as any).price) : '—'}</span>
-                          </div>
+                          {priceLabel ? (
+                            <div className={`${styles.contactItem} ${styles.contactItemHighlight}`}>
+                              <span className={styles.contactItemLabel}>{safeLocale === 'ar' ? 'السعر' : 'Price'}</span>
+                              <span className={styles.contactPriceValue}>{priceLabel}</span>
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     </Card>
