@@ -3,10 +3,9 @@
   align-items: center;
   gap: 6px;
   padding: 4px;
-  background: #ffffff;
+  background: #f4ece4; border: 1px solid #3737378a;
   border-radius: 999px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-  border: 1px solid #f1f1f1;
   width: 100%;
   min-width: 0;
 }

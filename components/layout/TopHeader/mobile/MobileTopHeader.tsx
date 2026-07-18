@@ -16,6 +16,7 @@ import StyledHeader from '../StyledHeader'
 
 import MobileNotificationsButton from './MobileNotificationsButton'
 import MobileMessagesButton from './MobileMessagesButton'
+import MobileProfileButton from './MobileProfileButton'
 import MobileHeaderSearchBar from './MobileHeaderSearchBar'
 import MobileLoginButton from './MobileLoginButton'
 
@@ -113,6 +114,7 @@ const MobileTopHeader = () => {
               <>
                 <MobileNotificationsButton locale={locale} />
                 <MobileMessagesButton locale={locale} />
+                <MobileProfileButton locale={locale} />
               </>
             ) : (
               <MobileLoginButton locale={locale} />

@@ -2,9 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
-import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import {
   Dropdown,
   DropdownItem,
@@ -21,6 +19,7 @@ import {
 
 import defaultUserAvatar from '@/assets/images/avatar/user-default.svg'
 import { useCurrentUser } from '@/context/useCurrentUser'
+import { useClientLogout } from '@/hooks/useClientLogout'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './ProfileDropdown.module.css'
@@ -59,42 +58,15 @@ const STRINGS: Record<SupportedLocale, Strings> = {
 
 const ProfileDropdown = ({ locale = 'ar' }: { locale?: SupportedLocale }) => {
   const { data: session, status } = useSession()
-  const router = useRouter()
-  const [loggingOut, setLoggingOut] = useState(false)
+  const { logout, loggingOut } = useClientLogout(locale)
 
   const { user: currentUser, avatarUrl: resolvedAvatarUrl } = useCurrentUser()
   const avatarUrl = currentUser ? resolvedAvatarUrl : null
 
   const t = STRINGS[locale] ?? STRINGS.ar
 
-  // ── Logout flow ──────────────────────────────────────────────────────────
-  // 1. Hit the backend logout endpoint so the API session is invalidated and
-  //    the auth-out notification (welcome-back / logout) can be recorded.
-  // 2. Clear the NextAuth client session without auto-redirect so we can
-  //    decide where to go ourselves.
-  // 3. Redirect to the locale-aware sign-in page and refresh the router so
-  //    server components re-render against the new (logged-out) state.
-  const handleLogout = async () => {
-    if (loggingOut) return
-    setLoggingOut(true)
-    try {
-      try {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        })
-      } catch (err) {
-        // Don't block client sign-out if the backend call fails.
-        // eslint-disable-next-line no-console
-        console.warn('Backend logout failed (continuing):', err)
-      }
-
-      await signOut({ redirect: false })
-      router.replace(`/${locale}/auth/sign-in`)
-      router.refresh()
-    } finally {
-      setLoggingOut(false)
-    }
+  const handleLogout = () => {
+    void logout()
   }
 
   // ── Unauthenticated: render a login button ───────────────────────────────

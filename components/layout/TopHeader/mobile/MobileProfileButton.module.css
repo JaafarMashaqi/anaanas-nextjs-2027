@@ -1,0 +1,45 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.btn:hover,
+.btn:focus-visible {
+  transform: translateY(-1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid rgba(255, 193, 7, 0.55);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+.ring {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  padding: 2px;
+  background: linear-gradient(135deg, #ffc107 0%, #ff5722 55%, #ff006e 100%);
+  box-shadow: 0 3px 10px rgba(255, 87, 34, 0.22);
+}
+
+.avatar {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid #fff;
+  background: #f3f4f6;
+}

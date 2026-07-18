@@ -280,8 +280,7 @@ const TopHeader = () => {
         }
 
         .topHeader__searchField .form-control {
-          background: #f4f5f8;
-          border: 1px solid transparent;
+      background: #f4ece4; border: 1px solid #3737378a;
           border-radius: 999px;
           padding-inline: 44px 16px; /* start for icon, end for text */
           height: 40px;
