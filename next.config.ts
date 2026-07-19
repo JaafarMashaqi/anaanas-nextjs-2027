@@ -3,6 +3,12 @@ import type {NextConfig} from "next";
 const nextConfig: NextConfig = {
     /* config options here */
     compress: true,
+    experimental: {
+        // Lower peak RAM during `next build` (Next.js 15+).
+        webpackMemoryOptimizations: true,
+        // Custom webpack config disables the default worker; re-enable to split memory.
+        webpackBuildWorker: true,
+    },
     allowedDevOrigins: [
         'demo.anaanas.com',
         'demo.localhost',
