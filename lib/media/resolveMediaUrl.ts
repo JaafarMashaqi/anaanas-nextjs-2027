@@ -59,6 +59,16 @@ export function resolveMediaUrl(url?: string | null): string {
   // Inline / object URLs always pass through.
   if (u.startsWith('data:') || u.startsWith('blob:')) return u
 
+  // `/post-media/...` — local mirror served from Laravel APP_URL (MEDIA_DRIVER=local).
+  if (u.startsWith('/post-media/')) {
+    if (CDN_BASE) return joinCdn(u.slice('/post-media/'.length))
+    return getApiUrl(u)
+  }
+  if (u.startsWith('post-media/')) {
+    if (CDN_BASE) return joinCdn(u.slice('post-media/'.length))
+    return getApiUrl(`/${u}`)
+  }
+
   // Storage paths returned from the Laravel API.  These get the CDN/API
   // treatment and are the only "/" paths we ever rewrite.
   if (u.startsWith('/storage/')) {

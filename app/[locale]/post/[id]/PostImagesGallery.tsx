@@ -9,6 +9,7 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'glightbox/dist/css/glightbox.min.css'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
+import { remoteMediaImageProps } from '@/lib/media/nextImageMediaProps'
 import gstyles from './PostImagesGallery.module.css'
 
 export default function PostImagesGallery({
@@ -78,6 +79,7 @@ export default function PostImagesGallery({
             priority
             quality={82}
             fetchPriority="high"
+            {...remoteMediaImageProps}
           />
         </div>
       </a>
@@ -115,6 +117,7 @@ export default function PostImagesGallery({
                     priority={idx === 0}
                     quality={82}
                     fetchPriority={idx === 0 ? 'high' : 'low'}
+                    {...remoteMediaImageProps}
                   />
                 </div>
               </a>

@@ -1,4 +1,91 @@
 import type {NextConfig} from "next";
+import type {RemotePattern} from "next/dist/shared/lib/image-config";
+
+function hostnameFromEnvUrl(raw?: string): string | null {
+  const value = raw?.trim();
+  if (!value) return null;
+  try {
+    return new URL(value).hostname;
+  } catch {
+    return null;
+  }
+}
+
+/** Allow Next/Image optimizer for API/CDN media when explicitly enabled. */
+function buildMediaRemotePatterns(): RemotePattern[] {
+  const patterns: RemotePattern[] = [
+    {
+      protocol: 'http',
+      hostname: 'localhost',
+      port: '8000',
+      pathname: '/storage/**',
+    },
+    {
+      protocol: 'http',
+      hostname: '127.0.0.1',
+      port: '8000',
+      pathname: '/storage/**',
+    },
+    {
+      protocol: 'http',
+      hostname: 'localhost',
+      pathname: '/storage/**',
+    },
+    {
+      protocol: 'http',
+      hostname: '127.0.0.1',
+      pathname: '/storage/**',
+    },
+    {
+      protocol: 'http',
+      hostname: 'localhost',
+      port: '8000',
+      pathname: '/post-media/**',
+    },
+    {
+      protocol: 'http',
+      hostname: '127.0.0.1',
+      port: '8000',
+      pathname: '/post-media/**',
+    },
+    {
+      protocol: 'https',
+      hostname: '**.amazonaws.com',
+      pathname: '/**',
+    },
+    {
+      protocol: 'https',
+      hostname: '**.cloudfront.net',
+      pathname: '/**',
+    },
+    {
+      protocol: 'https',
+      hostname: '**.anaanas.com',
+      pathname: '/post-media/**',
+    },
+    {
+      protocol: 'https',
+      hostname: '**.anaanas.com',
+      pathname: '/storage/**',
+    },
+  ];
+
+  const hosts = new Set<string>(['admin.anaanas.com']);
+
+  for (const envKey of ['NEXT_PUBLIC_API_BASE_URL', 'API_BASE_URL', 'NEXT_PUBLIC_MEDIA_CDN_URL'] as const) {
+    const host = hostnameFromEnvUrl(process.env[envKey]);
+    if (host) hosts.add(host);
+  }
+
+  for (const hostname of hosts) {
+    patterns.push(
+      { protocol: 'https', hostname, pathname: '/post-media/**' },
+      { protocol: 'https', hostname, pathname: '/storage/**' },
+    );
+  }
+
+  return patterns;
+}
 
 const nextConfig: NextConfig = {
     /* config options here */
@@ -24,40 +111,7 @@ const nextConfig: NextConfig = {
         dangerouslyAllowSVG: true,
         contentDispositionType: 'attachment',
         contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-        remotePatterns: [
-            {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '8000',
-                pathname: '/storage/**',
-            },
-            {
-                protocol: 'http',
-                hostname: '127.0.0.1',
-                port: '8000',
-                pathname: '/storage/**',
-            },
-            {
-                protocol: 'http',
-                hostname: 'localhost',
-                pathname: '/storage/**',
-            },
-            {
-                protocol: 'http',
-                hostname: '127.0.0.1',
-                pathname: '/storage/**',
-            },
-            {
-                protocol: 'https',
-                hostname: '**.amazonaws.com',
-                pathname: '/**',
-            },
-            {
-                protocol: 'https',
-                hostname: '**.cloudfront.net',
-                pathname: '/**',
-            },
-        ],
+        remotePatterns: buildMediaRemotePatterns(),
     },
     async rewrites() {
         return [
