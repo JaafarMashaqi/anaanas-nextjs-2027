@@ -17,6 +17,7 @@ import styles from './MobileDailyUpdatesBanner.module.css'
  * Keep the two IDs in sync.
  */
 const MOBILE_AI_PREVIEW_USER_ID = '28775'
+const MOBILE_AI_PREVIEW_USER_ID_2 = '61276'
 
 /**
  * Inline colorful dartboard-with-arrow used inside the "opportunities" pill.
@@ -155,7 +156,7 @@ const MobileDailyUpdatesBanner = ({ locale: localeOverride, className = '' }: Pr
   // Preview gate: actions row appears only for the internal preview user, same
   // as the mobile AI dashboard on the home page. Everyone else sees the banner
   // only.
-  const showActions = session?.user?.id === MOBILE_AI_PREVIEW_USER_ID
+  const showActions = session?.user?.id === MOBILE_AI_PREVIEW_USER_ID || session?.user?.id === MOBILE_AI_PREVIEW_USER_ID_2
 
   // Order is fixed in source (orders → favorites → opportunities); CSS handles
   // visual mirroring via flex direction so we honour the page direction

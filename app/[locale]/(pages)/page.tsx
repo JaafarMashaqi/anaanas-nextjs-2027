@@ -56,6 +56,7 @@ export async function generateMetadata({
 
 /** Mobile AI discovery block is visible only for this account (preview). */
 const MOBILE_AI_PREVIEW_USER_ID = '28775'
+const MOBILE_AI_PREVIEW_USER_ID_2 = '61276'
 
 const Home = async ({
   params,
@@ -79,7 +80,7 @@ const Home = async ({
     fetchSections(locale, { revalidateSeconds: 300 }),
     resolveCountryIdFromHeaders(),
   ])
-  const showMobileAiDashboard =   session?.user?.id === MOBILE_AI_PREVIEW_USER_ID
+  const showMobileAiDashboard =   session?.user?.id === MOBILE_AI_PREVIEW_USER_ID || session?.user?.id === MOBILE_AI_PREVIEW_USER_ID_2
   const sp = (await searchParams) ?? {}
   const pageRaw = sp.page ? (Array.isArray(sp.page) ? sp.page[0] : sp.page) : undefined
   const page = pageRaw ? Number(pageRaw) : undefined
