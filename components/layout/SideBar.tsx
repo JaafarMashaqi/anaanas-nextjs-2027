@@ -3,9 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
-import { BsChevronRight, BsGlobe2, BsHouseDoorFill } from 'react-icons/bs'
+import { BsChevronRight, BsGlobe2, BsHouseDoorFill, BsJournalRichtext } from 'react-icons/bs'
 import clsx from 'clsx'
 
 import styles from './SideBar.module.css'
@@ -41,6 +42,8 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const params = useParams<{ locale?: string }>()
+  const { status } = useSession()
+  const isAuthed = status === 'authenticated'
 
   const currentLocale: SupportedLocale = useMemo(() => {
     if (localeProp && isSupportedLocale(localeProp)) {
@@ -177,6 +180,7 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
 
   const normalizedPath = pathname?.replace(/\/$/, '')
   const homeHref = `/${currentLocale}`
+  const blogsHref = `/${currentLocale}/blogs`
   const profileHref = `/${currentLocale}/profile/feed`
   const myPostsHref = `/${currentLocale}/my-posts`
 
@@ -185,6 +189,8 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
     normalizedPath === `${homeHref}/home` ||
     normalizedPath === `${homeHref}/` ||
     normalizedPath === ''
+
+  const isBlogsActive = normalizedPath?.startsWith(blogsHref) ?? false
 
   const asideLabel =
     currentLocale === 'ar' ? 'أقسام الإعلانات والتنقل' : 'Listing sections and navigation'
@@ -223,6 +229,17 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
               <BsHouseDoorFill aria-hidden />
             </span>
             <span>{currentLocale === 'ar' ? 'الرئيسية' : 'Home'}</span>
+            <BsChevronRight className={styles.chevron} aria-hidden />
+          </Link>
+
+          <Link
+            href={blogsHref}
+            className={clsx(styles.homeLink, { [styles.homeLinkActive]: isBlogsActive })}
+          >
+            <span className={styles.homeIcon}>
+              <BsJournalRichtext aria-hidden />
+            </span>
+            <span>{currentLocale === 'ar' ? 'المدونة' : 'Blog'}</span>
             <BsChevronRight className={styles.chevron} aria-hidden />
           </Link>
 
@@ -317,13 +334,17 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
             {t('sidebar.contactUs', currentLocale)}
           </Link>
 
-          <Link href={myPostsHref} className={styles.profileLink}>
-            {currentLocale === 'ar' ? 'منشوراتي' : 'My posts'}
-          </Link>
+          {isAuthed ? (
+            <>
+              <Link href={myPostsHref} className={styles.profileLink}>
+                {currentLocale === 'ar' ? 'منشوراتي' : 'My posts'}
+              </Link>
 
-          <Link href={profileHref} className={styles.profileLink}>
-            {t('sidebar.viewProfile', currentLocale)}
-          </Link>
+              <Link href={profileHref} className={styles.profileLink}>
+                {t('sidebar.viewProfile', currentLocale)}
+              </Link>
+            </>
+          ) : null}
 
           <button type="button" className={styles.langBtn} onClick={() => setShowModal(true)}>
             <BsGlobe2 aria-hidden />

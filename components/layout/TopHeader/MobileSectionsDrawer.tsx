@@ -8,6 +8,7 @@ import {
   BsBoxArrowInRight,
   BsGearFill,
   BsGrid3X3GapFill,
+  BsJournalRichtext,
   BsList,
   BsPersonFill,
   BsPower,
@@ -47,6 +48,7 @@ const COPY = {
     guestSub: 'سجّل الدخول للوصول إلى ملفك ومنشوراتك',
     login: 'تسجيل الدخول',
     user: 'مستخدم',
+    blog: 'المدونة',
   },
   en: {
     openMenu: 'Open menu',
@@ -65,6 +67,7 @@ const COPY = {
     guestSub: 'Sign in to access your profile and listings',
     login: 'Sign in',
     user: 'User',
+    blog: 'Blog',
   },
 } as const
 
@@ -238,6 +241,17 @@ const MobileSectionsDrawer = ({ locale = 'ar' }: Props) => {
             )}
 
             <div className={styles.sectionsBlock}>
+              <Link
+                href={`/${locale}/blogs`}
+                onClick={handleClose}
+                className={styles.sectionItem}
+              >
+                <span className={styles.sectionIcon}>
+                  <BsJournalRichtext size={18} aria-hidden />
+                </span>
+                <span>{t.blog}</span>
+              </Link>
+
               <div className={styles.sectionsLabel}>{t.sections}</div>
 
               {loadingSections && (

@@ -82,7 +82,7 @@ const TopHeader = () => {
         <div className="topHeader__start">
           <MobileSectionsDrawer locale={locale} />
           <LogoBox />
-          <BetaBadge locale={locale} className="d-none d-sm-inline-flex" />
+          {/* <BetaBadge locale={locale} className="d-none d-sm-inline-flex" /> */}
         </div>
  
         {/* ==================== DESKTOP SEARCH (center) ==================== */}

@@ -48,6 +48,7 @@ type CreatePostResponse = {
   success: boolean
   data?: PostRecord
   message?: string
+  moderation_status?: string
 }
 
 export type PostsListResponse<T = PostRecord> = {

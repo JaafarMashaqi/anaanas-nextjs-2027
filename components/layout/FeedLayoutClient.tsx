@@ -34,7 +34,9 @@ import { FaXmark } from 'react-icons/fa6'
 import { useLayoutContext } from '@/context/useLayoutContext'
 import type { ChildrenType } from '@/types/component'
 import Messaging from '@/components/layout/Messaging'
+import AuthFooterSocialLinks from '@/components/layout/AuthFooterSocialLinks'
 import useViewPort from '@/hooks/useViewPort'
+import Link from 'next/link'
 
 type FeedLayoutClientProps = ChildrenType & {
   sidebar: ReactNode
@@ -67,6 +69,33 @@ const FeedLayoutClient = ({ children, sidebar, locale }: FeedLayoutClientProps) 
                   </Offcanvas>
                 )}
               </nav>
+
+
+
+
+
+              <footer className="auth-footer">
+                <Container>
+                  <Row className="justify-content-center">
+                    <Col sm={10} md={8} lg={6}>
+                      <div className="auth-footer-inner">
+                        <ul className="auth-footer-links">
+                          <li>
+                            <Link href={`/${locale}/contact`} >
+                              تواصل معنا
+                            </Link>
+                          </li>
+
+                        </ul>
+                        <AuthFooterSocialLinks />
+                      </div>
+                    </Col>
+                  </Row>
+                </Container>
+              </footer>
+
+
+
             </Col>
             {children}
           </Row>

@@ -2,6 +2,17 @@
 
 ترتيب زمني تقريبي لكل ما عُمل في هذه الجلسة.
 
+## الإبلاغ عن الإعلانات — 2026-09-01
+
+توثيق: [`19-report-post.md`](./19-report-post.md) · Backend [`17-post-reports.md`](../../anaanasBackend/docs/17-post-reports.md)
+
+| النطاق | الملف | التغيير |
+|--------|------|---------|
+| UI | `PostCard.tsx` + `PostReportDialog` | خيار إبلاغ في ActionMenu + حوار الأسباب |
+| BFF | `app/api/posts/[postId]/report` + `platform/public-settings` | وكلاء Laravel |
+| Backend | `post_reports`, `PostReportService`, Filament, إعدادات المنصة | بلاغات + عتبة إيقاف + بريد |
+| i18n | `lib/translations.ts` | `post.report.*` |
+
 ## Frontend
 
 | النطاق             | الملف                                                                      | التغيير                                                                                              |

@@ -24,6 +24,11 @@
 | [`16-post-card-listing-ui.md`](./16-post-card-listing-ui.md) | **PostCard listing UI** — الخلاصة + التفاصيل + PostActions + إصلاحات |
 | [`17-my-posts-ui.md`](./17-my-posts-ui.md) | **My Posts** — لوحة منشوراتي + Motion + MyPostListItem |
 | [`18-statistics-ui.md`](./18-statistics-ui.md) | **الإحصائيات** — ملف شخصي + إعلان + ثيم مشترك + Backend API |
+| [`19-report-post.md`](./19-report-post.md) | **الإبلاغ عن الإعلانات** — ActionMenu + عتبة 5 + Filament + إعدادات المنصة |
+| [`20-edit-post-review-notice.md`](./20-edit-post-review-notice.md) | **تعديل الإعلان** — تنبيه + تأكيد قبل الإعادة للمراجعة |
+| [`21-contact-social-footer.md`](./21-contact-social-footer.md) | **تذييل التواصل** — إعدادات مشتركة + إخفاء الفارغ |
+| [`22-cms-pages.md`](./22-cms-pages.md) | **صفحات CMS** — `/p/[slug]` + شروط/خصوصية |
+| [`23-blogs.md`](./23-blogs.md) | **المدونة** — قائمة/تفاصيل + تعليقات/إعجابات + ساب دومين `blogs` |
 
 ## كيفية القراءة
 

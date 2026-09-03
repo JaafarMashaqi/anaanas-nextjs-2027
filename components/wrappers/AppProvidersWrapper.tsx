@@ -10,6 +10,7 @@ import { ChatProvider } from '@/context/useChatContext'
 import { AppDataProvider } from '@/context/AppDataContext'
 import { CurrentUserProvider } from '@/context/useCurrentUser'
 import { LayoutProvider } from '@/context/useLayoutContext'
+import { PlatformPublicSettingsProvider } from '@/context/PlatformPublicSettingsContext'
 import AutoLoginWrapper from './AutoLoginWrapper'
 import { EmailVerificationProvider } from '@/context/EmailVerificationProvider'
 import DirectionSync from '@/components/DirectionSync'
@@ -54,14 +55,16 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
         <EmailVerificationProvider>
           <CurrentUserProvider>
             <AppDataProvider>
-              <LayoutProvider>
-                <ChatProvider>
-                  <NotificationProvider>
-                    {children}
-                    <ToastContainer theme="colored" />
-                  </NotificationProvider>
-                </ChatProvider>
-              </LayoutProvider>
+              <PlatformPublicSettingsProvider>
+                <LayoutProvider>
+                  <ChatProvider>
+                    <NotificationProvider>
+                      {children}
+                      <ToastContainer theme="colored" />
+                    </NotificationProvider>
+                  </ChatProvider>
+                </LayoutProvider>
+              </PlatformPublicSettingsProvider>
             </AppDataProvider>
           </CurrentUserProvider>
         </EmailVerificationProvider>

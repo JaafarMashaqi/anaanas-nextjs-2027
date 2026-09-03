@@ -47,6 +47,8 @@ import LoadContentButton from '../LoadContentButton'
 import CommentItem from './components/CommentItem'
 import PostActions from './components/PostActions'
 import FeaturePostModal from '@/components/promotion/FeaturePostModal'
+import PostReportDialog from './PostReportDialog'
+import type { PostReportCategory } from './PostReportDialog'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import LoginRequiredDialog from '@/components/dialogs/LoginRequiredDialog'
@@ -57,6 +59,7 @@ import { deletePost } from '@/lib/api/posts'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import { linkifyPlainText } from '@/lib/text/linkify'
 import { useCurrentUser } from '@/context/useCurrentUser'
+import { usePlatformPublicSettings } from '@/context/PlatformPublicSettingsContext'
 import clsx from 'clsx'
 import styles from './PostCard.module.css'
 
@@ -219,6 +222,8 @@ const ActionMenu = ({
   editHref,
   canDelete,
   onDelete,
+  canReport,
+  onReport,
   locale = 'ar',
 }: {
   name?: string
@@ -226,8 +231,12 @@ const ActionMenu = ({
   editHref?: string
   canDelete?: boolean
   onDelete?: () => void
+  canReport?: boolean
+  onReport?: () => void
   locale?: SupportedLocale
 }) => {
+  if (!canEdit && !canDelete && !canReport) return null
+
   return (
     <Dropdown>
       <DropdownToggle as="a" className="text-secondary btn btn-secondary-soft-hover py-1 px-2 content-none" id="cardFeedAction">
@@ -262,49 +271,27 @@ const ActionMenu = ({
           </li>
         )}
 
-
-
-
-        {/* <li>
-          <DropdownItem href="#">
-            {' '}
-            <BsBookmark size={22} className="fa-fw pe-2" />
-            Save post
-          </DropdownItem>
-        </li>
-
-        
-        <li>
-          <DropdownItem href="#">
-            {' '}
-            <BsPersonX size={22} className="fa-fw pe-2" />
-            Unfollow {name}{' '}
-          </DropdownItem>
-        </li>
-        <li>
-          <DropdownItem href="#">
-            {' '}
-            <BsXCircle size={22} className="fa-fw pe-2" />
-            Hide post
-          </DropdownItem>
-        </li>
-        <li>
-          <DropdownItem href="#">
-            {' '}
-            <BsSlashCircle size={22} className="fa-fw pe-2" />
-            Block
-          </DropdownItem>
-        </li>
-        <li>
-          <DropdownDivider />
-        </li>
-        <li>
-          <DropdownItem href="#">
-            {' '}
-            <BsFlag size={22} className="fa-fw pe-2" />
-            Report post
-          </DropdownItem>
-        </li> */}
+        {canReport && onReport && (
+          <>
+            {(canEdit || canDelete) && (
+              <li>
+                <DropdownDivider />
+              </li>
+            )}
+            <li>
+              <DropdownItem
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  onReport()
+                }}
+              >
+                <BsFlag size={22} className="fa-fw pe-2" />
+                {t('post.report.menu', locale)}
+              </DropdownItem>
+            </li>
+          </>
+        )}
       </DropdownMenu>
     </Dropdown>
   )
@@ -460,6 +447,68 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   const ownerId = (post as any)?.user_id ?? (post as any)?.user?.id
   const canEdit = status === 'authenticated' && ownerId != null && currentUserId != null && String(ownerId) === String(currentUserId)
   const canDelete = status === 'authenticated' && ownerId != null && currentUserId != null && String(ownerId) === String(currentUserId)
+  const { settings: platformSettings } = usePlatformPublicSettings()
+  const allowGuestReports = Boolean(platformSettings?.post_report_allow_guests)
+  const [reportOpen, setReportOpen] = useState(false)
+  const [reportBusy, setReportBusy] = useState(false)
+  const [alreadyReported, setAlreadyReported] = useState(false)
+
+  const canReport =
+    !isOwner &&
+    !alreadyReported &&
+    (status === 'authenticated' || (status === 'unauthenticated' && allowGuestReports))
+
+  const openReport = () => {
+    if (status === 'unauthenticated' && !allowGuestReports) {
+      alert(t('post.report.loginRequired', locale))
+      router.push(`/${locale}/auth/sign-in`)
+      return
+    }
+    setReportOpen(true)
+  }
+
+  const submitReport = async (payload: {
+    category: PostReportCategory
+    reason: string
+    description?: string
+  }) => {
+    const reportPostId = post?.id
+    if (!reportPostId || reportBusy) return
+    setReportBusy(true)
+    try {
+      const res = await fetch(`/api/posts/${encodeURIComponent(String(reportPostId))}/report?land=${encodeURIComponent(locale)}`, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || json?.success === false) {
+        const message =
+          (typeof json?.message === 'string' && json.message) ||
+          t('post.report.error', locale)
+        if (res.status === 401) {
+          alert(t('post.report.loginRequired', locale))
+          router.push(`/${locale}/auth/sign-in`)
+          return
+        }
+        alert(message)
+        if (String(message).includes('مسبقاً') || String(message).toLowerCase().includes('already')) {
+          setAlreadyReported(true)
+        }
+        return
+      }
+      setAlreadyReported(true)
+      setReportOpen(false)
+      alert(
+        (typeof json?.message === 'string' && json.message) ||
+          t('post.report.success', locale),
+      )
+    } catch {
+      alert(t('post.report.error', locale))
+    } finally {
+      setReportBusy(false)
+    }
+  }
 
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -1106,6 +1155,14 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
         defaultMessage={`${t('post.watchOnAnanas', locale)}: ${title || (locale === 'ar' ? 'منشور' : 'Post')}`}
       />
 
+      <PostReportDialog
+        open={reportOpen}
+        locale={locale}
+        busy={reportBusy}
+        onClose={() => setReportOpen(false)}
+        onSubmit={submitReport}
+      />
+
       {showComments && isDetailsPage && (
         <div className={styles.commentsSection}>
           <div id={`comments-${post?.id}`} className={styles.commentsComposer}>
@@ -1274,6 +1331,8 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                   editHref={postEditHref}
                   canDelete={canDelete}
                   onDelete={handleDelete}
+                  canReport={canReport}
+                  onReport={openReport}
                   locale={locale}
                 />
               </div>
@@ -1568,7 +1627,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
       ) : (
         <>
           <CardBody className={clsx(styles.content, styles.detailsContent)}>
-            {detailsIntroMode === 'actionsOnly' && (canEdit || canDelete) && (
+            {detailsIntroMode === 'actionsOnly' && (canEdit || canDelete || canReport) && (
               <div className={styles.detailsPageActionsBar}>
                 <ActionMenu
                   name={userName}
@@ -1576,6 +1635,8 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                   editHref={postEditHref}
                   canDelete={canDelete}
                   onDelete={handleDelete}
+                  canReport={canReport}
+                  onReport={openReport}
                   locale={locale}
                 />
               </div>
@@ -1587,7 +1648,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                   <h1 className={styles.detailH1}>
                     {title || (locale === 'ar' ? `إعلان ${post?.id}` : `Listing ${post?.id}`)}
                   </h1>
-                  {(canEdit || canDelete) && (
+                  {(canEdit || canDelete || canReport) && (
                     <div className={styles.detailsPageActions}>
                       <ActionMenu
                         name={userName}
@@ -1595,6 +1656,8 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                         editHref={postEditHref}
                         canDelete={canDelete}
                         onDelete={handleDelete}
+                        canReport={canReport}
+                        onReport={openReport}
                         locale={locale}
                       />
                     </div>

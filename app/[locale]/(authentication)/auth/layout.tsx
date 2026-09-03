@@ -3,8 +3,7 @@ import Link from 'next/link'
 import { headers } from 'next/headers'
 import { Col, Container, Row } from 'react-bootstrap'
 import AuthLanguageSwitch from '@/components/auth/AuthLanguageSwitch'
-import { FaFacebookSquare, FaTwitterSquare, FaYoutubeSquare } from 'react-icons/fa'
-import { FaLinkedin } from 'react-icons/fa6'
+import AuthFooterSocialLinks from '@/components/layout/AuthFooterSocialLinks'
 import { t } from '@/lib/translations'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
@@ -32,16 +31,14 @@ const AuthLayout = async ({ children }: ChildrenType) => {
             <Col sm={10} md={8} lg={6}>
               <div className="auth-footer-inner">
                 <ul className="auth-footer-links">
-                  <li><Link href="#">{t('auth.terms', locale)}</Link></li>
-                  <li><Link href="#">{t('auth.privacy', locale)}</Link></li>
-                  <li><Link href="#">{t('auth.cookies', locale)}</Link></li>
+                  <li>
+                    <Link href={`/${locale}/p/terms`}>{t('auth.terms', locale)}</Link>
+                  </li>
+                  <li>
+                    <Link href={`/${locale}/p/privacy`}>{t('auth.privacy', locale)}</Link>
+                  </li>
                 </ul>
-                <ul className="auth-footer-social">
-                  <li><Link href="#"><FaFacebookSquare /></Link></li>
-                  <li><Link href="#"><FaTwitterSquare /></Link></li>
-                  <li><Link href="#"><FaLinkedin /></Link></li>
-                  <li><Link href="#"><FaYoutubeSquare /></Link></li>
-                </ul>
+                <AuthFooterSocialLinks />
               </div>
             </Col>
           </Row>

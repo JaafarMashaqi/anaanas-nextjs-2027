@@ -1,0 +1,242 @@
+.page {
+  --cms-ink: #151515;
+  --cms-muted: rgba(21, 21, 21, 0.62);
+  --cms-line: rgba(21, 21, 21, 0.08);
+  --cms-accent: #177dc1;
+  --cms-gold: #fecb01;
+  --cms-surface: #ffffff;
+
+  min-height: 100vh;
+  padding: 5.25rem 1rem 3.5rem;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f4f6f9 42%, #eef1f5 100%);
+}
+
+.frame {
+  width: min(100%, 46rem);
+  margin-inline: auto;
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.crumbHome {
+  color: var(--cms-muted);
+  text-decoration: none;
+}
+
+.crumbHome:hover,
+.crumbHome:focus-visible {
+  color: var(--cms-accent);
+}
+
+.crumbSep {
+  color: rgba(21, 21, 21, 0.3);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.crumbNow {
+  color: var(--cms-ink);
+}
+
+.doc {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--cms-line);
+  border-radius: 20px;
+  background: var(--cms-surface);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 18px 40px rgba(21, 21, 21, 0.06);
+}
+
+.doc::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cms-gold), #ffd84d 40%, var(--cms-accent));
+}
+
+.docHead {
+  padding: 1.65rem 1.6rem 1.15rem;
+}
+
+.docTitle {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.6vw, 2rem);
+  font-weight: 900;
+  line-height: 1.35;
+  color: var(--cms-ink);
+  letter-spacing: -0.02em;
+}
+
+.docLead {
+  margin: 0.7rem 0 0;
+  color: var(--cms-muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
+  max-width: 38rem;
+}
+
+.docMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.95rem 0 0;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(23, 125, 193, 0.08);
+  color: #1469a3;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.rule {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--cms-line);
+}
+
+.prose {
+  padding: 1.35rem 1.6rem 1.75rem;
+  color: rgba(21, 21, 21, 0.88);
+  font-size: 1.02rem;
+  line-height: 1.85;
+}
+
+.prose :global(*:first-child) {
+  margin-top: 0;
+}
+
+.prose :global(h1),
+.prose :global(h2),
+.prose :global(h3),
+.prose :global(h4) {
+  position: static;
+  margin: 1.45rem 0 0.55rem;
+  font-weight: 900;
+  line-height: 1.35;
+  color: var(--cms-ink);
+}
+
+.prose :global(h1) {
+  font-size: 1.35rem;
+}
+
+.prose :global(h2) {
+  font-size: 1.22rem;
+}
+
+.prose :global(h3),
+.prose :global(h4) {
+  font-size: 1.08rem;
+}
+
+.prose :global(p) {
+  position: static;
+  margin: 0 0 1rem;
+}
+
+.prose :global(ul),
+.prose :global(ol) {
+  margin: 0 0 1rem;
+  padding-inline-start: 1.2rem;
+}
+
+.prose :global(li + li) {
+  margin-top: 0.35rem;
+}
+
+.prose :global(a) {
+  color: var(--cms-accent);
+  font-weight: 700;
+  text-underline-offset: 0.15em;
+}
+
+.prose :global(blockquote) {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border-inline-start: 3px solid var(--cms-gold);
+  background: rgba(254, 203, 1, 0.12);
+  border-radius: 0 12px 12px 0;
+}
+
+.prose :global(hr) {
+  margin: 1.35rem 0;
+  border: 0;
+  border-top: 1px solid var(--cms-line);
+}
+
+.prose :global(strong) {
+  font-weight: 800;
+  color: var(--cms-ink);
+}
+
+.empty {
+  margin: 0;
+  padding: 1.5rem 1.6rem 1.75rem;
+  color: var(--cms-muted);
+  font-size: 0.95rem;
+}
+
+.related {
+  margin-top: 1.35rem;
+}
+
+.relatedLabel {
+  margin: 0 0 0.65rem;
+  color: var(--cms-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.relatedRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.relatedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--cms-line);
+  background: #fff;
+  color: var(--cms-ink);
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.relatedChip:hover,
+.relatedChip:focus-visible {
+  border-color: rgba(23, 125, 193, 0.35);
+  background: rgba(23, 125, 193, 0.06);
+  color: var(--cms-accent);
+}
+
+@media (max-width: 767.98px) {
+  .page {
+    padding-top: 4.5rem;
+    padding-inline: 0.85rem;
+  }
+
+  .docHead,
+  .prose,
+  .empty {
+    padding-inline: 1.15rem;
+  }
+}

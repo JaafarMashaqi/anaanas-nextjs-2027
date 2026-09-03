@@ -227,6 +227,25 @@ type TranslationKey =
   | 'post.detailsTitle'
   | 'post.similarTitle'
   | 'post.notFound.title'
+  | 'post.report.menu'
+  | 'post.report.title'
+  | 'post.report.subtitle'
+  | 'post.report.categoryLabel'
+  | 'post.report.category.spam'
+  | 'post.report.category.harassment'
+  | 'post.report.category.scam'
+  | 'post.report.category.inappropriate'
+  | 'post.report.category.other'
+  | 'post.report.reasonLabel'
+  | 'post.report.reasonPlaceholder'
+  | 'post.report.descriptionLabel'
+  | 'post.report.descriptionPlaceholder'
+  | 'post.report.submit'
+  | 'post.report.submitting'
+  | 'post.report.cancel'
+  | 'post.report.success'
+  | 'post.report.error'
+  | 'post.report.loginRequired'
   | 'post.notFound.lead'
   | 'post.notFound.leadWithId'
   | 'post.notFound.mightInterestYou'
@@ -374,7 +393,14 @@ type TranslationKey =
   | 'createPost.wizard.navPrev'
   | 'createPost.wizard.navNext'
   | 'createPost.wizard.navSubmit'
+  | 'createPost.wizard.navSubmitEdit'
   | 'createPost.wizard.navSubmitting'
+  | 'createPost.edit.reviewNoticeTitle'
+  | 'createPost.edit.reviewNoticeMessage'
+  | 'createPost.edit.confirmTitle'
+  | 'createPost.edit.confirmMessage'
+  | 'createPost.edit.confirmContinue'
+  | 'createPost.edit.confirmCancel'
   | 'createPost.photos.title'
   | 'createPost.photos.hint'
   | 'createPost.photos.savedTitle'
@@ -404,6 +430,7 @@ type TranslationKey =
   | 'createPost.success.viewHomeFeed'
   | 'createPost.success.close'
   | 'createPost.success.updated'
+  | 'createPost.success.updatedPending'
   | 'createPost.rateLimit.title'
   | 'createPost.rateLimit.checking'
   | 'createPost.rateLimit.intervalHint'
@@ -877,6 +904,25 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     'post.statistics': 'إحصائيات الإعلان',
     'post.detailsTitle': 'تفاصيل الإعلان',
     'post.similarTitle': 'إعلانات مشابهة',
+    'post.report.menu': 'الإبلاغ عن الإعلان',
+    'post.report.title': 'الإبلاغ عن هذا الإعلان',
+    'post.report.subtitle': 'اختر سبب البلاغ. سيصل لفريق الإشراف للمراجعة. يمكنك الإبلاغ مرة واحدة فقط لكل إعلان.',
+    'post.report.categoryLabel': 'سبب البلاغ',
+    'post.report.category.spam': 'سبام / إعلان مزعج',
+    'post.report.category.harassment': 'تحرّش / مضايقة',
+    'post.report.category.scam': 'احتيال',
+    'post.report.category.inappropriate': 'محتوى غير لائق',
+    'post.report.category.other': 'سبب آخر',
+    'post.report.reasonLabel': 'وصف مختصر',
+    'post.report.reasonPlaceholder': 'اكتب سبب البلاغ بإيجاز...',
+    'post.report.descriptionLabel': 'تفاصيل إضافية (اختياري)',
+    'post.report.descriptionPlaceholder': 'أي تفاصيل تساعد فريق الإشراف...',
+    'post.report.submit': 'إرسال البلاغ',
+    'post.report.submitting': 'جارٍ الإرسال...',
+    'post.report.cancel': 'إلغاء',
+    'post.report.success': 'تم استلام البلاغ. سيقوم الفريق بمراجعته.',
+    'post.report.error': 'تعذّر إرسال البلاغ. حاول مرة أخرى.',
+    'post.report.loginRequired': 'يجب تسجيل الدخول للإبلاغ عن الإعلان.',
     'post.notFound.title': 'هذا الإعلان غير متاح',
     'post.notFound.lead': 'ربما حُذف الإعلان أو لم يُنشر بعد، أو أن الرابط غير صحيح.',
     'post.notFound.leadWithId': 'الإعلان رقم {id} غير متاح. ربما حُذف أو لم يُقبل بعد، أو أن الرابط غير صحيح.',
@@ -1028,7 +1074,16 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     'createPost.wizard.navPrev': 'رجوع',
     'createPost.wizard.navNext': 'متابعة',
     'createPost.wizard.navSubmit': 'نشر الإعلان',
+    'createPost.wizard.navSubmitEdit': 'حفظ التعديلات',
     'createPost.wizard.navSubmitting': 'جاري النشر…',
+    'createPost.edit.reviewNoticeTitle': 'تنبيه قبل الحفظ',
+    'createPost.edit.reviewNoticeMessage':
+      'عند حفظ التعديلات سيُعاد إعلانك إلى المراجعة ولن يظهر للزوار حتى توافق الإدارة عليه.',
+    'createPost.edit.confirmTitle': 'إعادة الإعلان للمراجعة؟',
+    'createPost.edit.confirmMessage':
+      'حفظ هذه التعديلات سيُخفي الإعلان مؤقتاً عن الجميع حتى تتم مراجعته والموافقة عليه من جديد. هل تريد المتابعة؟',
+    'createPost.edit.confirmContinue': 'نعم، احفظ وأرسل للمراجعة',
+    'createPost.edit.confirmCancel': 'إلغاء',
     'createPost.photos.title': 'صور الإعلان',
     'createPost.photos.hint':
       'أضف حتى 5 صور واضحة (JPG أو PNG أو WebP). الحد الأقصى 5 ميجابايت لكل صورة. الصور تُرفق عند نشر أو تحديث الإعلان.',
@@ -1059,6 +1114,8 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     'createPost.success.viewHomeFeed': 'الانتقال لتغذية الرئيسية',
     'createPost.success.close': 'متابعة التصفح',
     'createPost.success.updated': 'تم تحديث الإعلان بنجاح',
+    'createPost.success.updatedPending':
+      'تم حفظ التعديلات وإعادة إرسال الإعلان للمراجعة. سيظهر بعد موافقة الإدارة.',
     'createPost.rateLimit.title': 'يرجى الانتظار قبل نشر إعلان جديد',
     'createPost.rateLimit.checking': 'جاري التحقق من إمكانية النشر…',
     'createPost.rateLimit.intervalHint': 'يمكنك نشر إعلان واحد كل {minutes} دقائق.',
@@ -1534,6 +1591,25 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     'post.statistics': 'Ad Statistics',
     'post.detailsTitle': 'Ad Details',
     'post.similarTitle': 'Similar listings',
+    'post.report.menu': 'Report listing',
+    'post.report.title': 'Report this listing',
+    'post.report.subtitle': 'Choose a reason. Our moderation team will review it. You can report each listing only once.',
+    'post.report.categoryLabel': 'Report reason',
+    'post.report.category.spam': 'Spam',
+    'post.report.category.harassment': 'Harassment',
+    'post.report.category.scam': 'Scam',
+    'post.report.category.inappropriate': 'Inappropriate content',
+    'post.report.category.other': 'Other',
+    'post.report.reasonLabel': 'Short description',
+    'post.report.reasonPlaceholder': 'Briefly describe the issue...',
+    'post.report.descriptionLabel': 'Additional details (optional)',
+    'post.report.descriptionPlaceholder': 'Anything that helps our moderators...',
+    'post.report.submit': 'Submit report',
+    'post.report.submitting': 'Submitting...',
+    'post.report.cancel': 'Cancel',
+    'post.report.success': 'Report received. The team will review it.',
+    'post.report.error': 'Could not submit your report. Please try again.',
+    'post.report.loginRequired': 'Please sign in to report this listing.',
     'post.notFound.title': 'This ad is unavailable',
     'post.notFound.lead': 'It may have been removed, is still under review, or the link is incorrect.',
     'post.notFound.leadWithId': 'Ad #{id} is unavailable. It may have been removed, is pending approval, or the link is wrong.',
@@ -1685,7 +1761,16 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     'createPost.wizard.navPrev': 'Back',
     'createPost.wizard.navNext': 'Continue',
     'createPost.wizard.navSubmit': 'Publish ad',
+    'createPost.wizard.navSubmitEdit': 'Save changes',
     'createPost.wizard.navSubmitting': 'Publishing…',
+    'createPost.edit.reviewNoticeTitle': 'Before you save',
+    'createPost.edit.reviewNoticeMessage':
+      'Saving your changes will send this ad back for review. It won’t be visible to visitors until an admin approves it again.',
+    'createPost.edit.confirmTitle': 'Send ad back for review?',
+    'createPost.edit.confirmMessage':
+      'Saving these changes will temporarily hide the ad from everyone until it is reviewed and approved again. Continue?',
+    'createPost.edit.confirmContinue': 'Yes, save and submit for review',
+    'createPost.edit.confirmCancel': 'Cancel',
     'createPost.photos.title': 'Ad photos',
     'createPost.photos.hint':
       'Add up to 5 clear photos (JPG, PNG, or WebP). Max 5 MB per file. Photos are sent when you publish or update the ad.',
@@ -1716,6 +1801,8 @@ const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
     'createPost.success.viewHomeFeed': 'Go to home feed',
     'createPost.success.close': 'Keep browsing',
     'createPost.success.updated': 'Ad updated successfully',
+    'createPost.success.updatedPending':
+      'Changes saved and the ad was sent back for review. It will appear after admin approval.',
     'createPost.rateLimit.title': 'Please wait before posting another ad',
     'createPost.rateLimit.checking': 'Checking if you can post…',
     'createPost.rateLimit.intervalHint': 'You can post one ad every {minutes} minutes.',

@@ -15,6 +15,7 @@ import {
   normalizePreferredCountryIso2,
   readPreferredCountryIsoFromRequest,
 } from "./lib/geo/preferredCountryCookie";
+import { BLOGS_HOST_RESERVED_SEGMENTS } from "./lib/blogs/paths";
 
 const PUBLIC_FILE = /\.(.*)$/;
 
@@ -72,6 +73,64 @@ function applyPreferredCountryCookie(
   return res;
 }
 
+/**
+ * On blogs.{base}: public URLs omit `/blogs` — rewrite internally or redirect canonical.
+ */
+function resolveBlogsHostRedirect(
+  req: NextRequest,
+  locale: string,
+): NextResponse | null {
+  const segments = req.nextUrl.pathname.split("/").filter(Boolean);
+
+  if (segments[1] === "blogs") {
+    const rest = segments.slice(2);
+    if (rest[0] === "category" && rest.length >= 2) {
+      const url = req.nextUrl.clone();
+      url.pathname = `/${locale}/cat/${rest.slice(1).join("/")}`;
+      return NextResponse.redirect(url);
+    }
+    const url = req.nextUrl.clone();
+    url.pathname =
+      rest.length > 0 ? `/${locale}/${rest.join("/")}` : `/${locale}`;
+    return NextResponse.redirect(url);
+  }
+
+  if (segments[1] === "category" && segments.length >= 3) {
+    const url = req.nextUrl.clone();
+    url.pathname = `/${locale}/cat/${segments.slice(2).join("/")}`;
+    return NextResponse.redirect(url);
+  }
+
+  return null;
+}
+
+function resolveBlogsHostRewritePath(
+  req: NextRequest,
+  locale: string,
+): string | null {
+  const segments = req.nextUrl.pathname.split("/").filter(Boolean);
+
+  if (segments.length === 1) {
+    return `/${locale}/blogs`;
+  }
+
+  const second = segments[1]?.toLowerCase() ?? "";
+
+  if (second === "cat" && segments.length >= 3) {
+    return `/${locale}/blogs/cat/${segments.slice(2).join("/")}`;
+  }
+
+  if (second === "category" && segments.length >= 3) {
+    return `/${locale}/blogs/cat/${segments.slice(2).join("/")}`;
+  }
+
+  if (second && !BLOGS_HOST_RESERVED_SEGMENTS.has(second)) {
+    return `/${locale}/blogs/${segments.slice(1).join("/")}`;
+  }
+
+  return null;
+}
+
 export async function middleware(req: NextRequest) {
   const { nextUrl } = req;
   const { pathname, search } = nextUrl;
@@ -94,7 +153,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const { hasCountrySubdomain, countrySubdomain } = parseHost(
+  const { hasCountrySubdomain, countrySubdomain, isBlogsSubdomain } = parseHost(
     req.headers.get("host"),
   );
 
@@ -113,9 +172,23 @@ export async function middleware(req: NextRequest) {
   }
 
   const locale = maybeLocale as (typeof SUPPORTED_LOCALES)[number];
+
+  if (segments[1] === "blogs" && segments[2] === "category" && segments.length >= 4) {
+    const url = nextUrl.clone();
+    url.pathname = `/${locale}/blogs/cat/${segments.slice(3).join("/")}`;
+    return NextResponse.redirect(url);
+  }
+
   const isSelectCountry = segments[2] === "select-country";
-  const skipGeo = shouldSkipCountryGeoRouting(req);
+  const skipGeo = shouldSkipCountryGeoRouting(req) || isBlogsSubdomain === true;
   const preferredIso = readPreferredCountryIsoFromRequest(req);
+
+  if (isBlogsSubdomain) {
+    const blogsRedirect = resolveBlogsHostRedirect(req, locale);
+    if (blogsRedirect) {
+      return blogsRedirect;
+    }
+  }
 
   let supported = new Set<string>();
   let detected: string | null = null;
@@ -157,7 +230,7 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  if (!hasCountrySubdomain) {
+  if (!hasCountrySubdomain && !isBlogsSubdomain) {
     if (!skipGeo) {
       if (detected && supported.has(detected)) {
         if (!isSelectCountry) {
@@ -183,17 +256,34 @@ export async function middleware(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-locale", locale);
 
-  if (countrySubdomain) {
+  if (isBlogsSubdomain) {
+    requestHeaders.delete("x-country");
+    requestHeaders.set("x-blogs-host", "1");
+  } else if (countrySubdomain) {
     requestHeaders.set("x-country", countrySubdomain);
   } else {
     requestHeaders.delete("x-country");
   }
 
-  let res = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  const blogsRewritePath =
+    isBlogsSubdomain === true
+      ? resolveBlogsHostRewritePath(req, locale)
+      : null;
+
+  let res: NextResponse;
+  if (blogsRewritePath != null) {
+    const url = req.nextUrl.clone();
+    url.pathname = blogsRewritePath;
+    res = NextResponse.rewrite(url, {
+      request: { headers: requestHeaders },
+    });
+  } else {
+    res = NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
 
   // Align preference with the active tenant (apex can read it if geo detection fails later).
   const syncSubCookie =

@@ -132,7 +132,7 @@ const MobileTopHeader = () => {
             <CountryDropdown locale={locale} compact />
           </div>
         </div>
-        <BetaBadge locale={locale} className=" d-inline-flex m-auto" />
+        {/* <BetaBadge locale={locale} className=" d-inline-flex m-auto" /> */}
 
         <div
           className={clsx(styles.searchRow, searchCollapsed && styles.searchRowCollapsed)}

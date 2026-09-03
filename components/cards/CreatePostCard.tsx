@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Col,
+  Modal,
   Row,
 } from 'react-bootstrap'
 import * as yup from 'yup'
@@ -50,6 +51,7 @@ import {
   BsCurrencyDollar,
   BsGraphUp,
   BsGrid3X3Gap,
+  BsInfoCircle,
   BsPencilSquare,
   BsPeople,
   BsPlus,
@@ -294,6 +296,7 @@ const CreatePostCard = ({ mode = 'create', initialPost, postId, locale: localePr
   const { user: _currentUser, avatarUrl: _resolvedAvatarUrl } = useCurrentUser()
   const currentUserAvatar = _currentUser ? _resolvedAvatarUrl : null
   const [postSuccessOpen, setPostSuccessOpen] = useState(false)
+  const [showEditReviewConfirm, setShowEditReviewConfirm] = useState(false)
   const [postSuccessMeta, setPostSuccessMeta] = useState<{
     id?: number | string
     title?: string
@@ -459,10 +462,13 @@ const [step, setStep] = useState(1)
     () => ({
       prev: t('createPost.wizard.navPrev', locale as any),
       next: t('createPost.wizard.navNext', locale as any),
-      submit: t('createPost.wizard.navSubmit', locale as any),
+      submit: t(
+        isEdit ? 'createPost.wizard.navSubmitEdit' : 'createPost.wizard.navSubmit',
+        locale as any,
+      ),
       submitting: t('createPost.wizard.navSubmitting', locale as any),
     }),
-    [locale],
+    [locale, isEdit],
   )
 
   const navPrevIcon = isWizardRtl ? (
@@ -1120,7 +1126,15 @@ const [step, setStep] = useState(1)
 
       if (response.success) {
         if (isEdit && postId) {
-          toast.success(t('createPost.success.updated', locale as any))
+          const isPendingReview =
+            response.moderation_status === 'pending_review' ||
+            (response.data as PostRecord | undefined)?.status === 'pending_review'
+          toast.success(
+            t(
+              isPendingReview ? 'createPost.success.updatedPending' : 'createPost.success.updated',
+              locale as any,
+            ),
+          )
           const nextLocale = locale || (typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '')
           const target = nextLocale ? `/${nextLocale}/post/${postId}` : `/post/${postId}`
           router.push(target)
@@ -1566,6 +1580,22 @@ const [step, setStep] = useState(1)
 {
   step === 1 && (
     <motion.div key="w-1" className={styles.wizardStepSurface} {...wizardStepMotion(reduceMotion)}>
+                  {isEdit ? (
+                    <div
+                      className={styles.editReviewNotice}
+                      role="status"
+                    >
+                      <BsInfoCircle className={styles.editReviewNoticeIcon} aria-hidden />
+                      <div>
+                        <p className={styles.editReviewNoticeTitle}>
+                          {t('createPost.edit.reviewNoticeTitle', locale as any)}
+                        </p>
+                        <p className={styles.editReviewNoticeMessage}>
+                          {t('createPost.edit.reviewNoticeMessage', locale as any)}
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
                   {isEdit ? (
                     <div className={styles.composerTitleSection}>
                       <label className={styles.composerSrOnly} htmlFor="create-post-title">
@@ -2035,6 +2065,23 @@ const [step, setStep] = useState(1)
                             </p>
                           </div>
 
+                          {isEdit ? (
+                            <div
+                              className={clsx(styles.editReviewNotice, 'mb-4')}
+                              role="status"
+                            >
+                              <BsInfoCircle className={styles.editReviewNoticeIcon} aria-hidden />
+                              <div>
+                                <p className={styles.editReviewNoticeTitle}>
+                                  {t('createPost.edit.reviewNoticeTitle', locale as any)}
+                                </p>
+                                <p className={styles.editReviewNoticeMessage}>
+                                  {t('createPost.edit.reviewNoticeMessage', locale as any)}
+                                </p>
+                              </div>
+                            </div>
+                          ) : null}
+
                           <form onSubmit={handleSubmit(onSubmit)}>
                             {/* حقل اختيار المدينة */}
                             <div className={styles.wizardFieldGroup}>
@@ -2157,7 +2204,11 @@ const [step, setStep] = useState(1)
                                   const cityValid = await trigger('city')
                                   await trigger('price')
                                   if (cityValid) {
-                                    handleSubmit(onSubmit)()
+                                    if (isEdit) {
+                                      setShowEditReviewConfirm(true)
+                                    } else {
+                                      handleSubmit(onSubmit)()
+                                    }
                                   } else {
                                     setSubmitError('يرجى تصحيح الأخطاء قبل الإرسال')
                                   }
@@ -2365,6 +2416,46 @@ const [step, setStep] = useState(1)
         postTitle={postSuccessMeta?.title}
         variant={postSuccessMeta?.variant ?? 'published'}
       />
+
+      <Modal
+        show={showEditReviewConfirm}
+        onHide={() => setShowEditReviewConfirm(false)}
+        centered
+        contentClassName={styles.editReviewConfirmModal}
+      >
+        <Modal.Body className={styles.editReviewConfirmBody}>
+          <div className={styles.editReviewConfirmIconWrap} aria-hidden>
+            <BsInfoCircle size={28} />
+          </div>
+          <h2 className={styles.editReviewConfirmTitle}>
+            {t('createPost.edit.confirmTitle', locale as any)}
+          </h2>
+          <p className={styles.editReviewConfirmMessage}>
+            {t('createPost.edit.confirmMessage', locale as any)}
+          </p>
+          <div className={styles.editReviewConfirmActions}>
+            <Button
+              variant="light"
+              className={styles.editReviewConfirmCancel}
+              onClick={() => setShowEditReviewConfirm(false)}
+              disabled={isSubmitting}
+            >
+              {t('createPost.edit.confirmCancel', locale as any)}
+            </Button>
+            <Button
+              variant="primary"
+              className={styles.editReviewConfirmContinue}
+              disabled={isSubmitting}
+              onClick={() => {
+                setShowEditReviewConfirm(false)
+                handleSubmit(onSubmit)()
+              }}
+            >
+              {t('createPost.edit.confirmContinue', locale as any)}
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </>
   )
 }

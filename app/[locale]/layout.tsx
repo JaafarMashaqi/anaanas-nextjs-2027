@@ -1,19 +1,27 @@
-import ResponsiveTopHeader from '@/components/layout/TopHeader/ResponsiveTopHeader'
-import AnnouncementModalLazy from '@/components/layout/AnnouncementModalLazy'
-import FeaturedPopupAdLazy from '@/components/layout/FeaturedPopupAdLazy'
-import ResponsiveDailyUpdatesBanner from '@/components/layout/ResponsiveDailyUpdatesBanner'
-import NewPostRealtime from '@/components/realtime/NewPostRealtime'
 import type { ChildrenType } from '@/types/component'
+import { headers } from 'next/headers'
 
-const SocialLayout = ({ children }: ChildrenType) => {
+import FeaturedPopupAdLazy from '@/components/layout/FeaturedPopupAdLazy'
+import NewPostRealtime from '@/components/realtime/NewPostRealtime'
+import ResponsiveDailyUpdatesBanner from '@/components/layout/ResponsiveDailyUpdatesBanner'
+import ResponsiveTopHeader from '@/components/layout/TopHeader/ResponsiveTopHeader'
+import { isBlogsHostFromHeader } from '@/lib/blogs/paths'
+
+const SocialLayout = async ({ children }: ChildrenType) => {
+  const headersList = await headers()
+  const isBlogsHost = isBlogsHostFromHeader(headersList.get('x-blogs-host'))
+
   return (
     <>
       <ResponsiveTopHeader />
-      <ResponsiveDailyUpdatesBanner />
+      {!isBlogsHost ? <ResponsiveDailyUpdatesBanner /> : null}
       {children}
-      <AnnouncementModalLazy />
-      <FeaturedPopupAdLazy />
-      <NewPostRealtime />
+      {!isBlogsHost ? (
+        <>
+          <FeaturedPopupAdLazy />
+          <NewPostRealtime />
+        </>
+      ) : null}
     </>
   )
 }

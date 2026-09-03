@@ -2,6 +2,8 @@ import { headers } from 'next/headers'
 
 import { getBaseDomainFromEnv, parseHost } from '@/lib/domain'
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from '@/lib/localization'
+import { fetchBlogCategories, fetchBlogs } from '@/lib/api/blogs'
+import { blogCategoryPath, blogListPath, blogPostPath } from '@/lib/blogs/paths'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import {
   fetchSitemapCities,
@@ -69,6 +71,42 @@ export async function buildStaticSitemapUrls(origin: string): Promise<SitemapUrl
     urls.push({ loc: `${origin}/${locale}`, lastmod: now })
     urls.push({ loc: `${origin}/${locale}/select-country`, lastmod: now })
     urls.push({ loc: `${origin}/${locale}/contact`, lastmod: now })
+    urls.push({ loc: `${origin}/${locale}/blogs`, lastmod: now })
+  }
+
+  return urls
+}
+
+export async function buildBlogsSitemapUrls(origin: string): Promise<SitemapUrlEntry[]> {
+  const urls: SitemapUrlEntry[] = []
+
+  for (const locale of SUPPORTED_LOCALES) {
+    urls.push({ loc: `${origin}${blogListPath(locale, false)}` })
+
+    try {
+      const categories = await fetchBlogCategories(locale, { revalidateSeconds: 86_400 })
+      for (const category of categories) {
+        urls.push({
+          loc: `${origin}${blogCategoryPath(locale, category.slug, false)}`,
+        })
+      }
+
+      let page = 1
+      let lastPage = 1
+      do {
+        const result = await fetchBlogs(locale, { page, revalidateSeconds: 86_400 })
+        for (const post of result.data) {
+          urls.push({
+            loc: `${origin}${blogPostPath(locale, post.slug, false)}`,
+            lastmod: toSitemapLastmod(post.published_at),
+          })
+        }
+        lastPage = result.meta?.last_page ?? 1
+        page += 1
+      } while (page <= lastPage)
+    } catch {
+      // API unavailable during sitemap build — keep index URLs only
+    }
   }
 
   return urls
@@ -160,6 +198,7 @@ export async function buildPostsSitemapUrls(origin: string, countryIso2: string)
 export async function buildTenantSitemapIndex(origin: string, countryIso2: string): Promise<string> {
   const entries: SitemapUrlEntry[] = [
     { loc: `${origin}/sitemap-static.xml` },
+    { loc: `${origin}/sitemap-blogs.xml` },
     { loc: `${origin}/sitemap-sections.xml` },
     { loc: `${origin}/sitemap-cities.xml` },
   ]

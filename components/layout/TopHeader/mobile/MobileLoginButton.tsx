@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { BsBoxArrowInRight } from 'react-icons/bs'
 
 import type { SupportedLocale } from '@/lib/localization'
@@ -19,8 +20,11 @@ type Props = {
  * header actions (bell, chat, hamburger).
  */
 const MobileLoginButton = ({ locale }: Props) => {
+  const { status } = useSession()
   const isArabic = locale === 'ar'
   const label = isArabic ? 'تسجيل الدخول' : 'Login'
+
+  if (status !== 'unauthenticated') return null
 
   return (
     <Link

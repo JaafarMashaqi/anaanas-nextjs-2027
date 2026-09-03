@@ -4,6 +4,7 @@ export type HostContext = {
   baseDomain: string
   hasCountrySubdomain: boolean
   countrySubdomain?: string
+  isBlogsSubdomain?: boolean
 }
 
 const FALLBACK_HOSTNAME = 'localhost'
@@ -32,6 +33,7 @@ const RESERVED_SUBDOMAINS = new Set([
   'out',
   'ar',
   'en',
+  'blogs',
 ])
 
 /** Registered site domain (e.g. `anaanas.com`) without subdomain — used for apex URLs. */
@@ -91,6 +93,7 @@ export function parseHost(hostHeader: string | null): HostContext {
             port,
             baseDomain: baseEnv,
             hasCountrySubdomain: false,
+            isBlogsSubdomain: p === 'blogs',
           }
         }
         if (isLikelyIsoCountryCode(p)) {
@@ -130,10 +133,20 @@ export function parseHost(hostHeader: string | null): HostContext {
     }
   }
 
-  // Two labels: e.g. anaanas.com (apex) vs rare jo.com
+  // Two labels: e.g. anaanas.com (apex) vs blogs.localhost
   if (labels.length === 2) {
     const [a, b] = labels
-    if (a.length > 3 || RESERVED_SUBDOMAINS.has(a.toLowerCase()) || !isLikelyIsoCountryCode(a)) {
+    const aLower = a.toLowerCase()
+    if (RESERVED_SUBDOMAINS.has(aLower)) {
+      return {
+        hostname,
+        port,
+        baseDomain: `${a}.${b}`,
+        hasCountrySubdomain: false,
+        isBlogsSubdomain: aLower === 'blogs',
+      }
+    }
+    if (a.length > 3 || !isLikelyIsoCountryCode(a)) {
       return {
         hostname,
         port,
@@ -158,6 +171,7 @@ export function parseHost(hostHeader: string | null): HostContext {
       port,
       baseDomain: labels.slice(1).join('.') || FALLBACK_HOSTNAME,
       hasCountrySubdomain: false,
+      isBlogsSubdomain: firstLabel.toLowerCase() === 'blogs',
     }
   }
 
@@ -182,4 +196,8 @@ export function buildCountryHost(
 /** Base hostname for country links: env wins so apex pages build correct subdomains. */
 export function getBaseDomainForCountryLinks(hostInfo: HostContext): string {
   return getBaseDomainFromEnv() ?? hostInfo.baseDomain
+}
+
+export function isBlogsHost(hostHeader: string | null): boolean {
+  return parseHost(hostHeader).isBlogsSubdomain === true
 }
