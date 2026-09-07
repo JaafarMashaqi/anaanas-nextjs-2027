@@ -39,7 +39,7 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
-          APP_DIR="${DEPLOY_PATH:-/var/www/anaanas.com}"
+          APP_DIR="${DEPLOY_PATH:-/var/www/anaanas-nextjs}"
 
           ssh \
             -i ~/.ssh/id_ed25519 \
