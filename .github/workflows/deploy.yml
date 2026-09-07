@@ -1,0 +1,67 @@
+name: Deploy Anaanas Next.js
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+concurrency:
+  group: anaana-nextjs-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ANAANAS_SSH_PRIVATE_KEY }}
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Deploy Next.js
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          APP_DIR="${DEPLOY_PATH:-/var/www/anaanas.com}"
+
+          ssh \
+            -i ~/.ssh/id_ed25519 \
+            -p "${SERVER_PORT:-22}" \
+            -o StrictHostKeyChecking=yes \
+            "$SERVER_USER@$SERVER_HOST" \
+            "DEPLOY_PATH=$(printf %q "$APP_DIR") bash -s" << 'EOF'
+          set -euo pipefail
+
+          cd "$DEPLOY_PATH"
+
+          echo "==> Pulling latest code"
+          git pull origin main
+
+          echo "==> Installing Node dependencies"
+          npm install
+
+          echo "==> Building Next.js app"
+          npm run build
+
+          echo "==> Restarting PM2 processes"
+          pm2 restart all
+
+          echo "==> Next.js deploy complete"
+          EOF
