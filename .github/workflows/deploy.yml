@@ -61,7 +61,7 @@ jobs:
           npm run build
 
           echo "==> Restarting PM2 processes"
-          pm2 restart all
+          sudo pm2 restart all
 
           echo "==> Next.js deploy complete"
           EOF
