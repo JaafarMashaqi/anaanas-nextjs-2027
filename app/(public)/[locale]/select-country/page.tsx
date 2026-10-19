@@ -13,6 +13,10 @@ import { t } from "@/lib/translations";
 import { resolveCountryFlagUrl } from "@/lib/flags/resolveCountryFlagUrl";
 import styles from "./select-country.module.css";
 import { SelectCountryLink } from "./SelectCountryLink";
+import {
+  isPreviewCountryMode,
+  previewCountrySwitchPath,
+} from "@/lib/preview/countryMode";
 
 function buildCountryHost(
   isoCode: string,
@@ -101,6 +105,7 @@ function buildJsonLd(opts: {
   linkBaseDomain: string;
   proto: string;
   port?: string;
+  preview: boolean;
 }) {
   const {
     locale,
@@ -110,6 +115,7 @@ function buildJsonLd(opts: {
     linkBaseDomain,
     proto,
     port,
+    preview,
   } = opts;
 
   const pageUrl = `${origin}${canonicalPath}`;
@@ -118,7 +124,9 @@ function buildJsonLd(opts: {
   const itemListElements = available.map((country, index) => {
     const iso = (country.iso2 || country.iso_code || "").toLowerCase();
     const host = buildCountryHost(iso, linkBaseDomain, port);
-    const url = `${proto}://${host}/${locale}`;
+    const url = preview
+      ? `${origin}${previewCountrySwitchPath(locale, iso)}`
+      : `${proto}://${host}/${locale}`;
     return {
       "@type": "ListItem",
       position: index + 1,
@@ -200,6 +208,7 @@ export default async function SelectCountryPage({
   const proto =
     headersList.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https";
   const origin = getSiteOrigin(headersList);
+  const preview = isPreviewCountryMode();
   const canonicalPath = `/${initialLocale}/select-country`;
 
   const jsonLd = buildJsonLd({
@@ -210,6 +219,7 @@ export default async function SelectCountryPage({
     linkBaseDomain,
     proto,
     port: hostInfo.port,
+    preview,
   });
 
   return (
@@ -295,7 +305,9 @@ export default async function SelectCountryPage({
                         linkBaseDomain,
                         hostInfo.port,
                       );
-                      const countryUrl = `${proto}://${countryHost}/${initialLocale}`;
+                      const countryUrl = preview
+                        ? previewCountrySwitchPath(initialLocale, isoCode)
+                        : `${proto}://${countryHost}/${initialLocale}`;
                       const isoUpper = isoCode.toUpperCase();
                       const flagAlt =
                         initialLocale === "ar"

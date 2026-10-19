@@ -11,6 +11,7 @@ import type { SupportedLocale } from '@/lib/localization'
 import { isIndexingBotUserAgent } from '@/lib/seo/indexingBot'
 import { getPublicSiteOrigin } from '@/lib/seo/siteUrl'
 import { SPLASH_ENABLE_DELAY_MS } from '@/lib/perf/week1HomePerf'
+import { isPreviewCountryMode } from '@/lib/preview/countryMode'
 
 import logo from '@/assets/images/logo/logo500.png'
 import faviconIco from '@/assets/favicon.ico'
@@ -187,6 +188,7 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
       lang={locale}
       dir={direction}
       data-locale={locale}
+      data-preview-country={isPreviewCountryMode() ? '1' : undefined}
       data-indexing-bot={isIndexingBot ? '1' : undefined}
 
       suppressHydrationWarning

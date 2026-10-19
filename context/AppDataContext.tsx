@@ -5,6 +5,8 @@ import { fetchSections, type Section } from '@/lib/api/sections'
 import { fetchCountries, type Country } from '@/lib/api/countries'
 import { fetchCitiesByCountryId, type City } from '@/lib/api/cities'
 import { parseHost } from '@/lib/domain'
+import { readPreferredCountryIsoFromDocumentCookie } from '@/lib/geo/preferredCountryCookie'
+import { isPreviewCountryMode, PREVIEW_DEFAULT_COUNTRY } from '@/lib/preview/countryMode'
 
 type AppDataContextType = {
   // Sections
@@ -66,6 +68,12 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   // الحصول على country code من subdomain - only after mount to prevent hydration issues
   const currentCountryCode = useMemo(() => {
     if (mounted && typeof window !== 'undefined') {
+      if (isPreviewCountryMode()) {
+        return (
+          readPreferredCountryIsoFromDocumentCookie(document.cookie) ||
+          PREVIEW_DEFAULT_COUNTRY
+        )
+      }
       const hostContext = parseHost(window.location.host)
       console.log('Parsed host context:', { host: window.location.host, hostContext })
       return hostContext.countrySubdomain || null

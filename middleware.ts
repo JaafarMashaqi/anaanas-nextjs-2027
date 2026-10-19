@@ -16,6 +16,11 @@ import {
   readPreferredCountryIsoFromRequest,
 } from "./lib/geo/preferredCountryCookie";
 import { BLOGS_HOST_RESERVED_SEGMENTS } from "./lib/blogs/paths";
+import {
+  isPreviewCountryMode,
+  PREVIEW_COUNTRY_QUERY,
+  PREVIEW_DEFAULT_COUNTRY,
+} from "./lib/preview/countryMode";
 
 const PUBLIC_FILE = /\.(.*)$/;
 
@@ -47,6 +52,26 @@ function apexSelectCountryRedirect(req: NextRequest, locale: string) {
   const host = hostCtx.port ? `${base}:${hostCtx.port}` : base;
   const next = new URL(`${proto}://${host}/${locale}/select-country`);
   return NextResponse.redirect(next);
+}
+
+function applyPreviewCountryCookie(
+  res: NextResponse,
+  req: NextRequest,
+  iso: string,
+) {
+  const code = normalizePreferredCountryIso2(iso);
+  if (!code) return res;
+  const forwarded = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  res.cookies.set({
+    name: PREFERRED_COUNTRY_COOKIE,
+    value: code,
+    path: "/",
+    maxAge: PREFERRED_COUNTRY_MAX_AGE,
+    sameSite: "lax",
+    secure: forwarded === "https",
+    httpOnly: false,
+  });
+  return res;
 }
 
 function applyPreferredCountryCookie(
@@ -182,6 +207,28 @@ export async function middleware(req: NextRequest) {
   const isSelectCountry = segments[2] === "select-country";
   const skipGeo = shouldSkipCountryGeoRouting(req) || isBlogsSubdomain === true;
   const preferredIso = readPreferredCountryIsoFromRequest(req);
+
+  if (isPreviewCountryMode() && !isBlogsSubdomain) {
+    const requested = normalizePreferredCountryIso2(
+      nextUrl.searchParams.get(PREVIEW_COUNTRY_QUERY),
+    );
+    if (requested) {
+      const clean = nextUrl.clone();
+      clean.searchParams.delete(PREVIEW_COUNTRY_QUERY);
+      const res = NextResponse.redirect(clean);
+      return applyPreviewCountryCookie(res, req, requested);
+    }
+
+    const iso = preferredIso || PREVIEW_DEFAULT_COUNTRY;
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-locale", locale);
+    requestHeaders.set("x-country", iso);
+    const res = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+    if (!preferredIso) return applyPreviewCountryCookie(res, req, iso);
+    return res;
+  }
 
   if (isBlogsSubdomain) {
     const blogsRedirect = resolveBlogsHostRedirect(req, locale);

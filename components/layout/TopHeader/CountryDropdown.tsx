@@ -8,6 +8,7 @@ import { useAppData } from '@/context/AppDataContext'
 import { parseHost, buildCountryHost } from '@/lib/domain'
 import type { Country } from '@/lib/api/countries'
 import { persistPreferredCountryIso2 } from '@/lib/geo/persistPreferredCountry.client'
+import { isPreviewCountryMode, previewCountrySwitchPath } from '@/lib/preview/countryMode'
 import type { SupportedLocale } from '@/lib/localization'
 
 type Props = {
@@ -48,9 +49,13 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
     )
   }, [selectedCountry, hostCtx, countries])
 
+  const previewMode = isPreviewCountryMode()
+
   const buildCountryUrl = (country: Country): string => {
     const iso = (country.iso2 || country.iso_code || '').toLowerCase()
-    if (!iso || !hostCtx) return '#'
+    if (!iso) return '#'
+    if (previewMode) return previewCountrySwitchPath(locale, iso)
+    if (!hostCtx) return '#'
     const proto =
       typeof window !== 'undefined' ? window.location.protocol.replace(':', '') : 'https'
     const host = buildCountryHost(iso, hostCtx.baseDomain, hostCtx.port)

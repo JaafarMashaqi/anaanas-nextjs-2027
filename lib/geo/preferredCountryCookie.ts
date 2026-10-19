@@ -22,3 +22,19 @@ export function readPreferredCountryIsoFromRequest(
     req.cookies.get(PREFERRED_COUNTRY_COOKIE)?.value,
   );
 }
+
+export function readPreferredCountryIsoFromDocumentCookie(
+  cookieHeader: string | null | undefined,
+): string | null {
+  if (!cookieHeader) return null;
+  for (const part of cookieHeader.split(";")) {
+    const trimmed = part.trim();
+    const eq = trimmed.indexOf("=");
+    if (eq <= 0) continue;
+    if (trimmed.slice(0, eq) !== PREFERRED_COUNTRY_COOKIE) continue;
+    return normalizePreferredCountryIso2(
+      decodeURIComponent(trimmed.slice(eq + 1)),
+    );
+  }
+  return null;
+}
