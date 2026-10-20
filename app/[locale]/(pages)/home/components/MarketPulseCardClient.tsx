@@ -88,17 +88,50 @@ function MetricCard({
   metric,
   locale,
   pressed,
+  compact = false,
   onOpen,
 }: {
   metric: PulseMetric
   locale: SupportedLocale
   pressed: boolean
+  compact?: boolean
   onOpen: (id: PulseMetricId) => void
 }) {
   const Icon = ICONS[metric.id]
   const ar = locale === 'ar'
   const levelLabel =
     metric.level === 'live' ? (ar ? 'مباشر' : 'Live') : metric.level === 'demo' ? (ar ? 'تجريبي' : 'Demo') : ar ? 'مخطط' : 'Planned'
+  const figure =
+    metric.level === 'live' ? (
+      <LiveFigure raw={metric.raw} fallback={metric.value} storageKey={metric.id} locale={locale} />
+    ) : (
+      <strong className={styles.metricWord}>{metric.value}</strong>
+    )
+  if (compact) {
+    return (
+      <button
+        type="button"
+        className={`${styles.metric} ${styles.compact} ${styles[metric.tone]}`}
+        title={`${metric.period}. ${metric.hint}`}
+        aria-pressed={pressed}
+        aria-label={`${levelLabel}. ${metric.label}. ${metric.value}. ${metric.period}. ${metric.hint}`}
+        onClick={() => onOpen(metric.id)}
+      >
+        <span className={styles.metricIcon} aria-hidden>
+          <Icon size={14} />
+        </span>
+        <span className={styles.compactBody}>
+          <span className={styles.compactTop}>
+            {figure}
+            <span className={metric.level === 'live' ? styles.levelLive : metric.level === 'demo' ? styles.levelDemo : styles.levelBlocked}>
+              {levelLabel}
+            </span>
+          </span>
+          <span className={styles.metricLabel}>{metric.label}</span>
+        </span>
+      </button>
+    )
+  }
   return (
     <button
       type="button"
@@ -117,11 +150,7 @@ function MetricCard({
         </span>
       </span>
       <span className={styles.metricLabel}>{metric.label}</span>
-      {metric.level === 'live' ? (
-        <LiveFigure raw={metric.raw} fallback={metric.value} storageKey={metric.id} locale={locale} />
-      ) : (
-        <strong className={styles.metricWord}>{metric.value}</strong>
-      )}
+      {figure}
       <span className={styles.metricPeriod}>{metric.period}</span>
     </button>
   )
@@ -411,7 +440,7 @@ export default function MarketPulseCardClient({
         >
           {model.metrics.map((metric) => (
             <div key={metric.id} className={styles.railItem} role="listitem">
-              <MetricCard metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
+              <MetricCard compact metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
             </div>
           ))}
         </div>

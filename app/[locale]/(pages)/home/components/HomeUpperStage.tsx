@@ -64,14 +64,7 @@ function openComposer(intent: 'sale' | 'wanted') {
 
 export default function HomeUpperStage({ locale, countryLabel, sections, trending }: Props) {
   const isArabic = locale === 'ar'
-  const stable = isArabic ? `سوق أناناس في ${countryLabel}` : `ANANAS market in ${countryLabel}`
-  const [greeting, setGreeting] = useState(stable)
-  const [sky, setSky] = useState<'day' | 'night' | 'neutral'>('neutral')
-  const [line, setLine] = useState(0)
-  const [note, setNote] = useState<'map' | 'matches' | null>(null)
-  const lines = isArabic
-    ? ['ابحث في الإعلانات الحقيقية', 'انشر حين يكتمل العنوان', 'نبض السوق يعرض أرقام الخادم فقط']
-    : ['Search the real listings', 'Publish when the title is ready', 'Market Pulse shows server figures only']
+  const [note, setNote] = useState<'map' | 'matches' | 'concept' | null>(null)
 
   useEffect(() => {
     const onQuickAction = (event: MouseEvent) => {
@@ -83,53 +76,11 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
     return () => document.removeEventListener('click', onQuickAction)
   }, [])
 
-  useEffect(() => {
-    const hour = new Date().getHours()
-    const day = hour >= 6 && hour < 18
-    setSky(day ? 'day' : 'night')
-    if (isArabic) {
-      const part = hour < 12 ? 'صباح الخير' : hour < 17 ? 'نهارك سعيد' : 'مساء الخير'
-      setGreeting(part)
-      return
-    }
-    const part = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-    setGreeting(part)
-  }, [isArabic])
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const timer = window.setInterval(() => setLine((index) => (index + 1) % lines.length), 5200)
-    return () => window.clearInterval(timer)
-  }, [lines.length])
-
   const stories = sections.slice(0, 8)
 
   return (
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className={styles.greet}>
-        <span className={`${styles.sky} ${sky === 'day' ? styles.sun : ''} ${sky === 'night' ? styles.moon : ''}`} aria-hidden>
-          {sky === 'night' ? (
-            <svg viewBox="0 0 24 24" width="22" height="22">
-              <path fill="currentColor" d="M14.5 2.4a8.8 8.8 0 1 0 7.1 12.2A8 8 0 0 1 14.5 2.4z" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" width="22" height="22">
-              <circle cx="12" cy="12" r="4" fill="currentColor" />
-              <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-                <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" />
-              </g>
-            </svg>
-          )}
-        </span>
-        <div className={styles.greetCopy}>
-          <p className={styles.greetTitle}>{greeting}</p>
-          <p className={styles.greetHint}>
-            {isArabic ? `سوق أناناس في ${countryLabel}` : `ANANAS market in ${countryLabel}`}
-          </p>
-          <p className={styles.greetLine} aria-live="off">{lines[line]}</p>
-        </div>
-        <Image src={mascot} alt="" width={40} height={40} className={styles.mascot} />
-      </div>
+      <GreetingReel locale={locale} countryLabel={countryLabel} onSell={() => openComposer('sale')} onConcept={() => setNote('concept')} />
 
       <div className={styles.searchSlot}>
         <MobileHeaderSearchBar locale={locale} />
@@ -160,9 +111,13 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
             ? isArabic
               ? 'الخريطة غير مربوطة في هذا التطبيق. البلد الحالي يبقى من اختيار الدولة.'
               : 'A map is not connected in this app. The country still comes from the country selector.'
-            : isArabic
-              ? 'المطابقات غير مربوطة بخدمة بعد. استخدم البحث للوصول إلى الإعلانات الحالية.'
-              : 'Matches are not connected to a service yet. Use search for current listings.'}
+            : note === 'matches'
+              ? isArabic
+                ? 'المطابقات غير مربوطة بخدمة بعد. استخدم البحث للوصول إلى الإعلانات الحالية.'
+                : 'Matches are not connected to a service yet. Use search for current listings.'
+              : isArabic
+                ? 'هذه لمحة بصرية فقط. لا طلب، ولا حجز، ولا شراكة تجارية.'
+                : 'This is a visual concept only. No order, booking, or commercial partnership.'}
         </p>
       ) : null}
 
@@ -264,21 +219,197 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
           </button>
         </div>
       </section>
-
-      <Link href={`/${locale}/search`} className={styles.opp}>
-        <span className={styles.oppMark} aria-hidden>
-          <PinIcon />
-        </span>
-        <span className={styles.oppCopy}>
-          <strong>{isArabic ? 'فرص ظاهرة في السوق' : 'Opportunities visible now'}</strong>
-          <span>
-            {isArabic
-              ? 'لا يوجد عدّاد شخصي منذ آخر زيارة. افتح البحث الحقيقي.'
-              : 'There is no personal counter since your last visit. Open real search.'}
-          </span>
-        </span>
-      </Link>
     </div>
+  )
+}
+
+const REEL = ['greet', 'coffee', 'shark', 'flight', 'tip', 'insight'] as const
+type ReelId = (typeof REEL)[number]
+
+function GreetingReel({
+  locale,
+  countryLabel,
+  onSell,
+  onConcept,
+}: {
+  locale: SupportedLocale
+  countryLabel: string
+  onSell: () => void
+  onConcept: () => void
+}) {
+  const isArabic = locale === 'ar'
+  const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [hour, setHour] = useState(12)
+  const id = REEL[index]
+  const reelClass = {
+    greet: styles.reel_greet,
+    coffee: styles.reel_coffee,
+    shark: styles.reel_shark,
+    flight: styles.reel_flight,
+    tip: styles.reel_tip,
+    insight: styles.reel_insight,
+  }[id]
+
+  useEffect(() => {
+    setHour(new Date().getHours())
+  }, [])
+
+  useEffect(() => {
+    if (paused) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const dwell = id === 'greet' ? 9000 : 7500
+    const timer = window.setTimeout(() => setIndex((value) => (value + 1) % REEL.length), dwell)
+    return () => window.clearTimeout(timer)
+  }, [id, paused])
+
+  const step = (direction: 1 | -1) => {
+    setIndex((value) => (value + direction + REEL.length) % REEL.length)
+  }
+
+  const hello = isArabic
+    ? hour < 12
+      ? 'صباح الخير'
+      : hour < 17
+        ? 'نهارك سعيد'
+        : 'مساء الخير'
+    : hour < 12
+      ? 'Good morning'
+      : hour < 17
+        ? 'Good afternoon'
+        : 'Good evening'
+
+  return (
+    <section
+      className={`${styles.reel} ${reelClass}`}
+      data-reel={id}
+      aria-roledescription={isArabic ? 'عرض متحرك' : 'rotating highlight'}
+      aria-label={isArabic ? 'تحية أناناس والمفاهيم' : 'ANANAS greeting and concepts'}
+      onPointerEnter={() => setPaused(true)}
+      onPointerLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false)
+      }}
+    >
+      <div className={styles.reelControls}>
+        <button type="button" aria-label={isArabic ? 'السابق' : 'Previous'} onClick={() => step(-1)}>
+          ‹
+        </button>
+        <button type="button" aria-label={isArabic ? 'التالي' : 'Next'} onClick={() => step(1)}>
+          ›
+        </button>
+      </div>
+      <div key={id} className={styles.reelFrame}>
+        <ReelArt id={id} night={hour >= 18 || hour < 6} />
+        <div className={styles.reelCopy}>
+          {id === 'greet' ? (
+            <>
+              <p className={styles.reelTitle}>{hello}</p>
+              <p className={styles.reelBody}>
+                {isArabic
+                  ? `سوق أناناس في ${countryLabel}. تصفّح بهدوء، أو انشر حين يجهز العنوان.`
+                  : `ANANAS market in ${countryLabel}. Browse calmly, or publish when the title is ready.`}
+              </p>
+            </>
+          ) : (
+            <ReelCopy id={id} isArabic={isArabic} onSell={onSell} onConcept={onConcept} locale={locale} />
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ReelArt({ id, night }: { id: ReelId; night: boolean }) {
+  if (id === 'coffee') {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src="/brand/coffee-founder.png" alt="" className={styles.reelArt} />
+    )
+  }
+  if (id === 'shark') {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src="/brand/shark-6.jpg" alt="" className={styles.reelArt} />
+    )
+  }
+  if (id === 'flight') {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src="/brand/flight-concept.jpg" alt="" className={styles.reelArt} />
+    )
+  }
+  return (
+    <span className={styles.reelMascot}>
+      <Image src={mascot} alt="" width={64} height={64} />
+      <span className={styles.reelSky} aria-hidden>
+        {night ? (
+          <svg viewBox="0 0 24 24" width="12" height="12">
+            <path fill="currentColor" d="M14.5 2.4a8.8 8.8 0 1 0 7.1 12.2A8 8 0 0 1 14.5 2.4z" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" width="12" height="12">
+            <circle cx="12" cy="12" r="4" fill="currentColor" />
+          </svg>
+        )}
+      </span>
+    </span>
+  )
+}
+
+function ReelCopy({
+  id,
+  isArabic,
+  locale,
+  onSell,
+  onConcept,
+}: {
+  id: Exclude<ReelId, 'greet'>
+  isArabic: boolean
+  locale: SupportedLocale
+  onSell: () => void
+  onConcept: () => void
+}) {
+  const copy = isArabic
+    ? {
+        coffee: ['مفهوم فقط · ليست شراكة', 'فنجان بن العميد', 'شخصية أناناس قبل الزحمة. لا يوجد طلب قهوة.', 'المفهوم فقط'],
+        shark: ['مفهوم فقط · ليست رعاية', 'BYD SHARK في السيارات', 'لمحة لمن يبحث عن بيك أب. ليست رعاية من المصنّع.', 'سوق السيارات'],
+        flight: ['مفهوم فقط · ليست شراكة طيران', 'فكرة سفر من عمّان', 'اعرض رحلتك حين تجهّزها. لا حجز تذاكر من هنا.', 'اكتب إعلانًا'],
+        tip: ['من أناناس', 'أول سطر يبيع', 'عنوان واضح يختصر أسئلة المشتري قبل أن يسأل.', 'اكتب العنوان'],
+        insight: ['من السوق المنشور', 'لا عدّاد لزيارتك', 'لا رقم شخصي منذ آخر زيارة. افتح ما هو منشور فعلًا.', 'افتح البحث'],
+      }
+    : {
+        coffee: ['Concept only · not a partnership', 'A Ben Al Ameed moment', 'An ANANAS character, not a coffee order.', 'Concept only'],
+        shark: ['Concept only · not a sponsorship', 'BYD SHARK in cars', 'A creative pickup idea. Not a manufacturer sponsorship.', 'Browse cars'],
+        flight: ['Concept only · not an airline', 'A travel idea from Amman', 'List a trip when it is ready. This does not book a ticket.', 'Draft a listing'],
+        tip: ['From ANANAS', 'The first line sells', 'A clear title answers the buyer before they ask.', 'Write the title'],
+        insight: ['From published listings', 'No visit counter', 'There is no personal number since your last visit.', 'Open search'],
+      }
+  const [kicker, title, body, cta] = copy[id]
+  return (
+    <>
+      <p className={styles.reelKicker}>{kicker}</p>
+      <p className={styles.reelTitle}>{title}</p>
+      <p className={styles.reelBody}>{body}</p>
+      {id === 'shark' ? (
+        <Link className={styles.reelCta} href={`/${locale}/search?q=${encodeURIComponent(isArabic ? 'سيارات' : 'cars')}`}>
+          {cta}
+        </Link>
+      ) : id === 'insight' ? (
+        <Link className={styles.reelCta} href={`/${locale}/search`}>
+          {cta}
+        </Link>
+      ) : id === 'coffee' ? (
+        <button type="button" className={styles.reelCta} onClick={onConcept}>
+          {cta}
+        </button>
+      ) : (
+        <button type="button" className={styles.reelCta} onClick={onSell}>
+          {cta}
+        </button>
+      )}
+    </>
   )
 }
 

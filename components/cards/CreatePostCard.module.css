@@ -1510,8 +1510,8 @@
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  color: #ffc928;
-  background: #101828;
+  color: #101828;
+  background: #ffc928;
 }
 
 .composerProgress {

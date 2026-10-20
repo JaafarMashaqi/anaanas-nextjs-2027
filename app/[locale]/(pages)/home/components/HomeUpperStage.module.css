@@ -1,8 +1,167 @@
 .stage {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.55rem;
   color: #101828;
+}
+
+.reel {
+  position: relative;
+  height: 104px;
+  min-height: 104px;
+  max-height: 104px;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid #e7e9ee;
+}
+
+.reel_greet {
+  background: linear-gradient(to left, #bfe8ce, #f4fbf6 46%, #fff8de);
+}
+
+.reel_coffee {
+  background: linear-gradient(to left, #f6e6d4, #fff4e8 48%, #fff9f3);
+}
+
+.reel_shark {
+  background: linear-gradient(to left, #e7eef8, #f4f7fb 48%, #fff8f2);
+}
+
+.reel_flight {
+  background: linear-gradient(to left, #e7f0ff, #f7fbff 48%, #fff8f2);
+}
+
+.reel_tip {
+  background: #fff6d8;
+}
+
+.reel_insight {
+  background: #eef4ff;
+}
+
+.reelFrame {
+  display: flex;
+  align-items: center;
+  height: 104px;
+  gap: 0.35rem;
+  padding-inline: 0.35rem 3.5rem;
+  animation: reelIn 0.28s ease;
+}
+
+.reelCopy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.reelKicker {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #b8860b;
+}
+
+.reelTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #101828;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reelBody {
+  margin: 0.08rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #344054;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.reelCta {
+  margin-top: 0.12rem;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: #ffc928;
+  color: #101828;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.reelArt {
+  width: 72px;
+  height: 96px;
+  object-fit: contain;
+  object-position: center bottom;
+  flex: 0 0 auto;
+}
+
+.reelMascot {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  margin-inline-start: 0.2rem;
+  flex: 0 0 auto;
+}
+
+.reelMascot img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.reelSky {
+  position: absolute;
+  bottom: 0;
+  inset-inline-end: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffc928;
+  color: #101828;
+  display: grid;
+  place-items: center;
+}
+
+.reelControls {
+  position: absolute;
+  top: 6px;
+  inset-inline-end: 6px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+}
+
+.reelControls button {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid #e7e9ee;
+  background: #fff;
+  color: #667085;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@keyframes reelIn {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .searchSlot {
@@ -445,7 +604,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sun {
+  .sun,
+  .reelFrame {
     animation: none;
   }
 }

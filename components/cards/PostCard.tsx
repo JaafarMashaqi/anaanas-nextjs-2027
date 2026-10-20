@@ -299,6 +299,18 @@ const ActionMenu = ({
   )
 }
 
+function RelativeStamp({ date, raw, locale }: { date: Date; raw: string; locale: string }) {
+  const [label, setLabel] = useState('')
+  useEffect(() => {
+    setLabel(timeSince(date, locale))
+  }, [date, locale])
+  return (
+    <time dateTime={raw} suppressHydrationWarning>
+      {label}
+    </time>
+  )
+}
+
 const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallback, detailsIntroMode = 'full' }: PostCardProps) => {
   const { status, data: session } = useSession()
   const pathname = usePathname()
@@ -1317,7 +1329,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                     {cityName && createdAtDate && <span className={styles.metaDot} aria-hidden>•</span>}
                     {createdAtDate && (
                       <bdi>
-                        <time dateTime={createdAtDate.toISOString()}>{timeSince(createdAtDate, locale)}</time>
+                        <RelativeStamp date={createdAtDate} raw={String(createdAt)} locale={locale} />
                       </bdi>
                     )}
                   </div>

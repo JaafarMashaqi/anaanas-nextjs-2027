@@ -7,7 +7,7 @@ Inspected in the original Next.js app. Status is what the code does today, not t
 | Country preview routing | Jordan stays on this origin | `lib/preview/countryMode.ts`, middleware | working | cookie `ananas_country_pref` | — | `?ananas_country=` does not send the browser to `jo.localhost` | prior runtime |
 | Auth | Sign in and account | `auth.ts`, `app/api/auth` | working | Laravel login | — | Credentials hit `/api/auth/login` | code |
 | Header, language, country | Switch locale and market | `TopHeader` | working | countries API | — | AR RTL and EN LTR | prior screenshots |
-| Greeting | Time of day plus the real country | `HomeUpperStage.tsx` | working | local clock + country label | — | Restored Next Generation greeting. No invented visitor counts | this batch |
+| Greeting reel | One rotating slot for the greeting, mascot, and concept cards | `HomeUpperStage.tsx` | working | local clock. Coffee, BYD SHARK, and travel frames are labeled concepts, not partnerships | — | Height stays 104px. Reduced motion does not autoplay. Amman hero stays separate | this batch |
 | Section stories | Jump to a real section, plus an honest add action | `HomeUpperStage` stories | partial | sections API | P1 | Add opens the composer and does not publish a public story | this batch |
 | Market wire | Real trending titles in the restored rail | `fetchTrendingPosts` | working | trending endpoint | P3 | Titles from the server. No invented price-drop counts | this batch |
 | Identity hero | Restored Amman platform still | `public/brand/hero.jpg` from previous Next Generation | working | previous project asset, not live partner data | — | CMS slider in `HomeBanner` remains below it | this batch |

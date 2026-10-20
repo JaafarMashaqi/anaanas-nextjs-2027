@@ -6,9 +6,9 @@
   min-height: 160px;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.08);
   background: #f8fafc;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .bannerImg {
