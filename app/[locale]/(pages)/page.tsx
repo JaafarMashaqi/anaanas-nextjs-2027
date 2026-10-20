@@ -8,6 +8,7 @@ import Link from 'next/link'
 import LoadContentButton from '@/components/LoadContentButton'
 import type { Metadata } from 'next'
 import FeedLayoutClient from '@/components/layout/FeedLayoutClient'
+import homeGrid from '@/components/layout/feedHomeGrid.module.css'
 import SideBar from '@/components/layout/SideBar'
 import { fetchSections } from '@/lib/api/sections'
 import { t } from '@/lib/translations'
@@ -107,8 +108,8 @@ const Home = async ({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <FeedLayoutClient locale={locale} sidebar={<SideBar sections={sections} locale={locale} />}>
-        <Col md={8} lg={6} className={homeFlow.column}>
+      <FeedLayoutClient layout="home" locale={locale} sidebar={<SideBar sections={sections} locale={locale} />}>
+        <Col className={`${homeFlow.column} ${homeGrid.center}`}>
           <h1 className="visually-hidden">
             {t('home.a11y.visuallyHiddenTitle', uiLocale).replace('{{country}}', countryLabel)}
           </h1>
@@ -174,7 +175,7 @@ const Home = async ({
           </div>
         </Col>
 
-        <Col lg={3} md={3}>
+        <Col className={`${homeGrid.rail} d-none d-lg-block`}>
           <aside className="vstack gap-4" aria-label={uiLocale === 'ar' ? 'رؤى السوق' : 'Market insights'}>
             <div className={sideStyles.sideStack}>
               <Suspense fallback={<HomeInsightsSkeleton />}>

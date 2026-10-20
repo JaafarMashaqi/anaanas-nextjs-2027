@@ -883,8 +883,10 @@ const [step, setStep] = useState(1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, initialPost, initialCategoryId, sectionCategories])
 
-  // إعادة تهيئة الأخطاء عند تغيير step + إبقاء التحقق من العنوان نشطاً في كل الخطوات
+  // Title is checked when the visitor leaves step 1. Triggering it on mount
+  // painted "يرجى إدخال عنوان الإعلان" before anyone touched the field.
   useEffect(() => {
+    if (step <= 1) return
     clearErrors()
     void trigger('title')
   }, [step, clearErrors, trigger])
@@ -909,8 +911,12 @@ const [step, setStep] = useState(1)
     clearErrors,
   ])
 
-  // عمل scroll to top عند تغيير step
+  const skipInitialStepScroll = useRef(true)
   useEffect(() => {
+    if (skipInitialStepScroll.current) {
+      skipInitialStepScroll.current = false
+      return
+    }
     if (cardRef.current) {
       cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }

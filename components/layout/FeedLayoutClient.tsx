@@ -37,13 +37,16 @@ import type { ChildrenType } from '@/types/component'
 import Messaging from '@/components/layout/Messaging'
 import AuthFooterSocialLinks from '@/components/layout/AuthFooterSocialLinks'
 import Link from 'next/link'
+import homeGrid from './feedHomeGrid.module.css'
 
 type FeedLayoutClientProps = ChildrenType & {
   sidebar: ReactNode
   locale?: string
+  /** Home uses a wider canvas and a dominant center column. */
+  layout?: 'default' | 'home'
 }
 
-const FeedLayoutClient = ({ children, sidebar, locale }: FeedLayoutClientProps) => {
+const FeedLayoutClient = ({ children, sidebar, locale, layout = 'default' }: FeedLayoutClientProps) => {
   const { messagingOffcanvas, startOffcanvas } = useLayoutContext()
   const mobileSidebar =
     startOffcanvas.open && isValidElement(sidebar) ? cloneElement(sidebar as ReactElement) : null
@@ -51,9 +54,9 @@ const FeedLayoutClient = ({ children, sidebar, locale }: FeedLayoutClientProps) 
   return (
     <>
       <main>
-        <Container>
-          <Row className="g-md-4">
-            <Col lg={3} className="ananas-desktop-only">
+        <Container className={layout === 'home' ? homeGrid.canvas : undefined}>
+          <Row className={layout === 'home' ? homeGrid.row : 'g-md-4'}>
+            <Col lg={layout === 'home' ? undefined : 3} className={layout === 'home' ? `ananas-desktop-only ${homeGrid.side}` : 'ananas-desktop-only'}>
               <nav className="navbar navbar-expand-lg mx-0">
                 <div className="d-block px-2 px-lg-0 w-100">{sidebar}</div>
               </nav>

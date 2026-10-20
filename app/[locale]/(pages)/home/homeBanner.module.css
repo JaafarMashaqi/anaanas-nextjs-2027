@@ -1,13 +1,38 @@
+.slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.slotHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: #667085;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.slotHead button {
+  border: 0;
+  background: transparent;
+  color: #667085;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .bannerWrap {
   position: relative;
   width: 100%;
-  /* Aspect-ratio driven so we don't depend on min-height to lay out the slide */
-  aspect-ratio: 16 / 5;
-  min-height: 160px;
+  aspect-ratio: 6 / 1;
+  max-height: 128px;
+  min-height: 0;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.08);
-  background: #f8fafc;
+  box-shadow: none;
+  background: #fff8de;
   margin-bottom: 0;
 }
 
@@ -80,7 +105,8 @@
 /* Adapt heights per breakpoint while preserving aspect ratio */
 @media (max-width: 991.98px) {
   .bannerWrap {
-    aspect-ratio: 2.4 / 1;
+    aspect-ratio: 3.2 / 1;
+    max-height: 140px;
     min-height: 0;
     margin-bottom: 0;
   }

@@ -1,0 +1,30 @@
+.canvas {
+  max-width: 1480px;
+}
+
+@media (min-width: 992px) {
+  .row {
+    display: grid !important;
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) minmax(210px, 270px);
+    column-gap: 1.25rem;
+    align-items: start;
+  }
+
+  .side,
+  .center,
+  .rail {
+    width: auto !important;
+    max-width: none !important;
+    flex: none !important;
+    padding-inline: 0 !important;
+    min-width: 0;
+  }
+
+  .side,
+  .rail {
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 100px);
+    overflow: auto;
+  }
+}

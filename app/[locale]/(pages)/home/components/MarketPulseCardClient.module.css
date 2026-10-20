@@ -177,6 +177,18 @@
   text-overflow: ellipsis;
 }
 
+.stateDemo,
+.stateOff {
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #667085;
+}
+
+.stateDemo {
+  color: #7c3aed;
+}
+
 .compact .levelDemo,
 .compact .levelBlocked {
   padding: 0;

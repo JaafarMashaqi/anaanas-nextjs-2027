@@ -107,6 +107,28 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
   )
 
   const swiperRef = useRef<SwiperClass | null>(null)
+  const [slotHidden, setSlotHidden] = useState(false)
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem('ananas-admin-campaign-slot') === 'hidden') setSlotHidden(true)
+    } catch {
+      /* the slot stays visible */
+    }
+  }, [])
+
+  const hideSlot = () => {
+    setSlotHidden(true)
+    try {
+      window.localStorage.setItem('ananas-admin-campaign-slot', 'hidden')
+    } catch {
+      /* this view only */
+    }
+  }
+
+  const slotLabel = isArabic ? 'حملة من الإدارة · ليست بطاقة عمّان' : 'Admin campaign · not the Amman card'
+
+  if (slotHidden) return null
 
   // While the very first request is in flight render a sized skeleton so the
   // page doesn't jump. After that, if there's nothing to show we render
@@ -127,9 +149,15 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
   // Single-slide path — skip Swiper entirely for slightly faster paint.
   if (visibleSlides.length === 1) {
     return (
-      <div className={styles.bannerWrap}>
-        <SlideMedia slide={visibleSlides[0]} isArabic={isArabic} priority />
-      </div>
+      <section className={styles.slot} aria-label={slotLabel}>
+        <div className={styles.slotHead}>
+          <span>{slotLabel}</span>
+          <button type="button" onClick={hideSlot}>{isArabic ? 'إخفاء' : 'Hide'}</button>
+        </div>
+        <div className={styles.bannerWrap}>
+          <SlideMedia slide={visibleSlides[0]} isArabic={isArabic} priority />
+        </div>
+      </section>
     )
   }
 
@@ -140,7 +168,12 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
   const goNext = () => swiperRef.current?.slideNext()
 
   return (
-    <div className={`${styles.bannerWrap} ${styles.bannerSliderWrap}`}>
+    <section className={styles.slot} aria-label={slotLabel}>
+      <div className={styles.slotHead}>
+        <span>{slotLabel}</span>
+        <button type="button" onClick={hideSlot}>{isArabic ? 'إخفاء' : 'Hide'}</button>
+      </div>
+      <div className={`${styles.bannerWrap} ${styles.bannerSliderWrap}`}>
       <Swiper
         modules={[Autoplay, Pagination, Keyboard, A11y]}
         onSwiper={(s) => {
@@ -178,7 +211,8 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
       >
         {isArabic ? <BsChevronLeft aria-hidden /> : <BsChevronRight aria-hidden />}
       </button>
-    </div>
+      </div>
+    </section>
   )
 }
 

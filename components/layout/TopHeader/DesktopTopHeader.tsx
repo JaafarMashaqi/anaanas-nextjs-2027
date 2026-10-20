@@ -1,11 +1,14 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { BsChatLeftTextFill, BsSearch, BsXLg } from 'react-icons/bs'
+
+import searchAvatar from '@/assets/images/icon/s200.png'
 
 import LogoBox from '@/components/LogoBox'
 import NotificationsBell from './NotificationsBell'
@@ -23,6 +26,7 @@ const TopHeader = () => {
   const { status } = useSession()
   const params = useParams<{ locale?: string }>()
   const router = useRouter()
+  const pathname = usePathname() || ''
   const [query, setQuery] = useState('')
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const mobileInputRef = useRef<HTMLInputElement | null>(null)
@@ -37,6 +41,7 @@ const TopHeader = () => {
     return DEFAULT_LOCALE
   })()
 
+  const isHome = pathname === `/${locale}` || pathname === `/${locale}/`
   const desktopAssist = useSmartSearchAssist(locale, query)
   const popupAssist = useSmartSearchAssist(locale, query)
   const desktopToggle = useSearchFieldToggle(desktopAssist.open, desktopAssist.setOpen)
@@ -111,7 +116,7 @@ const TopHeader = () => {
           onSubmit={handleSearch}
         >
           <div className="topHeader__searchField">
-            <BsSearch className="topHeader__searchIcon" aria-hidden />
+            <Image src={searchAvatar} alt="" width={26} height={26} className="topHeader__searchMascot" />
             <input
               className="form-control"
               type="search"
@@ -150,6 +155,7 @@ const TopHeader = () => {
         {/* ==================== END CLUSTER (actions) ==================== */}
         <div className="topHeader__end">
           {/* Mobile search trigger — opens the popup search overlay */}
+          {!isHome ? (
           <button
             type="button"
             className="topHeader__iconBtn d-lg-none"
@@ -162,6 +168,7 @@ const TopHeader = () => {
           >
             <BsSearch size={15} />
           </button>
+          ) : null}
 
           {/* Country picker — full on desktop, compact on mobile */}
           <div className="d-none d-lg-inline-flex">
@@ -377,6 +384,17 @@ const TopHeader = () => {
           transform: translateY(-50%);
           color: #6b7280;
           font-size: 14px;
+          pointer-events: none;
+        }
+
+        .topHeader__searchMascot {
+          position: absolute;
+          inset-inline-start: 10px;
+          top: 50%;
+          width: 26px;
+          height: 26px;
+          transform: translateY(-50%);
+          object-fit: contain;
           pointer-events: none;
         }
 

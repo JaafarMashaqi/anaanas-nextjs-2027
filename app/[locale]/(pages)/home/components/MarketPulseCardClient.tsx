@@ -125,8 +125,13 @@ function MetricCard({
         <span className={styles.metricIcon} aria-hidden>
           <Icon size={18} />
         </span>
-        {metric.level === 'demo' ? <strong className={styles.metricWord}>—</strong> : figure}
+        {metric.level === 'live' ? figure : <strong className={styles.metricWord}>—</strong>}
         <span className={styles.metricLabel}>{metric.label}</span>
+        {metric.level !== 'live' ? (
+          <span className={metric.level === 'demo' ? styles.stateDemo : styles.stateOff}>
+            {metric.level === 'demo' ? (ar ? 'تجريبي' : 'Demo') : ar ? 'غير متاح' : 'Unavailable'}
+          </span>
+        ) : null}
       </button>
     )
   }
