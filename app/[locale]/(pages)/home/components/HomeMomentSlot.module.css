@@ -9,7 +9,6 @@
   color: #101828;
 }
 
-.card[data-kind='greeting'] .mascot,
 .card[data-kind='greeting'] .actions,
 .card[data-kind='greeting'] .kicker,
 .card[data-kind='greeting'] .dots {
@@ -70,8 +69,57 @@
   line-height: 1.35;
 }
 
-.note {
-  color: #667085;
+.cup {
+  position: relative;
+  width: 28px;
+  height: 34px;
+  flex: 0 0 auto;
+}
+
+.steam {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(102, 112, 133, 0.45);
+  animation: steam 1.8s ease-in-out infinite;
+}
+
+.steam:nth-child(1) { inset-inline-start: 6px; }
+.steam:nth-child(2) { inset-inline-start: 13px; animation-delay: 0.4s; }
+
+.cupBody {
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: 2px;
+  width: 20px;
+  height: 16px;
+  border: 2px solid #6b3f2a;
+  border-radius: 0 0 8px 8px;
+  background: #c47a45;
+}
+
+.cupBody::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  inset-inline-end: -7px;
+  width: 6px;
+  height: 8px;
+  border: 2px solid #6b3f2a;
+  border-inline-start: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+@keyframes steam {
+  0% { transform: translateY(4px); opacity: 0; }
+  40% { opacity: 0.7; }
+  100% { transform: translateY(-6px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steam { animation: none; opacity: 0.4; }
 }
 
 .actions {

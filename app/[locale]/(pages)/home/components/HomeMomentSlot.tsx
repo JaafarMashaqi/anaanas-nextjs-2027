@@ -11,14 +11,15 @@ import type { SupportedLocale } from '@/lib/localization'
 import styles from './HomeMomentSlot.module.css'
 
 type Slide = {
-  id: string
-  kind: 'greeting' | 'product' | 'concept'
+  id: 'greet' | 'coffee' | 'insight'
+  kind: 'greeting' | 'coffee' | 'insight'
   title: string
   line: string
   action: string
   href?: string
   composer?: boolean
   store?: boolean
+  ms: number
 }
 
 const DISMISS_KEY = 'ananas-moment-dismissed'
@@ -85,24 +86,47 @@ export default function HomeMomentSlot({
         : 'We hope you find it sooner than you expect.',
       action: ar ? 'أبيع' : 'Sell',
       composer: true,
+      ms: 12000,
     }
-    return [greeting]
-  }, [ar, countryLabel, displayName, hello])
+    const coffee: Slide = {
+      id: 'coffee',
+      kind: 'coffee',
+      title: ar ? 'القهوة أولاً' : 'Coffee first',
+      line: ar
+        ? 'لحظة واجهة. ليست شراكة، ولا توجد نقطة بيع مربوطة.'
+        : 'An interface moment. Not a partnership, and no store pin is connected.',
+      action: ar ? 'أقرب نقطة' : 'Nearest cup',
+      store: true,
+      ms: 8000,
+    }
+    const insight: Slide = {
+      id: 'insight',
+      kind: 'insight',
+      title: ar ? 'السوق أمامك' : 'The market is here',
+      line: ar
+        ? `${countryLabel}. الأرقام الحية في النبض، والأرقام التجريبية موسومة.`
+        : `${countryLabel}. Live figures are in the pulse. Demo figures are marked.`,
+      action: ar ? 'أبيع' : 'Sell',
+      composer: true,
+      ms: 10000,
+    }
+    return [greeting, coffee, insight].filter((slide) => slide.id === 'greet' || !dismissed.includes(slide.id))
+  }, [ar, countryLabel, dismissed, displayName, hello])
 
-  const visible = slides.filter((slide) => slide.id === 'greet' || !dismissed.includes(slide.id))
+  const visible = slides
   const safeIndex = visible.length ? index % visible.length : 0
   const slide = visible[safeIndex]
 
   useEffect(() => {
     if (!slide || paused || visible.length < 2) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const timer = window.setInterval(() => {
+    const timer = window.setTimeout(() => {
       const active = document.activeElement
       if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return
       setIndex((value) => value + 1)
       setStoreNote(false)
-    }, 8000)
-    return () => window.clearInterval(timer)
+    }, slide.ms)
+    return () => window.clearTimeout(timer)
   }, [paused, slide, visible.length])
 
   if (!slide) return null
@@ -124,13 +148,13 @@ export default function HomeMomentSlot({
       ? ar
         ? 'تحية'
         : 'Greeting'
-      : slide.kind === 'product'
+      : slide.kind === 'coffee'
         ? ar
-          ? 'من المنتج'
-          : 'Product'
+          ? 'مختبر التجربة · ليست شراكة'
+          : 'Experience lab · not a partnership'
         : ar
-          ? 'مفهوم · ليست شراكة'
-          : 'Concept · not a partnership'
+          ? 'بعد القهوة'
+          : 'After coffee'
 
   return (
     <section
@@ -154,6 +178,13 @@ export default function HomeMomentSlot({
         )}
       </span>
       <Image src={mascot} alt="" width={46} height={46} className={styles.mascot} />
+      {slide.kind === 'coffee' ? (
+        <span className={styles.cup} aria-hidden>
+          <span className={styles.steam} />
+          <span className={styles.steam} />
+          <span className={styles.cupBody} />
+        </span>
+      ) : null}
       <div className={styles.copy}>
         <p className={styles.kicker}>{kicker}</p>
         <h2>{slide.title}</h2>

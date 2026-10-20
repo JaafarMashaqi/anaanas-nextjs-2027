@@ -172,26 +172,26 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
     0,
     {
       id: 'online',
-      level: 'blocked',
+      level: 'demo',
       label: ar ? 'متواجدون' : 'Online',
-      value: ar ? 'لا رصد' : 'No signal',
-      period: ar ? 'لا جلسات حية' : 'No live sessions',
+      value: count(8600, locale, false),
+      period: ar ? 'مختبر التجربة · ليس من الخادم' : 'Experience lab · not from the server',
       hint: ar
-        ? 'لا يوجد عدّاد للمستخدمين المتصلين. لا نعرض رقماً.'
-        : 'There is no signed-in presence count. No number is shown.',
+        ? '٨٦٠٠ رقم تصميمي. لا يوجد عدّاد جلسات متصلة.'
+        : '8,600 is a design figure. There is no presence counter.',
       tone: 'blue',
-      href: `/${locale}`,
+      href: `/${locale}/search`,
       raw: null,
     },
     {
       id: 'searching',
-      level: 'blocked',
+      level: 'demo',
       label: ar ? 'يبحثون' : 'Searching',
-      value: ar ? 'لا رصد' : 'No signal',
-      period: ar ? 'لا نشاط بحث مجمع' : 'No aggregated search activity',
+      value: count(3920, locale, false),
+      period: ar ? 'مختبر التجربة · ليس من الخادم' : 'Experience lab · not from the server',
       hint: ar
-        ? 'لا يوجد عدّاد لمن يبحثون الآن. الاقتراحات المحلية ليست هذا الرقم.'
-        : 'There is no count of people searching now. Local suggestions are not that number.',
+        ? '٣٩٢٠ رقم تصميمي. لا يوجد تجميع لمن يبحث الآن.'
+        : '3,920 is a design figure. Live search is not aggregated.',
       tone: 'violet',
       href: `/${locale}/search`,
       raw: null,
@@ -252,39 +252,39 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
     },
     {
       id: 'hot',
-      level: 'blocked',
-      label: ar ? 'ساخنة' : 'Hot',
-      value: ar ? 'لا درجة' : 'No score',
-      period: ar ? 'لا مؤشر طلب' : 'No demand score',
+      level: 'demo',
+      label: ar ? 'مميزة' : 'Featured',
+      value: count(1240, locale, false),
+      period: ar ? 'مختبر التجربة · ليس من الخادم' : 'Experience lab · not from the server',
       hint: ar
-        ? 'لا توجد درجة عروض ساخنة. الإعلانات المميزة ليست حرارة سوق.'
-        : 'There is no hot-deal score. Featured posts are not market heat.',
+        ? '١٢٤٠ رقم تصميمي للعروض المميزة. ليس درجة طلب.'
+        : '1,240 is a design figure for featured deals. It is not a demand score.',
       tone: 'amber',
-      href: `/${locale}/market-pulse`,
+      href: `/${locale}/search`,
       raw: null,
     },
     {
       id: 'commerce',
-      level: 'blocked',
+      level: 'demo',
       label: ar ? 'بث' : 'Live',
-      value: ar ? 'لا بث' : 'No live',
-      period: ar ? 'لا جلسات بيع' : 'No selling sessions',
+      value: count(84, locale, false),
+      period: ar ? 'مختبر التجربة · لا بث متصل' : 'Experience lab · no live session',
       hint: ar
-        ? 'لا يوجد مسار بث أو تجارة مباشرة. هذه حالة غير متاحة وليست مشاهدين.'
-        : 'There is no live-session route. This is unavailable, not a viewer count.',
+        ? '٨٤ رقم تصميمي. لا توجد جلسات بيع مباشرة.'
+        : '84 is a design figure. There are no live selling sessions.',
       tone: 'coral',
       href: `/${locale}/search`,
       raw: null,
     },
     {
       id: 'sold',
-      level: 'blocked',
-      label: ar ? 'مباع' : 'Sold',
-      value: ar ? 'غير مؤكد' : 'Unconfirmed',
-      period: ar ? 'بانتظار حدث بيع' : 'Waiting for a sale event',
+      level: 'demo',
+      label: ar ? 'مباع اليوم' : 'Sold today',
+      value: count(128, locale, false),
+      period: ar ? 'مختبر التجربة · ليس بيعاً مؤكداً' : 'Experience lab · not a confirmed sale',
       hint: ar
-        ? 'لا نعرض عدداً. الخادم لا يعيد بيعاً مؤكداً.'
-        : 'No number is shown. The server does not return a confirmed sale.',
+        ? '١٢٨ رقم تصميمي. الخادم لا يعيد مبيعات مؤكدة.'
+        : '128 is a design figure. The server does not return confirmed sales.',
       tone: 'green',
       href: `/${locale}/market-pulse`,
       raw: null,

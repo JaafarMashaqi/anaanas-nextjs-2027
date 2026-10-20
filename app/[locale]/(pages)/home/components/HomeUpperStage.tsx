@@ -5,8 +5,9 @@ import { useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 
 import type { TrendingPostItem } from '@/lib/api/homeInsights'
-import type { LatestListingItem } from '@/lib/server/fetchLatestListings'
+import { demoMarketEvents, type DemoMarketEvent } from '@/lib/experience/demoMarketEvents'
 import type { SupportedLocale } from '@/lib/localization'
+import type { LatestListingItem } from '@/lib/server/fetchLatestListings'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
 import HomeMomentSlot from './HomeMomentSlot'
 import HomeOpportunitySlot from './HomeOpportunitySlot'
@@ -56,6 +57,9 @@ function openComposer(intent: 'sale' | 'wanted') {
 
 export default function HomeUpperStage({ locale, countryLabel, trending = [], latest = [], children }: Props) {
   const isArabic = locale === 'ar'
+  const [hiddenEvents, setHiddenEvents] = useState<string[]>([])
+  const events = demoMarketEvents(locale).filter((item) => !hiddenEvents.includes(item.id))
+  const hideEvent = (item: DemoMarketEvent) => setHiddenEvents((current) => [...current, item.id])
   const [note, setNote] = useState<'map' | 'matches' | null>(null)
 
   useEffect(() => {
@@ -113,29 +117,25 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
         <div className={styles.wireHead}>
           <span className={styles.liveDot} aria-hidden />
           <h2>{isArabic ? 'سلك السوق' : 'Market wire'}</h2>
-          <span>
-            {latest.length > 0
-              ? isArabic
-                ? `${latest.length} في آخر قائمة · ليست مبيعات`
-                : `${latest.length} in the latest list · not sales`
-              : isArabic
-                ? 'لا عناوين في آخر استجابة'
-                : 'The latest response had no titles'}
-          </span>
+          <span>{isArabic ? 'مختبر التجربة · ليست أحداثاً مؤكدة' : 'Experience lab · not confirmed events'}</span>
         </div>
-        {latest.length > 0 ? (
-          <div className={styles.wire}>
-            {latest.slice(0, 6).map((item) => (
-              <Link key={item.id} href={`/${locale}/post/${item.id}`} className={styles.wireItem}>
-                <strong>{item.title}</strong>
-                {item.price != null ? <span>{item.price}</span> : null}
+        <div className={styles.wire}>
+          {events.map((item) => (
+            <span key={item.id} className={styles.wireItem} data-kind={item.kind}>
+              <Link href={item.href}>
+                <strong>{isArabic ? item.textAr : item.textEn}</strong>
               </Link>
-            ))}
+              <button type="button" onClick={() => hideEvent(item)} aria-label={isArabic ? 'إخفاء' : 'Dismiss'}>
+                ×
+              </button>
+            </span>
+          ))}
+          {latest.length > 0 ? (
             <Link href="#home-latest" className={styles.wireItem}>
-              <strong>{isArabic ? 'آخر القائمة' : 'Latest list'}</strong>
+              <strong>{isArabic ? 'آخر الإعلانات الحقيقية' : 'Real latest listings'}</strong>
             </Link>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </section>
 
       <HomeBanner locale={locale} />

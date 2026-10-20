@@ -125,7 +125,7 @@ function MetricCard({
         <span className={styles.metricIcon} aria-hidden>
           <Icon size={18} />
         </span>
-        {metric.level === 'live' ? figure : <strong className={styles.metricWord}>—</strong>}
+        {metric.level === 'live' ? figure : <strong className={styles.metricWord}>{metric.value}</strong>}
         <span className={styles.metricLabel}>{metric.label}</span>
         {metric.level !== 'live' ? (
           <span className={metric.level === 'demo' ? styles.stateDemo : styles.stateOff}>
@@ -388,9 +388,10 @@ export default function MarketPulseCardClient({
   const [focus, setFocus] = useState<PulseMetricId | null>(null)
   const drawerId = variant === 'rail' ? 'market-pulse-drawer-rail' : 'market-pulse-drawer-stack'
   const isArabic = locale === 'ar'
-  const railMetrics = model.metrics.filter(
-    (metric) => metric.level === 'live' && metric.raw != null && ['listings', 'activity', 'auctions'].includes(metric.id),
-  )
+  const railOrder = ['listings', 'online', 'searching', 'hot', 'auctions', 'commerce', 'sold']
+  const railMetrics = model.metrics
+    .filter((metric) => railOrder.includes(metric.id) && (metric.level === 'live' ? metric.raw != null : metric.level === 'demo'))
+    .sort((a, b) => railOrder.indexOf(a.id) - railOrder.indexOf(b.id))
   const detailsLabel = open ? (isArabic ? 'إخفاء' : 'Hide') : isArabic ? 'التفاصيل' : 'Details'
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -449,11 +450,6 @@ export default function MarketPulseCardClient({
           </div>
         ))}
       </div>
-      <p className={styles.railSource}>
-        {isArabic
-          ? 'المعروض من أعداد الإعلانات والمزادات والأقسام. المؤشرات غير المرصودة داخل التفاصيل.'
-          : 'Shown counts come from listings, auctions, and sections. Unobserved indicators are inside Details.'}
-      </p>
       {open ? (
         <PulseDrawer
           model={model}

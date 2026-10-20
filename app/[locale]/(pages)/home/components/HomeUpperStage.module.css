@@ -526,6 +526,21 @@
   background: #eef2ff;
 }
 
+.wireItem a {
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.wireItem button {
+  border: 0;
+  background: transparent;
+  color: #667085;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .wireItem strong {
   font-size: 0.75rem;
   font-weight: 800;
