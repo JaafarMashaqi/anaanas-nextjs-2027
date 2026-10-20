@@ -1,14 +1,20 @@
 import { headers } from 'next/headers'
 
-import { fetchLatestListings } from '@/lib/server/fetchLatestListings'
+import { fetchLatestListings, type LatestListingItem } from '@/lib/server/fetchLatestListings'
 import { getCountryByCodeCached } from '@/lib/server/getCountryByCodeCached'
 import { isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
 
 import MobileLatestAdsSectionClient from './MobileLatestAdsSectionClient'
 
-/** Mobile-only horizontal strip; hidden from md breakpoint up via CSS. */
-export default async function MobileLatestAdsSection({ locale }: { locale: SupportedLocale }) {
+/** Compact latest rail. Hidden nowhere: the feed excludes these ids so they are not repeated below. */
+export default async function MobileLatestAdsSection({
+  locale,
+  items: provided,
+}: {
+  locale: SupportedLocale
+  items?: LatestListingItem[]
+}) {
   const headersList = await headers()
   const headerLocale = headersList.get('x-locale')
   const uiLocale: SupportedLocale =
@@ -25,15 +31,13 @@ export default async function MobileLatestAdsSection({ locale }: { locale: Suppo
     }
   }
 
-  const items = await fetchLatestListings({
-    countryId,
-    land: uiLocale,
-    limit: 12,
-  })
+  const items =
+    provided ??
+    (await fetchLatestListings({
+      countryId,
+      land: uiLocale,
+      limit: 12,
+    }))
 
-  return (
-    <div className="d-md-none">
-      <MobileLatestAdsSectionClient items={items} locale={uiLocale} />
-    </div>
-  )
+  return <MobileLatestAdsSectionClient items={items} locale={uiLocale} />
 }

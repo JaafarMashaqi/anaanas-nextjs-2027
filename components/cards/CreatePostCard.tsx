@@ -806,7 +806,7 @@ const [step, setStep] = useState(1)
     clearErrors,
   } = useForm({
     resolver: yupResolver(validationSchema),
-    mode: 'onChange',
+    mode: 'onTouched',
     defaultValues: {
       title: '',
       description: '',

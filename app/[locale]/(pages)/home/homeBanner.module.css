@@ -12,7 +12,8 @@
 }
 
 .bannerImg {
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff8de;
 }
 
 .bannerPicture {

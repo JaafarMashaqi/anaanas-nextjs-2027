@@ -11,6 +11,7 @@ import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import type { SupportedLocale } from '@/lib/localization'
 import { plainListingText } from '@/lib/text/plainListingText'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
+import HomeConceptSequence from './HomeConceptSequence'
 import mascot from '@/assets/uiux/mascot_sitting.png'
 
 import styles from './HomeUpperStage.module.css'
@@ -80,7 +81,8 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
 
   return (
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
-      <GreetingReel locale={locale} countryLabel={countryLabel} onSell={() => openComposer('sale')} onConcept={() => setNote('concept')} />
+      <GreetingCard locale={locale} countryLabel={countryLabel} />
+      <HomeConceptSequence locale={locale} />
 
       <div className={styles.searchSlot}>
         <MobileHeaderSearchBar locale={locale} />
@@ -223,50 +225,13 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
   )
 }
 
-const REEL = ['greet', 'coffee', 'shark', 'flight', 'tip', 'insight'] as const
-type ReelId = (typeof REEL)[number]
-
-function GreetingReel({
-  locale,
-  countryLabel,
-  onSell,
-  onConcept,
-}: {
-  locale: SupportedLocale
-  countryLabel: string
-  onSell: () => void
-  onConcept: () => void
-}) {
+function GreetingCard({ locale, countryLabel }: { locale: SupportedLocale; countryLabel: string }) {
   const isArabic = locale === 'ar'
-  const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
   const [hour, setHour] = useState(12)
-  const id = REEL[index]
-  const reelClass = {
-    greet: styles.reel_greet,
-    coffee: styles.reel_coffee,
-    shark: styles.reel_shark,
-    flight: styles.reel_flight,
-    tip: styles.reel_tip,
-    insight: styles.reel_insight,
-  }[id]
-
   useEffect(() => {
     setHour(new Date().getHours())
   }, [])
-
-  useEffect(() => {
-    if (paused) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const dwell = id === 'greet' ? 9000 : 7500
-    const timer = window.setTimeout(() => setIndex((value) => (value + 1) % REEL.length), dwell)
-    return () => window.clearTimeout(timer)
-  }, [id, paused])
-
-  const step = (direction: 1 | -1) => {
-    setIndex((value) => (value + direction + REEL.length) % REEL.length)
-  }
-
+  const night = hour >= 18 || hour < 6
   const hello = isArabic
     ? hour < 12
       ? 'صباح الخير'
@@ -278,138 +243,32 @@ function GreetingReel({
       : hour < 17
         ? 'Good afternoon'
         : 'Good evening'
-
   return (
-    <section
-      className={`${styles.reel} ${reelClass}`}
-      data-reel={id}
-      aria-roledescription={isArabic ? 'عرض متحرك' : 'rotating highlight'}
-      aria-label={isArabic ? 'تحية أناناس والمفاهيم' : 'ANANAS greeting and concepts'}
-      onPointerEnter={() => setPaused(true)}
-      onPointerLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false)
-      }}
-    >
-      <div className={styles.reelControls}>
-        <button type="button" aria-label={isArabic ? 'السابق' : 'Previous'} onClick={() => step(-1)}>
-          ‹
-        </button>
-        <button type="button" aria-label={isArabic ? 'التالي' : 'Next'} onClick={() => step(1)}>
-          ›
-        </button>
-      </div>
-      <div key={id} className={styles.reelFrame}>
-        <ReelArt id={id} night={hour >= 18 || hour < 6} />
-        <div className={styles.reelCopy}>
-          {id === 'greet' ? (
-            <>
-              <p className={styles.reelTitle}>{hello}</p>
-              <p className={styles.reelBody}>
-                {isArabic
-                  ? `سوق أناناس في ${countryLabel}. تصفّح بهدوء، أو انشر حين يجهز العنوان.`
-                  : `ANANAS market in ${countryLabel}. Browse calmly, or publish when the title is ready.`}
-              </p>
-            </>
-          ) : (
-            <ReelCopy id={id} isArabic={isArabic} onSell={onSell} onConcept={onConcept} locale={locale} />
-          )}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function ReelArt({ id, night }: { id: ReelId; night: boolean }) {
-  if (id === 'coffee') {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src="/brand/coffee-founder.png" alt="" className={styles.reelArt} />
-    )
-  }
-  if (id === 'shark') {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src="/brand/shark-6.jpg" alt="" className={styles.reelArt} />
-    )
-  }
-  if (id === 'flight') {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src="/brand/flight-concept.jpg" alt="" className={styles.reelArt} />
-    )
-  }
-  return (
-    <span className={styles.reelMascot}>
-      <Image src={mascot} alt="" width={64} height={64} />
-      <span className={styles.reelSky} aria-hidden>
+    <section className={styles.greetCard} aria-label={isArabic ? 'تحية أناناس' : 'ANANAS greeting'}>
+      <span className={styles.greetSky} data-sky={night ? 'night' : 'day'} aria-hidden>
         {night ? (
-          <svg viewBox="0 0 24 24" width="12" height="12">
+          <svg viewBox="0 0 24 24" width="28" height="28">
             <path fill="currentColor" d="M14.5 2.4a8.8 8.8 0 1 0 7.1 12.2A8 8 0 0 1 14.5 2.4z" />
           </svg>
         ) : (
-          <svg viewBox="0 0 24 24" width="12" height="12">
-            <circle cx="12" cy="12" r="4" fill="currentColor" />
+          <svg viewBox="0 0 24 24" width="28" height="28">
+            <circle cx="12" cy="12" r="4.2" fill="currentColor" />
+            <g stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+              <path d="M12 2.2v2.2M12 19.6v2.2M2.2 12h2.2M19.6 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" />
+            </g>
           </svg>
         )}
       </span>
-    </span>
-  )
-}
-
-function ReelCopy({
-  id,
-  isArabic,
-  locale,
-  onSell,
-  onConcept,
-}: {
-  id: Exclude<ReelId, 'greet'>
-  isArabic: boolean
-  locale: SupportedLocale
-  onSell: () => void
-  onConcept: () => void
-}) {
-  const copy = isArabic
-    ? {
-        coffee: ['مفهوم فقط · ليست شراكة', 'فنجان بن العميد', 'شخصية أناناس قبل الزحمة. لا يوجد طلب قهوة.', 'المفهوم فقط'],
-        shark: ['مفهوم فقط · ليست رعاية', 'BYD SHARK في السيارات', 'لمحة لمن يبحث عن بيك أب. ليست رعاية من المصنّع.', 'سوق السيارات'],
-        flight: ['مفهوم فقط · ليست شراكة طيران', 'فكرة سفر من عمّان', 'اعرض رحلتك حين تجهّزها. لا حجز تذاكر من هنا.', 'اكتب إعلانًا'],
-        tip: ['من أناناس', 'أول سطر يبيع', 'عنوان واضح يختصر أسئلة المشتري قبل أن يسأل.', 'اكتب العنوان'],
-        insight: ['من السوق المنشور', 'لا عدّاد لزيارتك', 'لا رقم شخصي منذ آخر زيارة. افتح ما هو منشور فعلًا.', 'افتح البحث'],
-      }
-    : {
-        coffee: ['Concept only · not a partnership', 'A Ben Al Ameed moment', 'An ANANAS character, not a coffee order.', 'Concept only'],
-        shark: ['Concept only · not a sponsorship', 'BYD SHARK in cars', 'A creative pickup idea. Not a manufacturer sponsorship.', 'Browse cars'],
-        flight: ['Concept only · not an airline', 'A travel idea from Amman', 'List a trip when it is ready. This does not book a ticket.', 'Draft a listing'],
-        tip: ['From ANANAS', 'The first line sells', 'A clear title answers the buyer before they ask.', 'Write the title'],
-        insight: ['From published listings', 'No visit counter', 'There is no personal number since your last visit.', 'Open search'],
-      }
-  const [kicker, title, body, cta] = copy[id]
-  return (
-    <>
-      <p className={styles.reelKicker}>{kicker}</p>
-      <p className={styles.reelTitle}>{title}</p>
-      <p className={styles.reelBody}>{body}</p>
-      {id === 'shark' ? (
-        <Link className={styles.reelCta} href={`/${locale}/search?q=${encodeURIComponent(isArabic ? 'سيارات' : 'cars')}`}>
-          {cta}
-        </Link>
-      ) : id === 'insight' ? (
-        <Link className={styles.reelCta} href={`/${locale}/search`}>
-          {cta}
-        </Link>
-      ) : id === 'coffee' ? (
-        <button type="button" className={styles.reelCta} onClick={onConcept}>
-          {cta}
-        </button>
-      ) : (
-        <button type="button" className={styles.reelCta} onClick={onSell}>
-          {cta}
-        </button>
-      )}
-    </>
+      <div className={styles.greetCopy}>
+        <p className={styles.greetTitle}>{hello}</p>
+        <p className={styles.greetBody}>
+          {isArabic
+            ? `سوق أناناس في ${countryLabel}. تصفّح بهدوء، أو انشر حين يجهز العنوان.`
+            : `ANANAS market in ${countryLabel}. Browse calmly, or publish when the title is ready.`}
+        </p>
+      </div>
+      <Image src={mascot} alt="" width={78} height={78} className={styles.greetMascot} />
+    </section>
   )
 }
 

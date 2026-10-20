@@ -4,7 +4,6 @@ import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap
 import Feeds from './home/components/Feeds'
 import Followers from './home/components/Followers'
 import HomeBanner from './home/components/HomeBanner'
-import HomeConceptSequence from './home/components/HomeConceptSequence'
 import Link from 'next/link'
 import LoadContentButton from '@/components/LoadContentButton'
 import type { Metadata } from 'next'
@@ -24,7 +23,8 @@ import MobileAiPromoGrid from './home/components/MobileAiPromoGrid'
 import MobileAIDashboard from './home/components/MobileAIDashboard'
 import MobileLatestAdsSection from './home/components/MobileLatestAdsSection'
 import HomeInsightsSkeleton from './home/components/HomeInsightsSkeleton'
-import FeaturedPostsStrip from './home/components/FeaturedPostsStrip'
+import FeaturedPostsStrip, { fetchFeaturedPosts } from './home/components/FeaturedPostsStrip'
+import { fetchLatestListings } from '@/lib/server/fetchLatestListings'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import CreatePostCardLazyClient from './home/components/CreatePostCardLazyClient'
 import HomeUpperStage from './home/components/HomeUpperStage'
@@ -92,6 +92,16 @@ const Home = async ({
   const feedView = viewRaw === 'photos' || viewRaw === 'price' ? viewRaw : 'latest'
   const pageRaw = sp.page ? (Array.isArray(sp.page) ? sp.page[0] : sp.page) : undefined
   const page = pageRaw ? Number(pageRaw) : undefined
+  const [featuredPosts, latestItems] = await Promise.all([
+    fetchFeaturedPosts(countryId ?? null, uiLocale),
+    fetchLatestListings({ countryId: countryId ?? undefined, land: uiLocale, limit: 8 }),
+  ])
+  const featuredIds = featuredPosts
+    .map((post) => Number(post.id))
+    .filter((id) => Number.isFinite(id) && id > 0)
+  const featuredSet = new Set(featuredIds)
+  const latestUnique = latestItems.filter((item) => !featuredSet.has(item.id))
+  const excludeIds = [...featuredSet, ...latestUnique.map((item) => item.id)]
 
   return (
     <>
@@ -112,7 +122,6 @@ const Home = async ({
 
           {/* CMS campaign slider stays. The Amman still above it is the restored platform identity, not a partner ad. */}
           <HomeBanner locale={uiLocale} />
-          <HomeConceptSequence locale={uiLocale} />
 
           <Suspense fallback={<HomeInsightsSkeleton />}>
             <MarketPulseCard locale={uiLocale} variant="rail" />
@@ -132,10 +141,10 @@ const Home = async ({
             </Col>
           </Row>
 
-          <MobileLatestAdsSection locale={uiLocale} />
+          <MobileLatestAdsSection locale={uiLocale} items={latestUnique} />
 
           <div id="home-featured" className={homeFlow.featuredAnchor}>
-            <FeaturedPostsStrip locale={uiLocale} countryId={countryId} />
+            <FeaturedPostsStrip locale={uiLocale} countryId={countryId} posts={featuredPosts} />
           </div>
 
           <Suspense fallback={null}>
@@ -151,6 +160,7 @@ const Home = async ({
                 hasImages: feedView === 'photos' ? true : undefined,
                 sort: feedView === 'price' ? 'price_asc' : 'newest',
               }}
+              excludeIds={excludeIds}
             />
           </div>
         </Col>

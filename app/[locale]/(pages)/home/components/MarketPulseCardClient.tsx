@@ -121,13 +121,11 @@ function MetricCard({
           <Icon size={14} />
         </span>
         <span className={styles.compactBody}>
-          <span className={styles.compactTop}>
-            {figure}
-            <span className={metric.level === 'live' ? styles.levelLive : metric.level === 'demo' ? styles.levelDemo : styles.levelBlocked}>
-              {levelLabel}
-            </span>
-          </span>
+          {figure}
           <span className={styles.metricLabel}>{metric.label}</span>
+          <span className={metric.level === 'live' ? styles.levelLive : metric.level === 'demo' ? styles.levelDemo : styles.levelBlocked}>
+            {levelLabel}
+          </span>
         </span>
       </button>
     )

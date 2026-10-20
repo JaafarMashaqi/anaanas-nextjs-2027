@@ -40,7 +40,7 @@ export default function FeaturedPostsStripClient({ locale, posts }: Props) {
               ((post.post_images as { image?: string }[] | undefined)?.[0]?.image ?? ''),
           )
           return (
-            <Link key={id} href={`/${locale}/post/${id}`} className={styles.card}>
+            <Link key={id} href={`/${locale}/post/${id}`} className={styles.card} data-listing-id={id}>
               {image ? (
                 <Image src={image} alt="" width={120} height={90} className={styles.thumb} unoptimized />
               ) : (

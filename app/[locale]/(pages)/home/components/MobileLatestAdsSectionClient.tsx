@@ -128,7 +128,7 @@ export default function MobileLatestAdsSectionClient({
               : '—'
 
           return (
-            <article key={item.id} className={styles.card}>
+            <article key={item.id} className={styles.card} data-listing-id={item.id}>
               <div className={styles.mediaWrap}>
                 {item.is_new ? <span className={styles.badgeNew}>{t('home.newBadge', locale)}</span> : null}
                 <ListingHeart postId={item.id} initial={item.is_favorited} locale={locale} />
@@ -138,7 +138,7 @@ export default function MobileLatestAdsSectionClient({
                       src={img}
                       alt=""
                       fill
-                      className="object-cover"
+                      className="object-contain"
                       sizes="184px"
                       unoptimized
                     />

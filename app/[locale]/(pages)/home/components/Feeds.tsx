@@ -575,6 +575,7 @@ const Feeds = async ({
   filters,
   useLoadMore,
   listingsHeading,
+  excludeIds = [],
 }: {
   filters?: FeedsFilters
   /**
@@ -585,6 +586,8 @@ const Feeds = async ({
   useLoadMore?: boolean
   /** Semantic h2 for the listings block (visually hidden; keeps outline for bots). */
   listingsHeading?: string
+  /** Listing ids already shown in adjacent homepage rails. Filtered by id only. */
+  excludeIds?: number[]
 } = {}) => {
   const headersList = await headers()
   const locale = headersList.get('x-locale') ?? undefined
@@ -601,8 +604,8 @@ const Feeds = async ({
   }
 
   const page = filters?.page && Number.isFinite(filters.page) && filters.page > 0 ? filters.page : undefined
-
-  const postsResponse = await fetchPosts({
+  const excluded = new Set(excludeIds.filter((id) => Number.isFinite(id)))
+  const query = {
     countryId,
     land: locale,
     sectionSlug: filters?.sectionSlug,
@@ -615,10 +618,25 @@ const Feeds = async ({
     sort: filters?.sort,
     attributes: filters?.attributes,
     attributeRanges: filters?.attributeRanges,
-    page,
-  })
+  }
 
-  const posts = Array.isArray(postsResponse?.data) ? postsResponse.data : []
+  const posts: Awaited<ReturnType<typeof fetchPosts>>['data'] = []
+  let nextPageUrl: string | null = null
+  let postsResponse: Awaited<ReturnType<typeof fetchPosts>> | null = null
+  let cursor = page ?? 1
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    postsResponse = await fetchPosts({ ...query, page: cursor })
+    const rows = Array.isArray(postsResponse?.data) ? postsResponse.data : []
+    nextPageUrl = (postsResponse as { next_page_url?: string | null })?.next_page_url ?? null
+    for (const row of rows) {
+      const id = Number(row?.id)
+      if (!Number.isFinite(id) || excluded.has(id)) continue
+      if (posts.some((kept) => Number(kept?.id) === id)) continue
+      posts.push(row)
+    }
+    if (posts.length >= 6 || !nextPageUrl || rows.length === 0) break
+    cursor += 1
+  }
 
   const enableLoadMore =
     typeof useLoadMore === 'boolean'
@@ -660,7 +678,8 @@ const Feeds = async ({
       {enableLoadMore ? (
         <PaginatedPosts
           initialPosts={posts}
-          initialNextPageUrl={(postsResponse as any)?.next_page_url ?? null}
+          initialNextPageUrl={nextPageUrl}
+          excludeIds={excludeIds}
           fetchParams={{
             countryId,
             land: locale,

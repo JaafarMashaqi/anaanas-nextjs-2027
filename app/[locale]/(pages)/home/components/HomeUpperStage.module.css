@@ -1,8 +1,66 @@
 .stage {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.45rem;
   color: #101828;
+}
+
+.greetCard {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 96px;
+  padding: 0.4rem 0.65rem;
+  border-radius: 20px;
+  border: 1px solid #e7e9ee;
+  background: linear-gradient(to left, #fff4c2, #fffefb 58%, #f4fbf6);
+}
+
+.greetSky {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #ffc928;
+  color: #101828;
+}
+
+.greetSky[data-sky='night'] {
+  background: #243656;
+  color: #fff6d0;
+}
+
+.greetCopy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.greetTitle {
+  margin: 0;
+  color: #101828;
+  font-size: 1.12rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.greetBody {
+  margin: 0.12rem 0 0;
+  color: #344054;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.greetMascot {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .reel {

@@ -7,7 +7,7 @@ type Props = {
   countryId?: number
 }
 
-async function fetchFeaturedFromApi(countryId: number | null, locale: string) {
+export async function fetchFeaturedPosts(countryId: number | null, locale: string) {
   const qs = new URLSearchParams({ land: locale, limit: '8' })
   if (countryId) qs.set('country_id', String(countryId))
   try {
@@ -23,8 +23,8 @@ async function fetchFeaturedFromApi(countryId: number | null, locale: string) {
   }
 }
 
-export default async function FeaturedPostsStrip({ locale, countryId }: Props) {
-  const posts = await fetchFeaturedFromApi(countryId ?? null, locale)
+export default async function FeaturedPostsStrip({ locale, countryId, posts: provided }: Props & { posts?: Record<string, unknown>[] }) {
+  const posts = provided ?? (await fetchFeaturedPosts(countryId ?? null, locale))
   if (posts.length === 0) return null
 
   return <FeaturedPostsStripClient locale={locale} posts={posts} />

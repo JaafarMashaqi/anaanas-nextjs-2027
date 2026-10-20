@@ -984,8 +984,29 @@
 }
 
 .viewAdBtn:hover {
-  background: #101828;
-  color: #ffc928;
+  background: #ffc928;
+  color: #101828;
+}
+
+.listingCard .listingHero {
+  height: auto;
+  aspect-ratio: 5 / 3;
+  max-height: 176px;
+  background: #f6f3ee;
+}
+
+.listingCard .mainImage {
+  object-fit: contain;
+  object-position: center;
+}
+
+.listingCard .listingBody {
+  padding-bottom: 0.4rem;
+}
+
+.listingCard .viewAdBtn {
+  min-height: 32px;
+  margin-top: 0.15rem;
 }
 
 @media (min-width: 768px) {

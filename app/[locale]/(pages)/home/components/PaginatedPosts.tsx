@@ -29,11 +29,13 @@ export default function PaginatedPosts({
   initialNextPageUrl,
   fetchParams,
   resetKey,
+  excludeIds = [],
 }: {
   initialPosts: PostRecord[]
   initialNextPageUrl?: string | null
   fetchParams: FetchParams
   resetKey: string
+  excludeIds?: number[]
 }) {
   const [posts, setPosts] = useState<PostRecord[]>(initialPosts)
   const [page, setPage] = useState(1)
@@ -172,6 +174,7 @@ export default function PaginatedPosts({
   }, [])
 
   const canLoadMore = Boolean(nextPageUrl)
+  const excluded = new Set(excludeIds)
 
   const handleDelete = (postId: number | string) => {
     setPosts((prev) => prev.filter((p) => String(p?.id) !== String(postId)))
@@ -181,14 +184,34 @@ export default function PaginatedPosts({
     if (!canLoadMore || loading) return
     setLoading(true)
     try {
-      const res = await fetchPosts({
-        ...fetchParams,
-        page: page + 1,
+      let cursor = page + 1
+      let incoming: PostRecord[] = []
+      let more: string | null = nextPageUrl
+      for (let attempt = 0; attempt < 3 && incoming.length === 0 && more; attempt += 1) {
+        const res = await fetchPosts({
+          ...fetchParams,
+          page: cursor,
+        })
+        const rows = Array.isArray(res?.data) ? (res.data as PostRecord[]) : []
+        incoming = rows.filter((row) => {
+          const id = Number(row?.id)
+          return Number.isFinite(id) && !excluded.has(id)
+        })
+        more = (res as { next_page_url?: string | null })?.next_page_url ?? null
+        cursor += 1
+      }
+      setPosts((prev) => {
+        const seen = new Set(prev.map((row) => Number(row?.id)))
+        const fresh = incoming.filter((row) => {
+          const id = Number(row?.id)
+          if (!Number.isFinite(id) || seen.has(id)) return false
+          seen.add(id)
+          return true
+        })
+        return [...prev, ...fresh]
       })
-      const newPosts = Array.isArray(res?.data) ? (res.data as PostRecord[]) : []
-      setPosts((prev) => [...prev, ...newPosts])
-      setPage((p) => p + 1)
-      setNextPageUrl((res as any)?.next_page_url ?? null)
+      setPage(cursor - 1)
+      setNextPageUrl(more)
     } catch (e) {
       console.error('Load more failed:', e)
     } finally {
@@ -197,13 +220,14 @@ export default function PaginatedPosts({
   }
 
   return (
-    <div id="home-feed-posts" className="vstack gap-4">
+    <div id="home-feed-posts" className="vstack gap-3">
       {posts.map((post, idx) => {
         const idStr = String(post?.id ?? idx)
         const pushed = post?.id != null && realtimeIds.has(idStr)
         return (
           <div
             key={post?.id ?? idx}
+            data-listing-id={post?.id ?? ''}
             className={`${styles.postWrap} ${pushed ? styles.realtimeRing : ''}`.trim()}
           >
             {pushed ? <PushedBadge /> : null}
