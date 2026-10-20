@@ -110,7 +110,7 @@ export default function MobileLatestAdsSectionClient({
   }
 
   return (
-    <section className={styles.wrapper} aria-label={t('home.latestAds', locale)}>
+    <section id="home-latest" className={styles.wrapper} aria-label={t('home.latestAds', locale)}>
       <header className={styles.header}>
         <h2 className={styles.title}>{t('home.latestAds', locale)}</h2>
         <Link href={`/${locale}`} className={styles.viewAll}>

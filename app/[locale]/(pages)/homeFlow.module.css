@@ -14,3 +14,18 @@
 .featuredAnchor {
   scroll-margin-top: 96px;
 }
+
+.opportunity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  border-radius: 14px;
+  background: #eef4ff;
+  color: #1d4ed8;
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-decoration: none;
+}

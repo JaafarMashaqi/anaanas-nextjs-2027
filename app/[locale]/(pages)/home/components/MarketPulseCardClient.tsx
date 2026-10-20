@@ -112,21 +112,20 @@ function MetricCard({
       <button
         type="button"
         className={`${styles.metric} ${styles.compact} ${styles[metric.tone]}`}
+        data-pulse-build="2"
         title={`${metric.period}. ${metric.hint}`}
         aria-pressed={pressed}
         aria-label={`${levelLabel}. ${metric.label}. ${metric.value}. ${metric.period}. ${metric.hint}`}
         onClick={() => onOpen(metric.id)}
       >
         <span className={styles.metricIcon} aria-hidden>
-          <Icon size={14} />
+          <Icon size={18} />
         </span>
-        <span className={styles.compactBody}>
-          {figure}
-          <span className={styles.metricLabel}>{metric.label}</span>
-          <span className={metric.level === 'live' ? styles.levelLive : metric.level === 'demo' ? styles.levelDemo : styles.levelBlocked}>
-            {levelLabel}
-          </span>
-        </span>
+        {metric.level === 'demo' ? <strong className={styles.metricWord}>—</strong> : figure}
+        <span className={styles.metricLabel}>{metric.label}</span>
+        {metric.level !== 'live' ? (
+          <span className={metric.level === 'demo' ? styles.levelDemo : styles.levelBlocked}>{levelLabel}</span>
+        ) : null}
       </button>
     )
   }

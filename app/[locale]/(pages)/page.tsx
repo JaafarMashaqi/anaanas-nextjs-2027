@@ -118,16 +118,11 @@ const Home = async ({
             countryLabel={countryLabel}
             sections={sections}
             trending={trending}
-          />
-
-          {/* CMS campaign slider stays. The Amman still above it is the restored platform identity, not a partner ad. */}
-          <HomeBanner locale={uiLocale} />
-
-          <Suspense fallback={<HomeInsightsSkeleton />}>
-            <MarketPulseCard locale={uiLocale} variant="rail" />
-          </Suspense>
-
-          <CreatePostCardLazyClient />
+          >
+            <Suspense fallback={<HomeInsightsSkeleton />}>
+              <MarketPulseCard locale={uiLocale} variant="rail" />
+            </Suspense>
+          </HomeUpperStage>
 
           <Row className={`g-3 ${homeDiscoveryStyles.discoveryRow} d-md-none`}>
             {showMobileAiDashboard ? (
@@ -140,6 +135,21 @@ const Home = async ({
               {showMobileAiDashboard ? <MobileAiPromoGrid locale={uiLocale} /> : null}
             </Col>
           </Row>
+
+          {latestUnique.length > 0 ? (
+            <Link href="#home-latest" className={homeFlow.opportunity}>
+              <span>
+                {uiLocale === 'ar'
+                  ? `${latestUnique.length} إعلانات جديدة في آخر قائمة`
+                  : `${latestUnique.length} new listings in the latest list`}
+              </span>
+              <span>{uiLocale === 'ar' ? 'عرض' : 'View'}</span>
+            </Link>
+          ) : null}
+
+          <CreatePostCardLazyClient />
+
+          <HomeBanner locale={uiLocale} />
 
           <MobileLatestAdsSection locale={uiLocale} items={latestUnique} />
 

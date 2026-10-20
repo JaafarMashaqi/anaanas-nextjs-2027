@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 
 import type { TrendingPostItem } from '@/lib/api/homeInsights'
 import type { Section } from '@/lib/api/sections'
@@ -11,7 +11,6 @@ import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import type { SupportedLocale } from '@/lib/localization'
 import { plainListingText } from '@/lib/text/plainListingText'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
-import HomeConceptSequence from './HomeConceptSequence'
 import mascot from '@/assets/uiux/mascot_sitting.png'
 
 import styles from './HomeUpperStage.module.css'
@@ -21,6 +20,7 @@ type Props = {
   countryLabel: string
   sections: Section[]
   trending: TrendingPostItem[]
+  children?: ReactNode
 }
 
 function sectionIcon(icon?: string | null) {
@@ -63,7 +63,7 @@ function openComposer(intent: 'sale' | 'wanted') {
   window.setTimeout(retry, 60)
 }
 
-export default function HomeUpperStage({ locale, countryLabel, sections, trending }: Props) {
+export default function HomeUpperStage({ locale, countryLabel, sections, trending, children }: Props) {
   const isArabic = locale === 'ar'
   const [note, setNote] = useState<'map' | 'matches' | 'concept' | null>(null)
 
@@ -81,12 +81,35 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
 
   return (
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
-      <GreetingCard locale={locale} countryLabel={countryLabel} />
-      <HomeConceptSequence locale={locale} />
-
       <div className={styles.searchSlot}>
         <MobileHeaderSearchBar locale={locale} />
       </div>
+
+      <GreetingCard locale={locale} countryLabel={countryLabel} />
+
+      <section className={styles.hero} data-hero="amman" aria-label={isArabic ? 'هوية أناناس' : 'ANANAS identity'}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/hero.jpg" alt="" className={styles.heroImage} />
+        <div className={styles.heroShade} />
+        <div className={styles.heroCopy}>
+          <p className={styles.heroKicker} style={{ color: '#ffe58a' }}>
+            {isArabic ? 'من عمّان · تعريف المنصة' : 'From Amman · platform identity'}
+          </p>
+          <h2 style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.55)' }}>
+            {isArabic ? 'بيع أذكى، من أول سطر' : 'Sell smarter, from the first line'}
+          </h2>
+          <p style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.45)' }}>
+            {isArabic
+              ? 'اكتب ما عندك. أناناس يرتّب الإعلان والحملة.'
+              : 'Write what you have. ANANAS arranges the listing and the campaign.'}
+          </p>
+          <button type="button" onClick={() => openComposer('sale')}>
+            {isArabic ? 'ابدأ الآن' : 'Start now'}
+          </button>
+        </div>
+      </section>
+
+      {children}
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
         <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
@@ -199,28 +222,6 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
         )}
       </div>
 
-      <section className={styles.hero} data-hero="amman" aria-label={isArabic ? 'هوية أناناس' : 'ANANAS identity'}>
-        {/* Restored platform still from the previous Next Generation project. Not a partner ad. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/hero.jpg" alt="" className={styles.heroImage} />
-        <div className={styles.heroShade} />
-        <div className={styles.heroCopy}>
-          <p className={styles.heroKicker} style={{ color: '#ffe58a' }}>
-            {isArabic ? 'من عمّان · تعريف المنصة' : 'From Amman · platform identity'}
-          </p>
-          <h2 style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.55)' }}>
-            {isArabic ? 'السوق حي… والفرص تتحرك الآن' : 'The market is alive… opportunities are moving now'}
-          </h2>
-          <p style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.45)' }}>
-            {isArabic
-              ? 'أعلن، اشتري، واستكشف. هذه هوية أناناس، وليست إعلان شريك.'
-              : 'List, buy, and explore. This is ANANAS identity, not a partner ad.'}
-          </p>
-          <button type="button" onClick={() => openComposer('sale')}>
-            {isArabic ? 'ابدأ الآن' : 'Start now'}
-          </button>
-        </div>
-      </section>
     </div>
   )
 }
@@ -260,14 +261,16 @@ function GreetingCard({ locale, countryLabel }: { locale: SupportedLocale; count
         )}
       </span>
       <div className={styles.greetCopy}>
-        <p className={styles.greetTitle}>{hello}</p>
+        <p className={styles.greetTitle}>
+          {hello}
+          <span> · {countryLabel}</span>
+        </p>
         <p className={styles.greetBody}>
           {isArabic
-            ? `سوق أناناس في ${countryLabel}. تصفّح بهدوء، أو انشر حين يجهز العنوان.`
-            : `ANANAS market in ${countryLabel}. Browse calmly, or publish when the title is ready.`}
+            ? 'نتمنى أن تجد ما تبحث عنه أسرع مما تتوقع.'
+            : 'We hope you find it sooner than you expect.'}
         </p>
       </div>
-      <Image src={mascot} alt="" width={78} height={78} className={styles.greetMascot} />
     </section>
   )
 }
