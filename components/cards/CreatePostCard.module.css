@@ -22,12 +22,12 @@
 /* بدون صندوق خارجي: لا خلفية ولا حد ولا ظل — الصف الداخلي (الكبسولة) يحمل المظهر */
 .composerCardAtmosphere {
   position: relative;
-  background: transparent;
+  background: #fff8de;
   border: none;
   box-shadow: none;
-  border-radius: 0;
+  border-radius: 18px;
   overflow: visible;
-  padding: 0;
+  padding: 0.45rem;
 }
 
 .composerSrOnly {

@@ -13,6 +13,9 @@ export type PulseMetricId =
   | 'opportunities'
   | 'sold'
   | 'commerce'
+  | 'online'
+  | 'searching'
+  | 'hot'
 
 export type PulseLevel = 'live' | 'demo' | 'blocked'
 
@@ -164,20 +167,50 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
   }
 
   const activeSections = source.sections.filter((item) => item.current_count > 0).length
-  metrics.splice(1, 0, {
-    id: 'fresh',
-    level: 'demo',
-    label: ar ? 'جديدة' : 'New',
-    value: ar ? 'تجريبي' : 'Demo',
-    period: ar ? 'لا نافذة ٢٤ ساعة' : 'No 24-hour window',
-    hint: ar
-      ? 'لا يوجد إجمالي للإعلانات الجديدة. اللوحة واجهة تجريبية، وشارة is_new ليست هذا الإجمالي.'
-      : 'There is no total of new listings. The panel is a demo, and is_new is not that total.',
-    tone: 'blue',
-    href: `/${locale}/search`,
-    raw: null,
-  })
-  metrics.splice(2, 0, {
+  metrics.splice(
+    1,
+    0,
+    {
+      id: 'online',
+      level: 'blocked',
+      label: ar ? 'متواجدون' : 'Online',
+      value: ar ? 'لا رصد' : 'No signal',
+      period: ar ? 'لا جلسات حية' : 'No live sessions',
+      hint: ar
+        ? 'لا يوجد عدّاد للمستخدمين المتصلين. لا نعرض رقماً.'
+        : 'There is no signed-in presence count. No number is shown.',
+      tone: 'blue',
+      href: `/${locale}`,
+      raw: null,
+    },
+    {
+      id: 'searching',
+      level: 'blocked',
+      label: ar ? 'يبحثون' : 'Searching',
+      value: ar ? 'لا رصد' : 'No signal',
+      period: ar ? 'لا نشاط بحث مجمع' : 'No aggregated search activity',
+      hint: ar
+        ? 'لا يوجد عدّاد لمن يبحثون الآن. الاقتراحات المحلية ليست هذا الرقم.'
+        : 'There is no count of people searching now. Local suggestions are not that number.',
+      tone: 'violet',
+      href: `/${locale}/search`,
+      raw: null,
+    },
+    {
+      id: 'fresh',
+      level: 'demo',
+      label: ar ? 'جديدة' : 'New',
+      value: ar ? 'تجريبي' : 'Demo',
+      period: ar ? 'لا نافذة ٢٤ ساعة' : 'No 24-hour window',
+      hint: ar
+        ? 'لا يوجد إجمالي للإعلانات الجديدة. اللوحة واجهة تجريبية، وشارة is_new ليست هذا الإجمالي.'
+        : 'There is no total of new listings. The panel is a demo, and is_new is not that total.',
+      tone: 'blue',
+      href: `/${locale}/search`,
+      raw: null,
+    },
+  )
+  metrics.splice(4, 0, {
     id: 'activity',
     level: 'live',
     label: ar ? 'الأقسام' : 'Sections',
@@ -190,7 +223,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
     href: hrefFor(locale, 'sections'),
     raw: source.sectionsError ? null : activeSections,
   })
-  metrics.splice(3, 0, {
+  metrics.splice(5, 0, {
     id: 'wanted',
     level: 'demo',
     label: ar ? 'مطلوب' : 'Wanted',
@@ -215,6 +248,19 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
         : 'There is no personal opportunity list. The panel is an interface sketch only.',
       tone: 'violet',
       href: `/${locale}/search`,
+      raw: null,
+    },
+    {
+      id: 'hot',
+      level: 'blocked',
+      label: ar ? 'ساخنة' : 'Hot',
+      value: ar ? 'لا درجة' : 'No score',
+      period: ar ? 'لا مؤشر طلب' : 'No demand score',
+      hint: ar
+        ? 'لا توجد درجة عروض ساخنة. الإعلانات المميزة ليست حرارة سوق.'
+        : 'There is no hot-deal score. Featured posts are not market heat.',
+      tone: 'amber',
+      href: `/${locale}/market-pulse`,
       raw: null,
     },
     {
@@ -256,6 +302,16 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
   })).sort((a, b) => b.current - a.current || a.name.localeCompare(b.name))
 
   const unavailable: UnavailableMetric[] = [
+    {
+      id: 'online',
+      label: ar ? 'متواجدون الآن' : 'Users online',
+      reason: ar ? 'لا يوجد تتبع جلسات متصلة.' : 'No presence tracking is returned.',
+    },
+    {
+      id: 'searching',
+      label: ar ? 'يبحثون الآن' : 'Users searching',
+      reason: ar ? 'لا يوجد تجميع لعمليات البحث الجارية.' : 'No live search aggregation is returned.',
+    },
     {
       id: 'wanted',
       label: ar ? 'طلبات مطلوب' : 'Wanted requests',

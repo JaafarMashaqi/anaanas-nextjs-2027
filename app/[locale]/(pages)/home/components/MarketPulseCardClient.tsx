@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import Link from 'next/link'
-import { BsBagCheck, BsBarChart, BsBroadcast, BsBullseye, BsGrid, BsGraphUpArrow, BsHammer, BsLightning, BsSearch, BsStars } from 'react-icons/bs'
+import { BsBagCheck, BsBarChart, BsBroadcast, BsBullseye, BsEye, BsFire, BsGrid, BsGraphUpArrow, BsHammer, BsLightning, BsPeople, BsSearch, BsStars } from 'react-icons/bs'
 
 import type { MarketPulseModel, PulseActivity, PulseMetric, PulseMetricId } from '@/lib/market/buildMarketPulse'
 import type { SupportedLocale } from '@/lib/localization'
@@ -20,6 +20,9 @@ const ICONS = {
   opportunities: BsBullseye,
   sold: BsBagCheck,
   commerce: BsBroadcast,
+  online: BsPeople,
+  searching: BsEye,
+  hot: BsFire,
 } as const
 
 export type PulseLatestItem = {
@@ -381,7 +384,7 @@ export default function MarketPulseCardClient({
   const drawerId = variant === 'rail' ? 'market-pulse-drawer-rail' : 'market-pulse-drawer-stack'
   const isArabic = locale === 'ar'
   const railMetrics = model.metrics.filter((metric) =>
-    ['listings', 'fresh', 'activity', 'wanted', 'auctions', 'commerce', 'sold'].includes(metric.id),
+    ['listings', 'online', 'searching', 'fresh', 'activity', 'wanted', 'auctions', 'hot', 'commerce', 'sold'].includes(metric.id),
   )
   const detailsLabel = open ? (isArabic ? 'إخفاء' : 'Hide') : isArabic ? 'التفاصيل' : 'Details'
 
@@ -405,7 +408,10 @@ export default function MarketPulseCardClient({
 
   const head = (
     <div className={styles.railHead}>
-      <h2>{t('home.marketPulse', locale)}</h2>
+      <h2>
+        <span className={styles.pulseMark} aria-hidden />
+        {t('home.marketPulse', locale)}
+      </h2>
       <button
         type="button"
         className={styles.railMore}

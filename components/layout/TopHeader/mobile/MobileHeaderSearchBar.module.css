@@ -6,6 +6,7 @@
 }
 
 .bar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -18,39 +19,16 @@
   min-width: 0;
 }
 
-/* ===== Submit button ===== */
-.submit {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
+.srSubmit {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
   border: 0;
-  background: #ffc928;
-  color: #101828;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-.submit:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(255, 183, 0, 0.5);
-}
-
-.submit:active {
-  transform: translateY(0);
-}
-
-.submit:focus-visible {
-  outline: 2px solid rgba(255, 193, 7, 0.65);
-  outline-offset: 3px;
-}
-
-.submit svg {
-  width: 18px;
-  height: 18px;
 }
 
 /* ===== Input ===== */

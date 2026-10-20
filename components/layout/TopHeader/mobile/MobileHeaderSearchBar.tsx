@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { BsCamera, BsMic, BsSearch, BsStars } from 'react-icons/bs'
+import { BsCamera, BsMic, BsStars } from 'react-icons/bs'
 
 import searchAvatar from '@/assets/images/icon/s200.png'
 import type { SupportedLocale } from '@/lib/localization'
@@ -114,8 +114,8 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
   return (
     <div className={styles.wrap}>
       <form ref={anchorRef} className={styles.bar} role="search" onSubmit={handleSubmit}>
-        <button type="submit" className={styles.submit} aria-label={submitLabel} title={submitLabel}>
-          <BsSearch aria-hidden />
+        <button type="submit" className={styles.srSubmit}>
+          {submitLabel}
         </button>
         <input
           type="search"

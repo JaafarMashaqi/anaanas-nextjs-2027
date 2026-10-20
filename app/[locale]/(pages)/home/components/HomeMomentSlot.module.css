@@ -1,0 +1,131 @@
+.card {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-areas:
+    'sky mascot copy'
+    'actions actions actions'
+    'dots dots dots';
+  gap: 0.35rem 0.45rem;
+  align-items: center;
+  min-height: 92px;
+  padding: 0.55rem 0.7rem 0.45rem;
+  border-radius: 18px;
+  background: linear-gradient(to left, #fff8de, #fffefb 55%);
+  color: #101828;
+}
+
+.sky {
+  grid-area: sky;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #ffc928;
+  color: #101828;
+}
+
+.sky[data-sky='night'] {
+  background: #243656;
+  color: #fff6d0;
+}
+
+.mascot {
+  grid-area: mascot;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+.copy {
+  grid-area: copy;
+  min-width: 0;
+}
+
+.kicker,
+.copy h2,
+.copy p,
+.note {
+  margin: 0;
+}
+
+.kicker {
+  color: #7c3aed;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.copy h2 {
+  font-size: 0.98rem;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.copy p,
+.note {
+  color: #344054;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.note {
+  color: #667085;
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.go,
+.quiet {
+  min-height: 30px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.go {
+  background: #ffc928;
+  color: #101828;
+}
+
+.quiet {
+  background: #fff;
+  color: #101828;
+  box-shadow: inset 0 0 0 1px #e7e9ee;
+}
+
+.dots {
+  grid-area: dots;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.dot,
+.dotOn {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #e7e9ee;
+  cursor: pointer;
+}
+
+.dotOn {
+  background: #f5a900;
+  width: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

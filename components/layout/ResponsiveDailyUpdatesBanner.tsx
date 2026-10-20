@@ -1,17 +1,18 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+
 import DailyUpdatesBanner from '@/components/layout/DailyUpdatesBanner'
 import MobileDailyUpdatesBanner from '@/components/layout/mobile/MobileDailyUpdatesBanner'
 import styles from '@/components/layout/ResponsiveDailyUpdatesBanner.module.css'
 
 /**
- * Renders the daily-updates banner appropriate for the active breakpoint.
- *
- * Both variants are emitted to the DOM and toggled with `display:` rules so we
- * stay friendly to SSR/RSC (no `window` peeks). The desktop banner is the
- * original implementation, untouched.
+ * Hidden on the locale home page. That page owns one greeting/campaign slot,
+ * so this banner would repeat the same product announcement.
  */
 const ResponsiveDailyUpdatesBanner = () => {
+  const pathname = usePathname() || ''
+  if (/^\/(ar|en)\/?$/.test(pathname)) return null
   return (
     <>
       <div className={styles.desktopOnly}>

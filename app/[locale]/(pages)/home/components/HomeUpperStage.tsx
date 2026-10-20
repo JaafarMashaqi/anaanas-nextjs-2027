@@ -1,12 +1,12 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useState, type ReactNode } from 'react'
 
 import type { TrendingPostItem } from '@/lib/api/homeInsights'
 import type { SupportedLocale } from '@/lib/localization'
-import { plainListingText } from '@/lib/text/plainListingText'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
+import HomeMomentSlot from './HomeMomentSlot'
+import HomeOpportunitySlot from './HomeOpportunitySlot'
 import MarketplaceStories from './MarketplaceStories'
 
 import styles from './HomeUpperStage.module.css'
@@ -51,7 +51,7 @@ function openComposer(intent: 'sale' | 'wanted') {
 
 export default function HomeUpperStage({ locale, countryLabel, trending = [], children }: Props) {
   const isArabic = locale === 'ar'
-  const [note, setNote] = useState<'map' | 'matches' | 'concept' | null>(null)
+  const [note, setNote] = useState<'map' | 'matches' | null>(null)
 
   useEffect(() => {
     const onQuickAction = (event: MouseEvent) => {
@@ -65,84 +65,10 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
 
   return (
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
+      <HomeMomentSlot locale={locale} countryLabel={countryLabel} onOpenComposer={() => openComposer('sale')} />
+
       <div className={styles.searchSlot}>
         <MobileHeaderSearchBar locale={locale} />
-      </div>
-
-      <GreetingCard locale={locale} countryLabel={countryLabel} />
-
-      <section className={styles.hero} data-hero="amman" aria-label={isArabic ? 'هوية أناناس' : 'ANANAS identity'}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/hero.jpg" alt="" className={styles.heroImage} />
-        <div className={styles.heroShade} />
-        <div className={styles.heroCopy}>
-          <p className={styles.heroKicker} style={{ color: '#ffe58a' }}>
-            {isArabic ? 'من عمّان · تعريف المنصة' : 'From Amman · platform identity'}
-          </p>
-          <h2 style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.55)' }}>
-            {isArabic ? 'بيع أذكى، من أول سطر' : 'Sell smarter, from the first line'}
-          </h2>
-          <p style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.45)' }}>
-            {isArabic
-              ? 'اكتب ما عندك. أناناس يرتّب الإعلان والحملة.'
-              : 'Write what you have. ANANAS arranges the listing and the campaign.'}
-          </p>
-          <button type="button" onClick={() => openComposer('sale')}>
-            {isArabic ? 'ابدأ الآن' : 'Start now'}
-          </button>
-        </div>
-      </section>
-
-      {children}
-
-      <div className={styles.block} id="market-wire">
-        <div className={styles.wireHead}>
-          <span className={styles.liveDot} aria-hidden />
-          <h2>{isArabic ? 'الفرص تتحرك الآن' : 'Opportunities are moving'}</h2>
-          <span>
-            {trending.length
-              ? isArabic
-                ? 'عناوين رائجة من الخادم'
-                : 'Trending titles from the server'
-              : isArabic
-                ? 'لا توجد أرقام تجريبية'
-                : 'No sample numbers'}
-          </span>
-        </div>
-        {trending.length === 0 ? (
-          <p className={styles.empty}>
-            {isArabic
-              ? 'لا توجد إعلانات رائجة مؤكدة من الخادم في هذه اللحظة.'
-              : 'The server has no confirmed trending listings right now.'}
-          </p>
-        ) : (
-          <div className={styles.wire}>
-            {trending.map((item) => (
-              <Link key={item.post_id} href={`/${locale}/post/${item.post_id}`} className={styles.wireItem}>
-                {item.section_name ? <span>{plainListingText(item.section_name)}</span> : null}
-                <strong>{plainListingText(item.title)}</strong>
-              </Link>
-            ))}
-          </div>
-        )}
-        <div className={styles.wire} aria-label={isArabic ? 'فرص تجريبية' : 'Demo opportunities'}>
-          <Link href={`/${locale}/search?q=${encodeURIComponent(isArabic ? 'سيارات' : 'cars')}`} className={styles.wireItem}>
-            <span>{isArabic ? 'تجريبي' : 'Demo'}</span>
-            <strong>{isArabic ? 'بحث عن سيارة مشابهة' : 'Search for a similar car'}</strong>
-          </Link>
-          <Link href={`/${locale}/pages/auction`} className={styles.wireItem}>
-            <span>{isArabic ? 'مزاد' : 'Auction'}</span>
-            <strong>{isArabic ? 'صفحة المزادات الحالية' : 'The current auctions page'}</strong>
-          </Link>
-          <button type="button" className={styles.wireItem} onClick={() => openComposer('wanted')}>
-            <span>{isArabic ? 'تجريبي' : 'Demo'}</span>
-            <strong>{isArabic ? 'اكتب طلب مطلوب' : 'Write a wanted request'}</strong>
-          </button>
-          <Link href={`/${locale}/search`} className={styles.wireItem}>
-            <span>{isArabic ? 'قريب' : 'Nearby'}</span>
-            <strong>{isArabic ? 'لا مسافة أدق من المدينة' : 'No distance finer than a city'}</strong>
-          </Link>
-        </div>
       </div>
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
@@ -170,68 +96,39 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
             ? isArabic
               ? 'الخريطة غير مربوطة في هذا التطبيق. البلد الحالي يبقى من اختيار الدولة.'
               : 'A map is not connected in this app. The country still comes from the country selector.'
-            : note === 'matches'
-              ? isArabic
-                ? 'المطابقات غير مربوطة بخدمة بعد. استخدم البحث للوصول إلى الإعلانات الحالية.'
-                : 'Matches are not connected to a service yet. Use search for current listings.'
-              : isArabic
-                ? 'هذه لمحة بصرية فقط. لا طلب، ولا حجز، ولا شراكة تجارية.'
-                : 'This is a visual concept only. No order, booking, or commercial partnership.'}
+            : isArabic
+              ? 'المطابقات غير مربوطة بخدمة بعد. استخدم البحث للوصول إلى الإعلانات الحالية.'
+              : 'Matches are not connected to a service yet. Use search for current listings.'}
         </p>
       ) : null}
 
       <MarketplaceStories locale={locale} />
 
-    </div>
-  )
-}
+      <section className={styles.hero} data-hero="amman" aria-label={isArabic ? 'هوية أناناس' : 'ANANAS identity'}>
+        <img src="/brand/hero.jpg" alt="" className={styles.heroImage} />
+        <div className={styles.heroShade} />
+        <div className={styles.heroCopy}>
+          <p className={styles.heroKicker} style={{ color: '#ffe58a' }}>
+            {isArabic ? 'من عمّان · تعريف المنصة' : 'From Amman · platform identity'}
+          </p>
+          <h2 style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.55)' }}>
+            {isArabic ? 'بيع أذكى، من أول سطر' : 'Sell smarter, from the first line'}
+          </h2>
+          <p style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.45)' }}>
+            {isArabic
+              ? 'اكتب ما عندك. أناناس يرتّب الإعلان والحملة.'
+              : 'Write what you have. ANANAS arranges the listing and the campaign.'}
+          </p>
+          <button type="button" onClick={() => openComposer('sale')}>
+            {isArabic ? 'ابدأ الآن' : 'Start now'}
+          </button>
+        </div>
+      </section>
 
-function GreetingCard({ locale, countryLabel }: { locale: SupportedLocale; countryLabel: string }) {
-  const isArabic = locale === 'ar'
-  const [hour, setHour] = useState(12)
-  useEffect(() => {
-    setHour(new Date().getHours())
-  }, [])
-  const night = hour >= 18 || hour < 6
-  const hello = isArabic
-    ? hour < 12
-      ? 'صباح الخير'
-      : hour < 17
-        ? 'نهارك سعيد'
-        : 'مساء الخير'
-    : hour < 12
-      ? 'Good morning'
-      : hour < 17
-        ? 'Good afternoon'
-        : 'Good evening'
-  return (
-    <section className={styles.greetCard} aria-label={isArabic ? 'تحية أناناس' : 'ANANAS greeting'}>
-      <span className={styles.greetSky} data-sky={night ? 'night' : 'day'} aria-hidden>
-        {night ? (
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <path fill="currentColor" d="M14.5 2.4a8.8 8.8 0 1 0 7.1 12.2A8 8 0 0 1 14.5 2.4z" />
-          </svg>
-        ) : (
-          <svg viewBox="0 0 24 24" width="28" height="28">
-            <circle cx="12" cy="12" r="4.2" fill="currentColor" />
-            <g stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-              <path d="M12 2.2v2.2M12 19.6v2.2M2.2 12h2.2M19.6 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" />
-            </g>
-          </svg>
-        )}
-      </span>
-      <div className={styles.greetCopy}>
-        <p className={styles.greetTitle}>
-          {hello}
-          <span> · {countryLabel}</span>
-        </p>
-        <p className={styles.greetBody}>
-          {isArabic
-            ? 'نتمنى أن تجد ما تبحث عنه أسرع مما تتوقع.'
-            : 'We hope you find it sooner than you expect.'}
-        </p>
-      </div>
-    </section>
+      {children}
+
+      <HomeOpportunitySlot locale={locale} trending={trending} />
+    </div>
   )
 }
 

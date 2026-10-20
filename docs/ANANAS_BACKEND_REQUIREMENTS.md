@@ -81,3 +81,17 @@ A create/delete subscription endpoint. The UI must not pretend a bell saves an a
 
 
 Listing payloads often send `country_id` and `country: null`. Currency must keep coming from that listing's country metadata. Do not add a shortcut that uses the portal country when the listing country is missing.
+
+## Presence, search activity, and opportunities
+
+These are still absent. The homepage shows an unavailable state instead of a number.
+
+- Online users: a presence count for the selected country, with `as_of`.
+- People searching now: an aggregated search count, not a list of private queries.
+- Hot deals: a defined score. Do not reuse featured posts.
+- Live commerce: session id, status, and a real watch URL.
+- Nearest store for a concept: store id, name, and coordinates. Without that, “nearest store” stays unavailable.
+- Opportunity feedback: `POST` of `{ event_id, signal: "interested" | "not_interested" }` for the signed-in user. Local storage is not training.
+- Alert subscriptions: create and delete. The bell must not pretend to save one.
+- Campaigns: a scheduled record with audience, country, language, start, end, and a real destination. Coffee, automotive, and airline lines stay labeled concepts until such a record exists.
+

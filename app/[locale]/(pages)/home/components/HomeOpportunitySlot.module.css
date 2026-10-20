@@ -1,0 +1,104 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 132px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px #e7e9ee;
+  color: #101828;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.head h2,
+.empty,
+.kicker,
+.meta,
+.why,
+.title {
+  margin: 0;
+}
+
+.head h2 {
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.head span:last-child {
+  margin-inline-start: auto;
+  color: #667085;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #ff3347;
+}
+
+.kicker {
+  color: #7c3aed;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.title {
+  color: #101828;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.meta,
+.empty,
+.why {
+  color: #667085;
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.actions a,
+.actions button,
+.reset {
+  min-height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff8de;
+  color: #101828;
+  padding: 0.15rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.actions a {
+  background: #ffc928;
+}
+
+.reset {
+  align-self: flex-start;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px #e7e9ee;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
+}

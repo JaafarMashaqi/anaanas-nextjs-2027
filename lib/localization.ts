@@ -2,8 +2,8 @@ export const SUPPORTED_LOCALES = ["ar", "en"] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: SupportedLocale = "ar";
 
-/** Not routed. Dictionaries, metadata, and middleware stay off until each one is verified. */
-export const PLANNED_LOCALES = ["tr", "fr", "es", "de"] as const;
+/** Not routed. The sixth locale stays unset until the founder names it. */
+export const PLANNED_LOCALES = ["tr", "fr", "es"] as const;
 export type PlannedLocale = (typeof PLANNED_LOCALES)[number];
 export type AppLocale = SupportedLocale | PlannedLocale;
 
@@ -13,7 +13,6 @@ export const LOCALE_DIRECTION: Record<AppLocale, "rtl" | "ltr"> = {
   tr: "ltr",
   fr: "ltr",
   es: "ltr",
-  de: "ltr",
 };
 
 /** routing, dictionary, and metadata must all be true before a locale joins SUPPORTED_LOCALES. */
@@ -26,7 +25,6 @@ export const LOCALE_COVERAGE: Record<
   tr: { routing: false, dictionary: false, metadata: false },
   fr: { routing: false, dictionary: false, metadata: false },
   es: { routing: false, dictionary: false, metadata: false },
-  de: { routing: false, dictionary: false, metadata: false },
 };
 
 export const isSupportedLocale = (

@@ -13,7 +13,6 @@ const PLANNED_NAMES: Record<(typeof PLANNED_LOCALES)[number], { ar: string; en: 
   tr: { ar: 'التركية', en: 'Turkish' },
   fr: { ar: 'الفرنسية', en: 'French' },
   es: { ar: 'الإسبانية', en: 'Spanish' },
-  de: { ar: 'الألمانية', en: 'German' },
 }
 
 type LocaleCopy = {
@@ -110,8 +109,8 @@ export default function LanguageSelectorModal({
         </div>
         <p className={styles.hint}>
           {currentLocale === 'ar'
-            ? `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].ar).join('، ')} غير مفعّلة. لا مسار لها حتى يكتمل القاموس.`
-            : `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].en).join(', ')} are not enabled. They have no route until the dictionary is complete.`}
+            ? `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].ar).join('، ')} غير مفعّلة. اللغة السادسة لم تُحدَّد بعد.`
+            : `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].en).join(', ')} are not enabled. The sixth language is not chosen yet.`}
         </p>
       </Modal.Body>
 
