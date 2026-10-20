@@ -53,7 +53,7 @@ const FeedLayoutClient = ({ children, sidebar, locale, layout = 'default' }: Fee
 
   return (
     <>
-      <main>
+      <main className={homeGrid.feedMain}>
         <Container className={layout === 'home' ? homeGrid.canvas : undefined}>
           <Row className={layout === 'home' ? homeGrid.row : 'g-md-4'}>
             <Col lg={layout === 'home' ? undefined : 3} className={layout === 'home' ? `ananas-desktop-only ${homeGrid.side}` : 'ananas-desktop-only'}>

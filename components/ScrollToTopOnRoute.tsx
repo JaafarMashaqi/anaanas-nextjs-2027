@@ -16,6 +16,7 @@ const ScrollToTopOnRoute = () => {
     if (typeof window === 'undefined') return
     const hash = window.location.hash
     if (hash && hash.length > 1) return
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'
 
     window.scrollTo(0, 0)
     document.documentElement.scrollTop = 0

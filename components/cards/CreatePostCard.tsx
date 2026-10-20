@@ -1720,7 +1720,7 @@ const [step, setStep] = useState(1)
                 onAddAdClick={async () => {
                   if (isCreationBlocked) return
                   if (!(await guardComposerEmailVerification())) return
-                  titleInputRef.current?.focus()
+                  titleInputRef.current?.focus({ preventScroll: true })
                 }}
                 limitOverlay={
                   <PostCreationLimitOverlay
@@ -1859,7 +1859,7 @@ const [step, setStep] = useState(1)
                           <button
                             type="button"
                             className={styles.composerLaunchChip}
-                            onClick={() => titleInputRef.current?.focus()}
+                            onClick={() => titleInputRef.current?.focus({ preventScroll: true })}
                             title={smartCopy.launch}
                           >
                             <BsRocketTakeoff className={styles.composerLaunchIcon} size={17} aria-hidden />

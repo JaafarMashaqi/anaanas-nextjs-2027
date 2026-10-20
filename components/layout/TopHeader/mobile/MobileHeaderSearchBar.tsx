@@ -141,24 +141,21 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
           aria-autocomplete="list"
           autoComplete="off"
         />
+        <span className={styles.tools} role="group" aria-label={isArabic ? 'أدوات البحث' : 'Search tools'}>
+          <button type="button" className={styles.iconBtn} onClick={startVoice} aria-label={isArabic ? 'صوت الجهاز' : 'Device voice'}>
+            <BsMic aria-hidden />
+          </button>
+          <button type="button" className={styles.iconBtn} onClick={() => setToolNote(toolNote === 'camera' ? null : 'camera')} aria-label={isArabic ? 'بحث بالصورة' : 'Photo search'}>
+            <BsCamera aria-hidden />
+          </button>
+          <button type="button" className={styles.iconBtn} onClick={() => setToolNote(toolNote === 'assistant' ? null : 'assistant')} aria-label={isArabic ? 'بحث بالمحادثة' : 'Chat search'}>
+            <BsStars aria-hidden />
+          </button>
+        </span>
         <span className={styles.avatar} title={isArabic ? 'محقق أناناس' : 'ANANAS detective'}>
           <Image src={searchAvatar} alt={isArabic ? 'محقق أناناس' : 'ANANAS detective'} width={26} height={26} priority className={styles.avatarImg} />
         </span>
       </form>
-      <div className={styles.tools} role="group" aria-label={isArabic ? 'أدوات البحث' : 'Search tools'}>
-          <button type="button" className={styles.tool} onClick={startVoice}>
-            <BsMic aria-hidden />
-            {isArabic ? 'صوت الجهاز' : 'Device voice'}
-          </button>
-          <button type="button" className={styles.tool} onClick={() => setToolNote(toolNote === 'camera' ? null : 'camera')}>
-            <BsCamera aria-hidden />
-            {isArabic ? 'صورة' : 'Photo'}
-          </button>
-          <button type="button" className={styles.tool} onClick={() => setToolNote(toolNote === 'assistant' ? null : 'assistant')}>
-            <BsStars aria-hidden />
-            {isArabic ? 'محادثة' : 'Chat'}
-          </button>
-        </div>
       {toolNote ? (
         <p className={styles.toolNote} role="status">
           {toolNote === 'camera'
