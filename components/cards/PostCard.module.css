@@ -778,12 +778,14 @@
   font-size: 1.12rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.35;
+  line-height: 1.2;
+  padding-bottom: 0.16em;
   box-shadow: none;
   background-image: linear-gradient(#ffc928, #ffc928);
   background-repeat: no-repeat;
-  background-size: 100% 0.18em;
-  background-position: left 92%;
+  background-size: 100% 0.14em;
+  background-position: center bottom;
+  unicode-bidi: isolate;
 }
 
 .listingAside {

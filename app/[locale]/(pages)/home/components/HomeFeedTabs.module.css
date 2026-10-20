@@ -37,3 +37,10 @@
   font-size: 0.75rem;
   line-height: 1.45;
 }
+
+.more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}

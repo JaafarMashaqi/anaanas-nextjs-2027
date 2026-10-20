@@ -1310,7 +1310,11 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                       </>
                     )}
                     {cityName && createdAtDate && <span className={styles.metaDot} aria-hidden>•</span>}
-                    {createdAtDate && <span>{timeSince(createdAtDate, locale)}</span>}
+                    {createdAtDate && (
+                      <bdi>
+                        <time dateTime={createdAtDate.toISOString()}>{timeSince(createdAtDate, locale)}</time>
+                      </bdi>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1468,7 +1472,9 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                     </div>
                   )}
 
+                {(postLikesCount > 0 || commentsCount > 0 || (viewsKnown && viewsCount > 0)) && (
                 <div className={styles.statsStrip} aria-label={locale === 'ar' ? 'إحصائيات الإعلان' : 'Listing stats'}>
+                  {postLikesCount > 0 && (
                   <div className={styles.statItem}>
                     <span className={clsx(styles.statIcon, styles.statIconGreen)}>
                       <BsHandThumbsUpFill size={14} aria-hidden />
@@ -1476,21 +1482,8 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                     <span className={styles.statValue}>{formatCompactCount(postLikesCount)}</span>
                     <span className={styles.statLabel}>{locale === 'ar' ? 'تفاعل' : 'Reactions'}</span>
                   </div>
-                  <div className={styles.statItem}>
-                    <span className={clsx(styles.statIcon, styles.statIconOrange)}>
-                      <BsFire size={14} aria-hidden />
-                    </span>
-                    <span className={styles.statValue}>{isFeaturedActive ? (locale === 'ar' ? 'مميز' : 'Featured') : formatCompactCount(commentsCount)}</span>
-                    <span className={styles.statLabel}>
-                      {isFeaturedActive
-                        ? locale === 'ar'
-                          ? 'عرض مميز'
-                          : 'Featured offer'
-                        : locale === 'ar'
-                          ? 'استفسار'
-                          : 'Inquiries'}
-                    </span>
-                  </div>
+                  )}
+                  {commentsCount > 0 && (
                   <div className={styles.statItem}>
                     <span className={clsx(styles.statIcon, styles.statIconBlue)}>
                       <BsChatFill size={14} aria-hidden />
@@ -1498,16 +1491,18 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                     <span className={styles.statValue}>{formatCompactCount(commentsCount)}</span>
                     <span className={styles.statLabel}>{locale === 'ar' ? 'تعليق' : 'Comments'}</span>
                   </div>
+                  )}
+                  {viewsKnown && viewsCount > 0 && (
                   <div className={styles.statItem}>
                     <span className={clsx(styles.statIcon, styles.statIconViolet)}>
                       <BsEyeFill size={14} aria-hidden />
                     </span>
-                    <span className={styles.statValue}>
-                      {viewsKnown ? formatCompactCount(viewsCount) : '—'}
-                    </span>
-                    <span className={styles.statLabel}>{locale === 'ar' ? 'اهتمام' : 'Interest'}</span>
+                    <span className={styles.statValue}>{formatCompactCount(viewsCount)}</span>
+                    <span className={styles.statLabel}>{locale === 'ar' ? 'مشاهدة' : 'Views'}</span>
                   </div>
+                  )}
                 </div>
+                )}
 
                 {(topReactionKeys.length > 0 || postLikesCount > 0) && (
                   <div className={styles.socialProofBar}>

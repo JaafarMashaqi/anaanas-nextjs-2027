@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { SupportedLocale } from '@/lib/localization'
 import styles from './HomeFeedTabs.module.css'
@@ -40,6 +41,7 @@ export default function HomeFeedTabs({ locale }: { locale: SupportedLocale }) {
   const current = params.get('view') || 'latest'
   const isArabic = locale === 'ar'
   const ready = READY_TABS.find((tab) => tab.id === current)
+  const [more, setMore] = useState(Boolean(ready))
 
   const select = (id: string) => {
     const next = new URLSearchParams(params.toString())
@@ -68,22 +70,32 @@ export default function HomeFeedTabs({ locale }: { locale: SupportedLocale }) {
             </button>
           )
         })}
-        {READY_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={current === tab.id}
-            className={current === tab.id ? styles.tabActive : styles.tab}
-            onClick={() => select(tab.id)}
-          >
-            {isArabic ? tab.ar : tab.en}
-          </button>
-        ))}
         <a className={styles.tab} href="#home-featured">
-          {isArabic ? 'الصفقات' : 'Deals'}
+          {isArabic ? 'المميزة' : 'Featured'}
         </a>
+        <button
+          type="button"
+          className={more || ready ? styles.tabActive : styles.tab}
+          aria-expanded={more}
+          onClick={() => setMore((value) => !value)}
+        >
+          {isArabic ? 'المزيد' : 'More'}
+        </button>
       </div>
+      {more ? (
+        <div className={styles.more} role="group" aria-label={isArabic ? 'اكتشاف غير متصل' : 'Unconnected discovery'}>
+          {READY_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={current === tab.id ? styles.tabActive : styles.tab}
+              onClick={() => select(tab.id)}
+            >
+              {isArabic ? tab.ar : tab.en}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {ready ? (
         <p className={styles.note} role="status">
           {isArabic ? ready.arNote : ready.enNote}{' '}

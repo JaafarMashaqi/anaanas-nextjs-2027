@@ -176,7 +176,7 @@ function CreatePostHeroShell({
   const rowDir = isWizardRtl ? 'rtl' : 'ltr'
   const queuedIntent = readQueuedComposerIntent()
   const [intent, setIntent] = useState<'sale' | 'wanted'>(queuedIntent ?? 'sale')
-  const [expanded, setExpanded] = useState(queuedIntent !== null)
+  const [expanded, setExpanded] = useState(queuedIntent !== null || title.trim().length > 0)
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
     { Icon: BsBrush, label: t('createPost.heroTagDesc', locale as any) },
@@ -255,7 +255,9 @@ function CreatePostHeroShell({
           <h2 className={styles.composerHeroHeading}>{t('createPost.heroTitle', locale as any)}</h2>
           <p className={styles.composerHeroSub}>
             {expanded || title.trim()
-              ? t('createPost.heroSubtitle', locale as any)
+              ? isArabic
+                ? 'العنوان يبدأ هنا، وباقي التفاصيل في مسار النشر نفسه.'
+                : 'The title starts here. The rest stays in this same publish flow.'
               : prompts[promptIndex % prompts.length]}
           </p>
           <p className={styles.composerProgress} aria-live="polite">

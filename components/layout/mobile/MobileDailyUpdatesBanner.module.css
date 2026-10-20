@@ -105,8 +105,10 @@
   text-align: start;
   position: relative;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .messageTrack {
@@ -132,12 +134,11 @@
 }
 
 .messageInner {
-  display: inline-block;
-  flex: 0 0 auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  display: inline;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  max-width: none;
   color: #101828;
   background: none;
   -webkit-text-fill-color: #101828;

@@ -68,6 +68,13 @@
   max-height: calc(100dvh - 96px);
 }
 
+@media (max-width: 991.98px) {
+  :global(html.ananas-has-product-nav) .frame {
+    height: min(calc(100dvh - 168px), 900px);
+    max-height: calc(100dvh - 168px);
+  }
+}
+
 @media (min-width: 992px) {
   .frame {
     grid-template-columns: minmax(320px, 380px) 1fr;

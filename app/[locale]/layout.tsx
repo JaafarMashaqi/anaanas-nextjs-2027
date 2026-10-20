@@ -2,6 +2,7 @@ import type { ChildrenType } from '@/types/component'
 import { headers } from 'next/headers'
 
 import FeaturedPopupAdLazy from '@/components/layout/FeaturedPopupAdLazy'
+import MobileProductNav from '@/components/layout/mobile/MobileProductNav'
 import NewPostRealtime from '@/components/realtime/NewPostRealtime'
 import ResponsiveDailyUpdatesBanner from '@/components/layout/ResponsiveDailyUpdatesBanner'
 import ResponsiveTopHeader from '@/components/layout/TopHeader/ResponsiveTopHeader'
@@ -16,6 +17,7 @@ const SocialLayout = async ({ children }: ChildrenType) => {
       <ResponsiveTopHeader />
       {!isBlogsHost ? <ResponsiveDailyUpdatesBanner /> : null}
       {children}
+      {!isBlogsHost ? <MobileProductNav /> : null}
       {!isBlogsHost ? (
         <>
           <FeaturedPopupAdLazy />

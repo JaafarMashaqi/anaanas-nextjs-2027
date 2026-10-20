@@ -1345,7 +1345,9 @@
 
 .composerHeroCollapsed .composerHeroTags,
 .composerHeroCollapsed .composerModeNote,
-.composerHeroCollapsed .composerProgress {
+.composerHeroCollapsed .composerProgress,
+.composerHeroShell:not([data-expanded='1']) .composerShortcuts,
+.composerHeroShell:not([data-expanded='1']) .composerIntentRow {
   display: none;
 }
 

@@ -5,11 +5,19 @@ import dynamic from 'next/dynamic'
 const CreatePostCardLazy = dynamic(() => import('@/components/cards/CreatePostCard'), {
   ssr: false,
   loading: () => (
-    <div className="card border-0 shadow-sm mb-4 placeholder-glow" aria-hidden="true">
-      <div className="card-body py-4">
-        <span className="placeholder col-7 col-md-5 rounded" style={{ height: 20 }} />
-        <span className="placeholder col-12 rounded mt-3" style={{ height: 48 }} />
-      </div>
+    <div
+      aria-hidden="true"
+      style={{
+        borderRadius: 18,
+        border: '1px solid #e6e8ef',
+        borderInlineStart: '3px solid #f5c518',
+        background: '#ffffff',
+        padding: '0.7rem 0.75rem',
+        marginBottom: '1rem',
+      }}
+    >
+      <div style={{ height: 14, width: '42%', borderRadius: 8, background: '#f3f4f6' }} />
+      <div style={{ height: 40, marginTop: 10, borderRadius: 12, background: '#f7f8fa' }} />
     </div>
   ),
 })

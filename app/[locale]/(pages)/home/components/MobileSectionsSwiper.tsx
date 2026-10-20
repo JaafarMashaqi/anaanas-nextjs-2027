@@ -45,7 +45,7 @@ const TILE_PALETTE: string[] = [
   '#e7f0f9', // ice
   '#ffe6c9', // peach
   '#e9e5f7', // lavender
-  '#1f1f1f', // charcoal accent
+  '#efe7fb', // lavender
   '#f1f0ed', // bone
 ]
 
