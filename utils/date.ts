@@ -10,35 +10,38 @@ export const addOrSubtractMinutesFromDate: AddOrSubtractFromDate = (minutes, add
   else return new Date(new Date().setMinutes(startingDate.getMinutes() - minutes))
 }
 
-export const timeSince = (date: Date) => {
-  if (typeof date !== 'object') {
-    date = new Date(date)
-  }
+const RELATIVE_UNITS: Array<[Intl.RelativeTimeFormatUnit, number]> = [
+  ['year', 31536000],
+  ['month', 2592000],
+  ['week', 604800],
+  ['day', 86400],
+  ['hour', 3600],
+  ['minute', 60],
+  ['second', 1],
+]
 
-  const seconds = Math.floor((new Date().valueOf() - date.valueOf()) / 1000)
-  let interval: number = 0
-  let intervalType: string = ''
+/**
+ * Locale-aware relative time. Default stays English so older English-only
+ * callers (notification slice, mock activity) do not change. Pass `ar` on
+ * marketplace surfaces so Arabic cards do not show reversed English.
+ */
+export const timeSince = (date: Date | string | number, locale: string = 'en') => {
+  const parsed = date instanceof Date ? date : new Date(date)
+  if (Number.isNaN(parsed.valueOf())) return ''
 
-  const intervals = {
-    year: 31536000,
-    month: 2592000,
-    day: 86400,
-    hour: 3600,
-    minute: 60,
-    second: 1,
-  }
+  const diffSec = Math.round((parsed.valueOf() - Date.now()) / 1000)
+  const abs = Math.abs(diffSec)
+  const lang = locale.toLowerCase().startsWith('ar') ? 'ar' : 'en'
+  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' })
 
-  for (const [key, value] of Object.entries(intervals)) {
-    interval = Math.floor(seconds / value)
-    if (interval >= 1) {
-      intervalType = key
-      break
+  if (abs < 10) return rtf.format(0, 'second')
+
+  for (const [unit, size] of RELATIVE_UNITS) {
+    if (abs >= size || unit === 'second') {
+      const value = Math.round(diffSec / size)
+      return rtf.format(value === 0 ? (diffSec < 0 ? -1 : 1) : value, unit)
     }
   }
 
-  if (interval > 1 || interval === 0) {
-    intervalType += 's'
-  }
-
-  return `${interval} ${intervalType} ago`
+  return rtf.format(0, 'second')
 }

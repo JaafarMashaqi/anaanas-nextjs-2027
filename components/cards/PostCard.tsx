@@ -41,7 +41,7 @@ import {
   BsThreeDots,
   BsXCircle,
 } from 'react-icons/bs'
-import { resolveCurrencyForCountry } from '@/lib/seo/countryCurrency'
+import { resolveListingCurrency } from '@/lib/seo/countryCurrency'
 import GlightBox from '../GlightBox'
 import LoadContentButton from '../LoadContentButton'
 import CommentItem from './components/CommentItem'
@@ -333,7 +333,10 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   const sectionSlug = (post as any)?.section?.slug ?? ''
   const categorySlug = (post as any)?.category?.slug ?? ''
   const countryIso2 = String((post as any)?.country?.iso2 ?? (post as any)?.country?.iso_code ?? '').toLowerCase()
-  const currencyCode = resolveCurrencyForCountry(countryIso2)
+  const currencyCode = resolveListingCurrency({
+    iso2: countryIso2,
+    countryId: (post as any)?.country_id ?? (post as any)?.country?.id,
+  })
   const priceLabel = formatListingPrice((post as any)?.price, currencyCode, locale)
   const attributeChips = extractAttributeChips(post as Record<string, unknown>)
   const isUserVerified = Boolean((user as any)?.is_account_verified)
@@ -1304,7 +1307,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                       </>
                     )}
                     {cityName && createdAtDate && <span className={styles.metaDot} aria-hidden>•</span>}
-                    {createdAtDate && <span>{timeSince(createdAtDate)}</span>}
+                    {createdAtDate && <span>{timeSince(createdAtDate, locale)}</span>}
                   </div>
                 </div>
               </div>

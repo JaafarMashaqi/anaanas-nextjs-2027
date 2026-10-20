@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
+import { resolveListingCurrency } from '@/lib/seo/countryCurrency'
 import type { SupportedLocale } from '@/lib/localization'
 import styles from './SimpleListingCard.module.css'
 
@@ -10,6 +11,8 @@ export type SimpleListing = {
   id: number | string
   title?: string
   price?: number | string | null
+  country_id?: number | string | null
+  country?: { iso2?: string | null; iso_code?: string | null; id?: number | null } | null
   city?: { name?: string | { ar?: string; en?: string } } | null
   category?: { name?: string | { ar?: string; en?: string } } | null
   post_images?: Array<{ image_full_url?: string; image?: string }>
@@ -38,6 +41,17 @@ export default function SimpleListingCard({ post, locale }: { post: SimpleListin
 
   const cta = locale === 'ar' ? 'عرض التفاصيل' : 'View details'
   const arrow = locale === 'ar' ? '←' : '→'
+  const currency = resolveListingCurrency({
+    iso2: post.country?.iso2 || post.country?.iso_code,
+    countryId: post.country_id ?? post.country?.id,
+  })
+  const numericPrice = Number(String(post.price ?? '').replace(/,/g, ''))
+  const priceLabel =
+    post.price == null || post.price === '' || !Number.isFinite(numericPrice) || numericPrice <= 0
+      ? null
+      : `${new Intl.NumberFormat(locale === 'ar' ? 'ar-JO' : 'en-US', { maximumFractionDigits: 0 }).format(numericPrice)}${
+          currency === 'JOD' ? (locale === 'ar' ? ' د.أ' : ' JOD') : currency ? ` ${currency}` : ''
+        }`
 
   return (
     <Link href={href} className={styles.card}>
@@ -49,9 +63,7 @@ export default function SimpleListingCard({ post, locale }: { post: SimpleListin
             📷
           </span>
         )}
-        {post.price != null && post.price !== '' ? (
-          <span className={styles.priceBadge}>{String(post.price)}</span>
-        ) : null}
+        {priceLabel ? <span className={styles.priceBadge}>{priceLabel}</span> : null}
       </div>
       <div className={styles.body}>
         <h3 className={styles.title}>{post.title || `#${post.id}`}</h3>

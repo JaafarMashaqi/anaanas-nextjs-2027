@@ -143,7 +143,7 @@ export default function MyPostListItem({
         <div className={styles.postMeta}>
           {cityName && <span>{cityName}</span>}
           {cityName && createdAtDate && <span className={styles.metaDot} aria-hidden>•</span>}
-          {createdAtDate && <span>{timeSince(createdAtDate)}</span>}
+          {createdAtDate && <span>{timeSince(createdAtDate, locale)}</span>}
           {priceLabel && (
             <>
               <span className={styles.metaDot} aria-hidden>•</span>

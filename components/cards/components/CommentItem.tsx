@@ -102,7 +102,7 @@ const CommentItem = ({
               </div>
 
               <div className={styles.actions}>
-                <span className={styles.time}>{timeSince(createdAt)}</span>
+                <span className={styles.time}>{timeSince(createdAt, locale)}</span>
                 <span className={styles.actionSep} aria-hidden>
                   ·
                 </span>

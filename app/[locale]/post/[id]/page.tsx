@@ -12,7 +12,7 @@ import PostNotFoundBlock from './PostNotFoundBlock'
 import PostStatusBanner from './PostStatusBanner'
 import styles from './postDetails.module.css'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
-import { resolveCurrencyForCountry } from '@/lib/seo/countryCurrency'
+import { iso2ForCountryId, resolveListingCurrency } from '@/lib/seo/countryCurrency'
 import Image from 'next/image'
 import defaultUserAvatar from '@/assets/images/avatar/user-default.svg'
 import FeedLayoutClient from '@/components/layout/FeedLayoutClient'
@@ -320,10 +320,16 @@ export default async function PostDetailsPage({ params }: { params: Promise<{ lo
   const userEmail = (post as any)?.user?.email ? String((post as any).user.email) : ''
   const hasPrice = (post as any)?.price != null && (post as any)?.price !== ''
   const countryIso2 = String(
-    (post as any)?.country?.iso2 || (post as any)?.country?.iso_code || '',
+    (post as any)?.country?.iso2 ||
+      (post as any)?.country?.iso_code ||
+      iso2ForCountryId((post as any)?.country_id ?? (post as any)?.country?.id) ||
+      '',
   ).toLowerCase()
   const countryName = pickLocalizedName((post as any)?.country?.name, safeLocale)
-  const currencyCode = resolveCurrencyForCountry(countryIso2)
+  const currencyCode = resolveListingCurrency({
+    iso2: countryIso2,
+    countryId: (post as any)?.country_id ?? (post as any)?.country?.id,
+  })
   const priceLabel = hasPrice ? formatDetailsPrice((post as any).price, currencyCode, safeLocale) : null
   const isFeaturedActive = Boolean((post as any)?.is_featured_active || (post as any)?.promotion?.is_active)
   const listingTitle = (post as any)?.title
