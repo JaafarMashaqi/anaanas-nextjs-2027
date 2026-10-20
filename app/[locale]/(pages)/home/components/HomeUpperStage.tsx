@@ -1,35 +1,21 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState, type ReactNode } from 'react'
 
 import type { TrendingPostItem } from '@/lib/api/homeInsights'
-import type { Section } from '@/lib/api/sections'
-import { getApiUrl } from '@/lib/api/config'
-import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import type { SupportedLocale } from '@/lib/localization'
 import { plainListingText } from '@/lib/text/plainListingText'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
-import mascot from '@/assets/uiux/mascot_sitting.png'
+import MarketplaceStories from './MarketplaceStories'
 
 import styles from './HomeUpperStage.module.css'
 
 type Props = {
   locale: SupportedLocale
   countryLabel: string
-  sections: Section[]
   trending: TrendingPostItem[]
   children?: ReactNode
-}
-
-function sectionIcon(icon?: string | null) {
-  if (!icon) return null
-  if (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('//')) {
-    return resolveMediaUrl(icon)
-  }
-  const path = icon.startsWith('/') ? icon : `/${icon}`
-  return resolveMediaUrl(getApiUrl(path))
 }
 
 function focusComposerTitle() {
@@ -63,7 +49,7 @@ function openComposer(intent: 'sale' | 'wanted') {
   window.setTimeout(retry, 60)
 }
 
-export default function HomeUpperStage({ locale, countryLabel, sections, trending, children }: Props) {
+export default function HomeUpperStage({ locale, countryLabel, trending = [], children }: Props) {
   const isArabic = locale === 'ar'
   const [note, setNote] = useState<'map' | 'matches' | 'concept' | null>(null)
 
@@ -76,8 +62,6 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
     document.addEventListener('click', onQuickAction)
     return () => document.removeEventListener('click', onQuickAction)
   }, [])
-
-  const stories = sections.slice(0, 8)
 
   return (
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
@@ -110,6 +94,56 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
       </section>
 
       {children}
+
+      <div className={styles.block} id="market-wire">
+        <div className={styles.wireHead}>
+          <span className={styles.liveDot} aria-hidden />
+          <h2>{isArabic ? 'الفرص تتحرك الآن' : 'Opportunities are moving'}</h2>
+          <span>
+            {trending.length
+              ? isArabic
+                ? 'عناوين رائجة من الخادم'
+                : 'Trending titles from the server'
+              : isArabic
+                ? 'لا توجد أرقام تجريبية'
+                : 'No sample numbers'}
+          </span>
+        </div>
+        {trending.length === 0 ? (
+          <p className={styles.empty}>
+            {isArabic
+              ? 'لا توجد إعلانات رائجة مؤكدة من الخادم في هذه اللحظة.'
+              : 'The server has no confirmed trending listings right now.'}
+          </p>
+        ) : (
+          <div className={styles.wire}>
+            {trending.map((item) => (
+              <Link key={item.post_id} href={`/${locale}/post/${item.post_id}`} className={styles.wireItem}>
+                {item.section_name ? <span>{plainListingText(item.section_name)}</span> : null}
+                <strong>{plainListingText(item.title)}</strong>
+              </Link>
+            ))}
+          </div>
+        )}
+        <div className={styles.wire} aria-label={isArabic ? 'فرص تجريبية' : 'Demo opportunities'}>
+          <Link href={`/${locale}/search?q=${encodeURIComponent(isArabic ? 'سيارات' : 'cars')}`} className={styles.wireItem}>
+            <span>{isArabic ? 'تجريبي' : 'Demo'}</span>
+            <strong>{isArabic ? 'بحث عن سيارة مشابهة' : 'Search for a similar car'}</strong>
+          </Link>
+          <Link href={`/${locale}/pages/auction`} className={styles.wireItem}>
+            <span>{isArabic ? 'مزاد' : 'Auction'}</span>
+            <strong>{isArabic ? 'صفحة المزادات الحالية' : 'The current auctions page'}</strong>
+          </Link>
+          <button type="button" className={styles.wireItem} onClick={() => openComposer('wanted')}>
+            <span>{isArabic ? 'تجريبي' : 'Demo'}</span>
+            <strong>{isArabic ? 'اكتب طلب مطلوب' : 'Write a wanted request'}</strong>
+          </button>
+          <Link href={`/${locale}/search`} className={styles.wireItem}>
+            <span>{isArabic ? 'قريب' : 'Nearby'}</span>
+            <strong>{isArabic ? 'لا مسافة أدق من المدينة' : 'No distance finer than a city'}</strong>
+          </Link>
+        </div>
+      </div>
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
         <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
@@ -146,81 +180,7 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
         </p>
       ) : null}
 
-      <div className={styles.block}>
-        <div className={styles.blockHead}>
-          <h2>{isArabic ? 'القصص' : 'Stories'}</h2>
-          <span>{isArabic ? 'أقسام حقيقية، وليست قصص حسابات' : 'Real sections, not account stories'}</span>
-        </div>
-        <div className={styles.stories}>
-          <button
-            type="button"
-            className={styles.story}
-            onClick={() => openComposer('sale')}
-            aria-label={
-              isArabic
-                ? 'أضف قصتك يفتح منشئ الإعلان ولا ينشر قصة عامة'
-                : 'Add your story opens the ad composer and does not publish a public story'
-            }
-          >
-            <span className={`${styles.storyRing} ${styles.storyAdd}`}>
-              <span className={styles.storyPlus}>+</span>
-            </span>
-            <span>{isArabic ? 'أضف قصتك' : 'Add your story'}</span>
-          </button>
-          {stories.length === 0 ? (
-            <p className={styles.empty}>{isArabic ? 'لا توجد أقسام للعرض الآن.' : 'No sections to show right now.'}</p>
-          ) : (
-            stories.map((section) => {
-              const icon = sectionIcon(section.icon)
-              return (
-                <Link key={section.id} href={`/${locale}/sections/${section.slug}`} className={styles.story}>
-                  <span className={styles.storyRing}>
-                    {icon ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={icon} alt="" />
-                    ) : (
-                      <Image src={mascot} alt="" width={44} height={44} />
-                    )}
-                  </span>
-                  <span>{section.name}</span>
-                </Link>
-              )
-            })
-          )}
-        </div>
-      </div>
-
-      <div className={styles.block} id="market-wire">
-        <div className={styles.wireHead}>
-          <span className={styles.liveDot} aria-hidden />
-          <h2>{isArabic ? 'الفرص تتحرك الآن' : 'Opportunities are moving'}</h2>
-          <span>
-            {trending.length
-              ? isArabic
-                ? 'عناوين رائجة من الخادم'
-                : 'Trending titles from the server'
-              : isArabic
-                ? 'لا توجد أرقام تجريبية'
-                : 'No sample numbers'}
-          </span>
-        </div>
-        {trending.length === 0 ? (
-          <p className={styles.empty}>
-            {isArabic
-              ? 'لا توجد إعلانات رائجة مؤكدة من الخادم في هذه اللحظة.'
-              : 'The server has no confirmed trending listings right now.'}
-          </p>
-        ) : (
-          <div className={styles.wire}>
-            {trending.map((item) => (
-              <Link key={item.post_id} href={`/${locale}/post/${item.post_id}`} className={styles.wireItem}>
-                {item.section_name ? <span>{plainListingText(item.section_name)}</span> : null}
-                <strong>{plainListingText(item.title)}</strong>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      <MarketplaceStories locale={locale} />
 
     </div>
   )

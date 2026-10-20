@@ -116,7 +116,6 @@ const Home = async ({
           <HomeUpperStage
             locale={uiLocale}
             countryLabel={countryLabel}
-            sections={sections}
             trending={trending}
           >
             <Suspense fallback={<HomeInsightsSkeleton />}>
@@ -178,9 +177,6 @@ const Home = async ({
         <Col lg={3} md={3}>
           <aside className="vstack gap-4" aria-label={uiLocale === 'ar' ? 'رؤى السوق' : 'Market insights'}>
             <div className={sideStyles.sideStack}>
-              <Suspense fallback={<HomeInsightsSkeleton />}>
-                <MarketPulseCard locale={uiLocale} />
-              </Suspense>
               <Suspense fallback={<HomeInsightsSkeleton />}>
                 <TrendingAdsCard locale={uiLocale} />
               </Suspense>

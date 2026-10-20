@@ -12,6 +12,7 @@ export type PulseMetricId =
   | 'measured'
   | 'opportunities'
   | 'sold'
+  | 'commerce'
 
 export type PulseLevel = 'live' | 'demo' | 'blocked'
 
@@ -84,7 +85,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
   const metrics: PulseMetric[] = [
     {
       id: 'listings',
-      label: ar ? 'إعلانات منشورة' : 'Published listings',
+      label: ar ? 'منشورة' : 'Published',
       value: count(source.listingsTotal, locale, source.listingsError),
       period: ar ? 'كل الإعلانات النشطة' : 'All active listings',
       hint: source.listingsError
@@ -101,7 +102,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
     },
     {
       id: 'auctions',
-      label: ar ? 'مزادات مباشرة' : 'Live auctions',
+      label: ar ? 'مزادات' : 'Auctions',
       value: count(source.auctionsTotal, locale, source.auctionsError),
       period: ar ? 'الحالة الآن' : 'Right now',
       hint: source.auctionsError
@@ -166,7 +167,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
   metrics.splice(1, 0, {
     id: 'fresh',
     level: 'demo',
-    label: ar ? 'إعلانات جديدة' : 'New listings',
+    label: ar ? 'جديدة' : 'New',
     value: ar ? 'تجريبي' : 'Demo',
     period: ar ? 'لا نافذة ٢٤ ساعة' : 'No 24-hour window',
     hint: ar
@@ -179,7 +180,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
   metrics.splice(2, 0, {
     id: 'activity',
     level: 'live',
-    label: ar ? 'حركة الأقسام' : 'Section activity',
+    label: ar ? 'الأقسام' : 'Sections',
     value: count(source.sectionsError ? null : activeSections, locale, source.sectionsError),
     period: ar ? 'أقسام بعدد أكبر من صفر' : 'Sections with a count above zero',
     hint: ar
@@ -192,7 +193,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
   metrics.splice(3, 0, {
     id: 'wanted',
     level: 'demo',
-    label: ar ? 'طلب / مطلوب' : 'Wanted demand',
+    label: ar ? 'مطلوب' : 'Wanted',
     value: ar ? 'تجريبي' : 'Demo',
     period: ar ? 'لا نوع مطلوب' : 'No wanted type',
     hint: ar
@@ -213,6 +214,19 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
         ? 'لا قائمة فرص شخصية. اللوحة شكل للواجهة فقط.'
         : 'There is no personal opportunity list. The panel is an interface sketch only.',
       tone: 'violet',
+      href: `/${locale}/search`,
+      raw: null,
+    },
+    {
+      id: 'commerce',
+      level: 'blocked',
+      label: ar ? 'بث' : 'Live',
+      value: ar ? 'لا بث' : 'No live',
+      period: ar ? 'لا جلسات بيع' : 'No selling sessions',
+      hint: ar
+        ? 'لا يوجد مسار بث أو تجارة مباشرة. هذه حالة غير متاحة وليست مشاهدين.'
+        : 'There is no live-session route. This is unavailable, not a viewer count.',
+      tone: 'coral',
       href: `/${locale}/search`,
       raw: null,
     },
@@ -267,6 +281,11 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
       id: 'sold',
       label: ar ? 'مباع حديثاً' : 'Recently sold',
       reason: ar ? 'لا توجد أحداث بيع موثّقة.' : 'No verified sale events are returned.',
+    },
+    {
+      id: 'commerce',
+      label: ar ? 'تجارة مباشرة' : 'Live commerce',
+      reason: ar ? 'لا توجد جلسات بث أو متجر على الهواء.' : 'No live sessions or on-air store are returned.',
     },
     {
       id: 'matches',

@@ -4,10 +4,17 @@ import clsx from 'clsx'
 import { Modal, Spinner } from 'react-bootstrap'
 import { BsStars } from 'react-icons/bs'
 
-import { SUPPORTED_LOCALES } from '@/lib/localization'
+import { PLANNED_LOCALES, SUPPORTED_LOCALES } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './LanguageSelectorModal.module.css'
+
+const PLANNED_NAMES: Record<(typeof PLANNED_LOCALES)[number], { ar: string; en: string }> = {
+  tr: { ar: 'التركية', en: 'Turkish' },
+  fr: { ar: 'الفرنسية', en: 'French' },
+  es: { ar: 'الإسبانية', en: 'Spanish' },
+  de: { ar: 'الألمانية', en: 'German' },
+}
 
 type LocaleCopy = {
   modalTitle: string
@@ -101,6 +108,11 @@ export default function LanguageSelectorModal({
             )
           })}
         </div>
+        <p className={styles.hint}>
+          {currentLocale === 'ar'
+            ? `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].ar).join('، ')} غير مفعّلة. لا مسار لها حتى يكتمل القاموس.`
+            : `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].en).join(', ')} are not enabled. They have no route until the dictionary is complete.`}
+        </p>
       </Modal.Body>
 
       {isPending && targetLocale ? (

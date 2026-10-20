@@ -490,9 +490,13 @@
   min-height: 40px;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
+  border: 0;
   background: #fff6d8;
   color: #101828;
   text-decoration: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 
 .wireItem:nth-child(2) {

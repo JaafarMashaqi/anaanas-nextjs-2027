@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import Link from 'next/link'
-import { BsBagCheck, BsBarChart, BsBullseye, BsGrid, BsGraphUpArrow, BsHammer, BsLightning, BsSearch, BsStars } from 'react-icons/bs'
+import { BsBagCheck, BsBarChart, BsBroadcast, BsBullseye, BsGrid, BsGraphUpArrow, BsHammer, BsLightning, BsSearch, BsStars } from 'react-icons/bs'
 
 import type { MarketPulseModel, PulseActivity, PulseMetric, PulseMetricId } from '@/lib/market/buildMarketPulse'
 import type { SupportedLocale } from '@/lib/localization'
@@ -19,6 +19,7 @@ const ICONS = {
   measured: BsGraphUpArrow,
   opportunities: BsBullseye,
   sold: BsBagCheck,
+  commerce: BsBroadcast,
 } as const
 
 export type PulseLatestItem = {
@@ -113,9 +114,9 @@ function MetricCard({
         type="button"
         className={`${styles.metric} ${styles.compact} ${styles[metric.tone]}`}
         data-pulse-build="2"
-        title={`${metric.period}. ${metric.hint}`}
+        title={metric.period}
         aria-pressed={pressed}
-        aria-label={`${levelLabel}. ${metric.label}. ${metric.value}. ${metric.period}. ${metric.hint}`}
+        aria-label={`${levelLabel}. ${metric.label}. ${metric.level === 'live' ? metric.value : metric.value}`}
         onClick={() => onOpen(metric.id)}
       >
         <span className={styles.metricIcon} aria-hidden>
@@ -123,9 +124,6 @@ function MetricCard({
         </span>
         {metric.level === 'demo' ? <strong className={styles.metricWord}>—</strong> : figure}
         <span className={styles.metricLabel}>{metric.label}</span>
-        {metric.level !== 'live' ? (
-          <span className={metric.level === 'demo' ? styles.levelDemo : styles.levelBlocked}>{levelLabel}</span>
-        ) : null}
       </button>
     )
   }
@@ -382,6 +380,9 @@ export default function MarketPulseCardClient({
   const [focus, setFocus] = useState<PulseMetricId | null>(null)
   const drawerId = variant === 'rail' ? 'market-pulse-drawer-rail' : 'market-pulse-drawer-stack'
   const isArabic = locale === 'ar'
+  const railMetrics = model.metrics.filter((metric) =>
+    ['listings', 'fresh', 'activity', 'wanted', 'auctions', 'commerce', 'sold'].includes(metric.id),
+  )
   const detailsLabel = open ? (isArabic ? 'إخفاء' : 'Hide') : isArabic ? 'التفاصيل' : 'Details'
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -423,51 +424,20 @@ export default function MarketPulseCardClient({
   return (
     <section className={variant === 'rail' ? styles.rail : styles.stack} aria-label={t('home.marketPulse', locale)}>
       {head}
-      <p className={styles.stamp}>
-        {isArabic ? 'كما في' : 'As of'} {formatStamp(generatedAt, locale)}
-      </p>
-      {variant === 'rail' ? (
-        <div
-          ref={scroller}
-          className={styles.railTrack}
-          tabIndex={0}
-          role="list"
-          aria-label={isArabic ? 'مؤشرات النبض' : 'Pulse metrics'}
-          onKeyDown={onKeyDown}
-        >
-          {model.metrics.map((metric) => (
-            <div key={metric.id} className={styles.railItem} role="listitem">
-              <MetricCard compact metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <>
-          <div className={styles.stackList}>
-            {model.metrics.map((metric) => (
-              <MetricCard key={metric.id} metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
-            ))}
+      <div
+        ref={scroller}
+        className={styles.railTrack}
+        tabIndex={0}
+        role="list"
+        aria-label={isArabic ? 'مؤشرات النبض' : 'Pulse metrics'}
+        onKeyDown={onKeyDown}
+      >
+        {railMetrics.map((metric) => (
+          <div key={metric.id} className={styles.railItem} role="listitem">
+            <MetricCard compact metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
           </div>
-          {model.bars.length === 0 ? (
-            <p className={styles.railEmpty}>{t('home.marketPulseEmpty', locale)}</p>
-          ) : (
-            <ol className={styles.rank}>
-              {model.bars.map((bar, index) => (
-                <li key={bar.sectionId}>
-                  <Link href={bar.href} title={bar.growthLabel ?? (isArabic ? 'لا توجد نافذة سابقة' : 'No previous window')}>
-                    <span>{index + 1}</span>
-                    <strong>{bar.name}</strong>
-                    <em>
-                      {bar.current}
-                      {bar.growthLabel ? ` ${bar.growthLabel}` : ''}
-                    </em>
-                  </Link>
-                </li>
-              ))}
-            </ol>
-          )}
-        </>
-      )}
+        ))}
+      </div>
       {open ? (
         <PulseDrawer
           model={model}
