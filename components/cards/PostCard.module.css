@@ -989,15 +989,26 @@
 }
 
 .listingCard .listingHero {
-  height: auto;
-  aspect-ratio: 5 / 3;
-  max-height: 176px;
-  background: #f6f3ee;
+  height: auto !important;
+  aspect-ratio: 16 / 10;
+  max-height: 210px;
+  background: #f4f1ea;
 }
 
 .listingCard .mainImage {
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
+}
+
+.listingCard .listingHeader {
+  padding: 0.45rem 0.7rem 0.25rem;
+}
+
+.listingCard .listingInfoCaption {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .listingCard .listingBody {

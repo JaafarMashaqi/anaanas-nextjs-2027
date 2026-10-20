@@ -59,6 +59,10 @@ import {
   BsRocketTakeoff,
   BsTag,
   BsTags,
+  BsMic,
+  BsCameraVideo,
+  BsGeoAlt,
+  BsStars,
 } from 'react-icons/bs'
 import { useParams } from 'next/navigation'
 import { t } from '@/lib/translations'
@@ -255,14 +259,23 @@ function CreatePostHeroShell({
 
       <div className={styles.composerHeroTop} dir={rowDir}>
         <div className={styles.composerHeroCopy}>
-          <h2 className={styles.composerHeroHeading}>{t('createPost.heroTitle', locale as any)}</h2>
-          <p className={styles.composerHeroSub}>
-            {expanded || title.trim()
-              ? isArabic
-                ? 'العنوان يبدأ هنا، وباقي التفاصيل في مسار النشر نفسه.'
-                : 'The title starts here. The rest stays in this same publish flow.'
-              : prompts[promptIndex % prompts.length]}
-          </p>
+          <div className={styles.composerLead}>
+            <div>
+              <h2 className={styles.composerHeroHeading}>
+                {isArabic ? 'أنشئ إعلانك في ثوانٍ' : 'Create your ad in seconds'}
+              </h2>
+              <p className={styles.composerHeroSub}>
+                {expanded || title.trim()
+                  ? isArabic
+                    ? 'العنوان هنا، ثم الوصف والصور والسعر في مسار النشر نفسه.'
+                    : 'The title is here. Description, photos, and price stay in this publish flow.'
+                  : prompts[promptIndex % prompts.length]}
+              </p>
+            </div>
+            <button type="button" className={styles.composerCampaign} onClick={onAddAdClick}>
+              {isArabic ? 'ابدأ حملتك الآن' : 'Start your campaign'}
+            </button>
+          </div>
           <p className={styles.composerProgress} aria-live="polite">
             {title.trim()
               ? isArabic
@@ -341,44 +354,70 @@ function CreatePostHeroShell({
         </div>
       </div>
 
-      <div className={styles.composerShortcuts} aria-label={isArabic ? 'اختصارات الإعلان' : 'Listing shortcuts'}>
-        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
-          {isArabic ? 'صور' : 'Photos'}
-        </button>
-        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
-          {isArabic ? 'السعر' : 'Price'}
-        </button>
-        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
-          {isArabic ? 'الموقع' : 'Location'}
-        </button>
-        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
-          {isArabic ? 'القسم' : 'Category'}
+      <div className={styles.composerIconTools} aria-label={isArabic ? 'أدوات الإعلان' : 'Listing tools'}>
+        <button type="button" className={styles.composerIconBtn} onClick={onAddAdClick} aria-label={isArabic ? 'صور' : 'Photos'}>
+          <BsCamera aria-hidden />
         </button>
         <button
           type="button"
-          className={styles.composerShortcut}
+          className={styles.composerIconBtn}
+          aria-label={isArabic ? 'فيديو' : 'Video'}
           onClick={() =>
             setAssistNote(
               isArabic
-                ? 'الإملاء الصوتي غير مربوط باستوديو الإعلان. اكتب العنوان هنا.'
-                : 'Voice dictation is not connected to the ad studio. Type the title here.',
+                ? 'رفع الفيديو غير مربوط. الصور تُضاف في خطوة النشر الحالية.'
+                : 'Video upload is not connected. Photos are added in the current publish step.',
             )
           }
         >
-          {isArabic ? 'صوت' : 'Voice'}
+          <BsCameraVideo aria-hidden />
         </button>
         <button
           type="button"
-          className={styles.composerShortcut}
+          className={styles.composerIconBtn}
+          aria-label={isArabic ? 'صوت' : 'Voice'}
+          onClick={() => {
+            const host = window as Window & { SpeechRecognition?: new () => any; webkitSpeechRecognition?: new () => any }
+            const Ctor = host.SpeechRecognition || host.webkitSpeechRecognition
+            if (!Ctor) {
+              setAssistNote(
+                isArabic
+                  ? 'الإملاء غير متاح في هذا المتصفح. اكتب العنوان.'
+                  : 'Dictation is not available in this browser. Type the title.',
+              )
+              return
+            }
+            const recognition = new Ctor()
+            recognition.lang = isArabic ? 'ar-JO' : 'en-US'
+            recognition.onresult = (event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => {
+              const transcript = event.results[0]?.[0]?.transcript?.trim()
+              if (!transcript) return
+              onChange({ target: { value: transcript } } as ChangeEvent<HTMLInputElement>)
+              setExpanded(true)
+            }
+            recognition.onerror = () =>
+              setAssistNote(isArabic ? 'تعذر استخدام الميكروفون.' : 'The microphone could not be used.')
+            recognition.start()
+          }}
+        >
+          <BsMic aria-hidden />
+        </button>
+        <button type="button" className={styles.composerIconBtn} onClick={onAddAdClick} aria-label={isArabic ? 'الموقع' : 'Location'}>
+          <BsGeoAlt aria-hidden />
+        </button>
+        <button
+          type="button"
+          className={styles.composerIconBtn}
+          aria-label={isArabic ? 'مساعدة' : 'Assist'}
           onClick={() =>
             setAssistNote(
               isArabic
-                ? 'اقتراح السعر والعنوان غير مربوط بخدمة. النشر يبقى في المسار الحالي.'
-                : 'Title and price suggestions are not connected. Publishing stays in the current flow.',
+                ? 'اقتراح السعر والطلب غير مربوط بخدمة. لا يوجد رقم باحثين في هذه الشاشة.'
+                : 'Price and demand suggestions are not connected. This screen has no buyer count.',
             )
           }
         >
-          {isArabic ? 'اقتراح' : 'Suggest'}
+          <BsStars aria-hidden />
         </button>
       </div>
       {assistNote ? <p className={styles.composerHeroSub}>{assistNote}</p> : null}

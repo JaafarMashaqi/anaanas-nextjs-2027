@@ -1331,16 +1331,13 @@
 .composerHeroShell {
   position: relative;
   width: 100%;
-  border-radius: 18px;
-  padding: 0.7rem 0.75rem 0.65rem;
-  background: #ffffff;
-  border: 1px solid #e6e8ef;
-  border-inline-start: 3px solid #f5c518;
-  box-shadow: none;
+  border-radius: 22px;
+  padding: 0.75rem 0.8rem 0.7rem;
+  background: #fff8de;
+  border: 0;
   color: #101828;
   scroll-margin-top: 96px;
   scroll-margin-bottom: 24px;
-  box-shadow: none;
 }
 
 .composerHeroCollapsed .composerHeroTags,
@@ -1423,6 +1420,52 @@
 
 .composerHeroCopy {
   min-width: 0;
+}
+
+.composerLead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.composerCampaign {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  background: #101828;
+  color: #ffffff;
+  min-height: 36px;
+  padding: 0 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.composerIconTools {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin-top: 0.35rem;
+}
+
+.composerIconBtn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #344054;
+  cursor: pointer;
+}
+
+.composerIconBtn:hover,
+.composerIconBtn:focus-visible {
+  background: #ffffff;
+  color: #101828;
 }
 
 .composerHeroHeading {

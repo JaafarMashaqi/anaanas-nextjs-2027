@@ -1419,32 +1419,6 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                 <div onClick={handleCardOpenDetails}>
                   {banner}
                   {attributesAndOptions && attributesAndOptions}
-                  {photos && (
-                    <div className="d-flex justify-content-between">
-                      <Row className="g-3">
-                        <Col xs={6}>
-                          <GlightBox className="h-100" href={postImg3.src} data-gallery="image-popup">
-                            <Image className="rounded img-fluid" src={postImg3} alt="Image" />
-                          </GlightBox>
-                        </Col>
-                        <Col xs={6}>
-                          <GlightBox href={postImg1.src} data-glightbox data-gallery="image-popup">
-                            <Image className="rounded img-fluid" src={postImg1} alt="Image" />
-                          </GlightBox>
-                          <div className="position-relative bg-dark mt-3 rounded">
-                            <div className="hover-actions-item position-absolute top-50 start-50 translate-middle z-index-9">
-                              <Link className="btn btn-link text-white" href="#">
-                                {t('post.viewAll', locale)}
-                              </Link>
-                            </div>
-                            <GlightBox href={postImg2.src} data-glightbox data-gallery="image-popup">
-                              <Image className="img-fluid opacity-50 rounded" src={postImg2} alt="image" />
-                            </GlightBox>
-                          </div>
-                        </Col>
-                      </Row>
-                    </div>
-                  )}
                   {isVideo && <VideoPlayer />}
                 </div>
               </div>

@@ -12,6 +12,6 @@ Sources actually opened: this conversation, the attached mobile references, and 
 | Market wire | Spec 5.6 | HomeUpperStage | Sold counts and buyer demand | High | /api/home/latest-listings | Verified: 8 real titles, labeled not sales |
 | Amman hero, one campaign frame | Spec 5.7 and 06 | HomeBanner | Separate scheduling service | High | /api/home/sliders | One frame. Daily banner hidden on home |
 | Market pulse | Spec 5.8 | MarketPulseCardClient | Online, searching, featured, sold | High | posts, auctions, sections | Rail is live figures only |
-| Composer | Spec 07 | CreatePostCard | Full social studio and real AI pricing | Next | Existing publish flow | Not rebuilt this phase |
-| Social cards, reels, live, following | Spec 08–10 | Feeds and later routes | Most of the reference feed | Next | Several missing endpoints | Not rebuilt this phase |
+| Composer | Spec 07, historical composer screenshot | CreatePostCard hero shell | Video upload, demand count, paid tiers | High | Existing publish API. No pricing or video service | Compact cream composer on the home feed. Photos, location, and publish open the current flow. Voice uses the device. Video and AI say they are not connected. |
+| Social cards | Spec 08 | PostCard listingCard | Follow, offer, wanted variant, opportunity score | High | Reactions and comments already on the post API | Feed image capped and cropped. Stock collage removed from the feed. |
 | Mascot family | Spec 11 | Existing pineapple assets | Distinct category characters | Later | Art, not an API | Not newly drawn |
