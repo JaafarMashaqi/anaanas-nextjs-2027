@@ -26,8 +26,8 @@
 }
 
 .tabActive {
-  background: #101828;
-  color: #ffc928;
+  background: #ffc928;
+  color: #101828;
   box-shadow: none;
 }
 

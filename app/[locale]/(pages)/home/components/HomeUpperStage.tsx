@@ -85,12 +85,12 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
     setSky(day ? 'day' : 'night')
     if (isArabic) {
       const part = hour < 12 ? 'صباح الخير' : hour < 17 ? 'نهارك سعيد' : 'مساء الخير'
-      setGreeting(`${part} في ${countryLabel}`)
+      setGreeting(part)
       return
     }
     const part = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-    setGreeting(`${part} in ${countryLabel}`)
-  }, [countryLabel, isArabic])
+    setGreeting(part)
+  }, [isArabic])
 
   const stories = sections.slice(0, 8)
 
@@ -114,7 +114,7 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
         <div className={styles.greetCopy}>
           <p className={styles.greetTitle}>{greeting}</p>
           <p className={styles.greetHint}>
-            {isArabic ? 'ابحث، انشر، وتابع السوق من هنا' : 'Search, publish, and follow the market from here'}
+            {isArabic ? `سوق أناناس في ${countryLabel}` : `ANANAS market in ${countryLabel}`}
           </p>
         </div>
         <Image src={mascot} alt="" width={40} height={40} className={styles.mascot} />
@@ -126,15 +126,19 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
         <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
+          <SellIcon />
           {isArabic ? 'أبيع' : 'Sell'}
         </button>
         <button type="button" data-composer-intent="wanted" className={styles.actionWanted} onClick={() => openComposer('wanted')}>
-          {isArabic ? 'مطلوب الآن' : 'Wanted'}
+          <WantedIcon />
+          {isArabic ? 'مطلوب الآن' : 'Wanted now'}
         </button>
         <button type="button" className={styles.actionQuiet} onClick={() => setNote(note === 'map' ? null : 'map')}>
+          <PinIcon />
           {isArabic ? 'الخريطة' : 'Map'}
         </button>
         <button type="button" className={styles.actionQuiet} onClick={() => setNote(note === 'matches' ? null : 'matches')}>
+          <MatchIcon />
           {isArabic ? 'المطابقات' : 'Matches'}
         </button>
       </div>
@@ -151,18 +155,27 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
         </p>
       ) : null}
 
-      <div className={styles.links}>
-        <Link href={`/${locale}/search`}>{isArabic ? 'بحث' : 'Search'}</Link>
-        <Link href={`/${locale}/pages/auction`}>{isArabic ? 'مزادات' : 'Auctions'}</Link>
-        <Link href={`/${locale}/stores`}>{isArabic ? 'متاجر' : 'Stores'}</Link>
-      </div>
-
       <div className={styles.block}>
         <div className={styles.blockHead}>
-          <h2>{isArabic ? 'قصص الأقسام' : 'Section stories'}</h2>
-          <span>{isArabic ? 'من الأقسام الحالية، وليست قصص حسابات' : 'Current sections, not account stories'}</span>
+          <h2>{isArabic ? 'القصص' : 'Stories'}</h2>
+          <span>{isArabic ? 'أقسام حقيقية، وليست قصص حسابات' : 'Real sections, not account stories'}</span>
         </div>
         <div className={styles.stories}>
+          <button
+            type="button"
+            className={styles.story}
+            onClick={() => openComposer('sale')}
+            aria-label={
+              isArabic
+                ? 'أضف قصتك يفتح منشئ الإعلان ولا ينشر قصة عامة'
+                : 'Add your story opens the ad composer and does not publish a public story'
+            }
+          >
+            <span className={`${styles.storyRing} ${styles.storyAdd}`}>
+              <span className={styles.storyPlus}>+</span>
+            </span>
+            <span>{isArabic ? 'أضف قصتك' : 'Add your story'}</span>
+          </button>
           {stories.length === 0 ? (
             <p className={styles.empty}>{isArabic ? 'لا توجد أقسام للعرض الآن.' : 'No sections to show right now.'}</p>
           ) : (
@@ -186,9 +199,10 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
         </div>
       </div>
 
-      <div className={styles.block}>
-        <div className={styles.blockHead}>
-          <h2>{isArabic ? 'سلك السوق' : 'Market wire'}</h2>
+      <div className={styles.block} id="market-wire">
+        <div className={styles.wireHead}>
+          <span className={styles.liveDot} aria-hidden />
+          <h2>{isArabic ? 'الفرص تتحرك الآن' : 'Opportunities are moving'}</h2>
           <span>
             {trending.length
               ? isArabic
@@ -216,6 +230,79 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
           </div>
         )}
       </div>
+
+      <section className={styles.hero} data-hero="amman" aria-label={isArabic ? 'هوية أناناس' : 'ANANAS identity'}>
+        {/* Restored platform still from the previous Next Generation project. Not a partner ad. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/hero.jpg" alt="" className={styles.heroImage} />
+        <div className={styles.heroShade} />
+        <div className={styles.heroCopy}>
+          <p className={styles.heroKicker} style={{ color: '#ffe58a' }}>
+            {isArabic ? 'من عمّان · تعريف المنصة' : 'From Amman · platform identity'}
+          </p>
+          <h2 style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.55)' }}>
+            {isArabic ? 'السوق حي… والفرص تتحرك الآن' : 'The market is alive… opportunities are moving now'}
+          </h2>
+          <p style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.45)' }}>
+            {isArabic
+              ? 'أعلن، اشتري، واستكشف. هذه هوية أناناس، وليست إعلان شريك.'
+              : 'List, buy, and explore. This is ANANAS identity, not a partner ad.'}
+          </p>
+          <button type="button" onClick={() => openComposer('sale')}>
+            {isArabic ? 'ابدأ الآن' : 'Start now'}
+          </button>
+        </div>
+      </section>
+
+      <Link href={`/${locale}/search`} className={styles.opp}>
+        <span className={styles.oppMark} aria-hidden>
+          <PinIcon />
+        </span>
+        <span className={styles.oppCopy}>
+          <strong>{isArabic ? 'فرص ظاهرة في السوق' : 'Opportunities visible now'}</strong>
+          <span>
+            {isArabic
+              ? 'لا يوجد عدّاد شخصي منذ آخر زيارة. افتح البحث الحقيقي.'
+              : 'There is no personal counter since your last visit. Open real search.'}
+          </span>
+        </span>
+      </Link>
     </div>
+  )
+}
+
+function SellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden>
+      <path fill="currentColor" d="M12 4.2 13.6 8l4.2.4-3.2 2.8.9 4.1L12 13.4 8.5 15.3l.9-4.1L6.2 8.4 10.4 8 12 4.2z" />
+    </svg>
+  )
+}
+
+function WantedIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="11" cy="11" r="5.2" />
+      <path strokeLinecap="round" d="M15.2 15.2 19 19" />
+    </svg>
+  )
+}
+
+function PinIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path strokeLinecap="round" d="M12 20s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10z" />
+      <circle cx="12" cy="10" r="1.8" />
+    </svg>
+  )
+}
+
+function MatchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="8" cy="9" r="2.2" />
+      <circle cx="16" cy="10" r="1.8" />
+      <path strokeLinecap="round" d="M3.8 17.2c.8-2.2 2.4-3.3 4.2-3.3s3.4 1.1 4.2 3.3M13 17.4c.6-1.5 1.8-2.3 3.2-2.3 1.2 0 2.2.6 2.9 1.6" />
+    </svg>
   )
 }

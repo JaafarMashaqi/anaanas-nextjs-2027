@@ -109,7 +109,7 @@ const Home = async ({
             trending={trending}
           />
 
-          {/* Original banner stays. The Amman hero is still waiting for an approved asset. */}
+          {/* CMS campaign slider stays. The Amman still above it is the restored platform identity, not a partner ad. */}
           <HomeBanner locale={uiLocale} />
 
           <Suspense fallback={<HomeInsightsSkeleton />}>

@@ -84,9 +84,43 @@
 }
 
 .railItem {
-  flex: 0 0 74%;
+  flex: 0 0 168px;
   scroll-snap-align: start;
   min-width: 0;
+}
+
+.rail .metric {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 64px;
+  padding: 0.45rem 0.55rem;
+  border: 0;
+  box-shadow: none;
+}
+
+.rail .navy {
+  background: #fff4c8;
+}
+
+.rail .amber {
+  background: #fff6d8;
+}
+
+.rail .green {
+  background: #e7f8ee;
+}
+
+.rail .violet {
+  background: #f3e8ff;
+}
+
+.rail .blue {
+  background: #e7f1ff;
+}
+
+.rail .coral {
+  background: #ffe8e6;
 }
 
 @media (min-width: 768px) {
