@@ -145,6 +145,12 @@ type CreatePostHeroShellProps = {
   limitOverlay?: ReactNode
 }
 
+function readQueuedComposerIntent(): 'sale' | 'wanted' | null {
+  if (typeof document === 'undefined') return null
+  const value = document.documentElement.dataset.composerIntent
+  return value === 'sale' || value === 'wanted' ? value : null
+}
+
 /** واجهة البطل الافتراضية (ضيف / عنوان فارغ) — تصميم موحّد للموبايل والشاشات العريضة */
 function CreatePostHeroShell({
   locale,
@@ -160,8 +166,9 @@ function CreatePostHeroShell({
 }: CreatePostHeroShellProps) {
   const shellDir = isWizardRtl ? 'rtl' : 'ltr'
   const rowDir = isWizardRtl ? 'rtl' : 'ltr'
-  const [intent, setIntent] = useState<'sale' | 'wanted'>('sale')
-  const [expanded, setExpanded] = useState(false)
+  const queuedIntent = readQueuedComposerIntent()
+  const [intent, setIntent] = useState<'sale' | 'wanted'>(queuedIntent ?? 'sale')
+  const [expanded, setExpanded] = useState(queuedIntent !== null)
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
     { Icon: BsBrush, label: t('createPost.heroTagDesc', locale as any) },
@@ -181,11 +188,41 @@ function CreatePostHeroShell({
     return () => window.removeEventListener('ananas:composer-intent', onIntent)
   }, [])
 
+  useEffect(() => {
+    if (!expanded) return
+    let cancelled = false
+    let tries = 0
+    let timer = 0
+    const tryFocus = () => {
+      if (cancelled) return
+      const input = document.getElementById('create-post-title')
+      if (!(input instanceof HTMLInputElement) || input.readOnly || input.disabled) {
+        if (tries < 40) {
+          tries += 1
+          timer = window.setTimeout(tryFocus, 100)
+        }
+        return
+      }
+      input.dataset.allowFocus = '1'
+      input.focus({ preventScroll: true })
+      if (document.activeElement !== input && tries < 40) {
+        tries += 1
+        timer = window.setTimeout(tryFocus, 100)
+      }
+    }
+    timer = window.setTimeout(tryFocus, 0)
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [expanded, intent])
+
   const isArabic = locale === 'ar'
 
   return (
     <div
       id="ananas-composer"
+      data-expanded={expanded ? '1' : undefined}
       className={clsx(styles.composerHeroShell, !expanded && !title && styles.composerHeroCollapsed)}
       dir={shellDir}
     >
@@ -226,6 +263,10 @@ function CreatePostHeroShell({
               aria-describedby={errorText ? 'create-post-hero-title-err' : undefined}
               onFocus={(event) => {
                 setExpanded(true)
+                if (event.currentTarget.dataset.allowFocus === '1') {
+                  delete event.currentTarget.dataset.allowFocus
+                  return
+                }
                 inputProps.onFocus?.(event)
               }}
             />
@@ -359,6 +400,7 @@ const CreatePostCard = ({ mode = 'create', initialPost, postId, locale: localePr
   const { data: session, status } = useSession()
   const { ensureEmailVerified } = useEmailVerificationGate()
   const emailVerifiedForComposerRef = useRef(false)
+  const [guestDraft, setGuestDraft] = useState('')
   const [showLoginAlert, setShowLoginAlert] = useState(false)
   // Current user avatar comes from the shared CurrentUserProvider — one fetch, global state.
   const { user: _currentUser, avatarUrl: _resolvedAvatarUrl } = useCurrentUser()
@@ -391,10 +433,7 @@ const CreatePostCard = ({ mode = 'create', initialPost, postId, locale: localePr
   const showHeroRateLimitOverlay =
     !isEdit &&
     !creationLimit.isAccountVerified &&
-    (isSessionPending ||
-      isAwaitingAccessToken ||
-      creationLimit.loading ||
-      isRateLimitActive)
+    (isAwaitingAccessToken || creationLimit.loading || isRateLimitActive)
 
   const overlayLoading =
     isSessionPending || isAwaitingAccessToken || creationLimit.loading
@@ -844,6 +883,15 @@ const [step, setStep] = useState(1)
     setValue('title', title, { shouldValidate: false })
     setValue('description', description, { shouldValidate: false })
   }, [step, title, description, setValue])
+
+  useEffect(() => {
+    if (isEdit) return
+    if (status === 'unauthenticated' && title && !guestDraft) setGuestDraft(title)
+    if (status === 'authenticated' && guestDraft && !title) {
+      setTitle(guestDraft)
+      setValue('title', guestDraft, { shouldValidate: false })
+    }
+  }, [status, title, guestDraft, isEdit, setValue])
 
   // عند فتح خطوة القسم/الفئة: التأكد من أن معرفات RHF تطابق الاختيار البصري
   useEffect(() => {
@@ -1492,7 +1540,7 @@ const [step, setStep] = useState(1)
     )
   }
 
-  if (status === 'unauthenticated') {
+  if (status === 'unauthenticated' || status === 'loading') {
     return (
       <>
         <Card className={clsx('card-body', 'w-100', styles.composerCard)}>
@@ -1500,13 +1548,12 @@ const [step, setStep] = useState(1)
             <CreatePostHeroShell
               locale={locale}
               isWizardRtl={isWizardRtl}
-              title=""
-              onChange={() => {}}
+              title={guestDraft}
+              onChange={(e) => setGuestDraft(e.target.value)}
               inputProps={{
-                readOnly: true,
-                onClick: () => setShowLoginAlert(true),
-                onFocus: (e) => (e.target as HTMLInputElement).blur(),
-                id: 'create-post-hero-title-guest',
+                id: 'create-post-title',
+                name: 'title',
+                autoComplete: 'off',
               }}
               showTags
               onAddAdClick={() => setShowLoginAlert(true)}

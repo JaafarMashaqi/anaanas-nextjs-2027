@@ -31,14 +31,35 @@ function sectionIcon(icon?: string | null) {
   return resolveMediaUrl(getApiUrl(path))
 }
 
+function focusComposerTitle() {
+  const input = document.getElementById('create-post-title')
+  if (!(input instanceof HTMLInputElement) || input.readOnly || input.disabled) return false
+  input.dataset.allowFocus = '1'
+  input.focus({ preventScroll: true })
+  return document.activeElement === input
+}
+
 function openComposer(intent: 'sale' | 'wanted') {
+  document.documentElement.dataset.composerIntent = intent
   window.dispatchEvent(new CustomEvent('ananas:composer-intent', { detail: intent }))
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  document.getElementById('ananas-composer')?.scrollIntoView({
+  const composer = document.getElementById('ananas-composer')
+  composer?.setAttribute('data-expanded', '1')
+  composer?.scrollIntoView({
     behavior: reduced ? 'auto' : 'smooth',
     block: 'center',
   })
-  window.setTimeout(() => document.getElementById('create-post-title')?.focus(), reduced ? 0 : 280)
+  if (focusComposerTitle()) return
+  let tries = 0
+  const retry = () => {
+    document.getElementById('ananas-composer')?.scrollIntoView({ behavior: 'auto', block: 'center' })
+    if (focusComposerTitle()) return
+    if (tries < 40) {
+      tries += 1
+      window.setTimeout(retry, 100)
+    }
+  }
+  window.setTimeout(retry, 60)
 }
 
 export default function HomeUpperStage({ locale, countryLabel, sections, trending }: Props) {
@@ -47,6 +68,16 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
   const [greeting, setGreeting] = useState(stable)
   const [sky, setSky] = useState<'day' | 'night' | 'neutral'>('neutral')
   const [note, setNote] = useState<'map' | 'matches' | null>(null)
+
+  useEffect(() => {
+    const onQuickAction = (event: MouseEvent) => {
+      const target = event.target instanceof Element ? event.target.closest('[data-composer-intent]') : null
+      const intent = target?.getAttribute('data-composer-intent')
+      if (intent === 'sale' || intent === 'wanted') openComposer(intent)
+    }
+    document.addEventListener('click', onQuickAction)
+    return () => document.removeEventListener('click', onQuickAction)
+  }, [])
 
   useEffect(() => {
     const hour = new Date().getHours()
@@ -94,10 +125,10 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
       </div>
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
-        <button type="button" className={styles.action} onClick={() => openComposer('sale')}>
+        <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
           {isArabic ? 'أبيع' : 'Sell'}
         </button>
-        <button type="button" className={styles.action} onClick={() => openComposer('wanted')}>
+        <button type="button" data-composer-intent="wanted" className={styles.action} onClick={() => openComposer('wanted')}>
           {isArabic ? 'مطلوب الآن' : 'Wanted'}
         </button>
         <button type="button" className={styles.actionQuiet} onClick={() => setNote(note === 'map' ? null : 'map')}>
