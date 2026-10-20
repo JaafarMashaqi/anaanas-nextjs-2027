@@ -26,19 +26,19 @@
 .bannerWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 6 / 1;
-  max-height: 128px;
+  aspect-ratio: 16 / 5;
+  max-height: none;
   min-height: 0;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: none;
-  background: #fff8de;
+  background: #101828;
   margin-bottom: 0;
 }
 
 .bannerImg {
-  object-fit: contain;
-  background: #fff8de;
+  object-fit: cover;
+  background: #101828;
 }
 
 .bannerPicture {
@@ -105,8 +105,7 @@
 /* Adapt heights per breakpoint while preserving aspect ratio */
 @media (max-width: 991.98px) {
   .bannerWrap {
-    aspect-ratio: 3.2 / 1;
-    max-height: 140px;
+    max-height: none;
     min-height: 0;
     margin-bottom: 0;
   }
@@ -114,7 +113,7 @@
 
 @media (max-width: 575.98px) {
   .bannerWrap {
-    aspect-ratio: 2.4 / 1;
+    max-height: none;
     border-radius: 14px;
     margin-bottom: 0;
   }

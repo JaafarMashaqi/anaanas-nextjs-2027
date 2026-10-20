@@ -388,8 +388,8 @@ export default function MarketPulseCardClient({
   const [focus, setFocus] = useState<PulseMetricId | null>(null)
   const drawerId = variant === 'rail' ? 'market-pulse-drawer-rail' : 'market-pulse-drawer-stack'
   const isArabic = locale === 'ar'
-  const railMetrics = model.metrics.filter((metric) =>
-    ['listings', 'online', 'searching', 'fresh', 'activity', 'wanted', 'auctions', 'hot', 'commerce', 'sold'].includes(metric.id),
+  const railMetrics = model.metrics.filter(
+    (metric) => metric.level === 'live' && metric.raw != null && ['listings', 'activity', 'auctions'].includes(metric.id),
   )
   const detailsLabel = open ? (isArabic ? 'إخفاء' : 'Hide') : isArabic ? 'التفاصيل' : 'Details'
 

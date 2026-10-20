@@ -154,7 +154,7 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
           <span>{slotLabel}</span>
           <button type="button" onClick={hideSlot}>{isArabic ? 'إخفاء' : 'Hide'}</button>
         </div>
-        <div className={styles.bannerWrap}>
+        <div className={styles.bannerWrap} data-banner-frame>
           <SlideMedia slide={visibleSlides[0]} isArabic={isArabic} priority />
         </div>
       </section>
@@ -173,7 +173,7 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
         <span>{slotLabel}</span>
         <button type="button" onClick={hideSlot}>{isArabic ? 'إخفاء' : 'Hide'}</button>
       </div>
-      <div className={`${styles.bannerWrap} ${styles.bannerSliderWrap}`}>
+      <div className={`${styles.bannerWrap} ${styles.bannerSliderWrap}`} data-banner-frame>
       <Swiper
         modules={[Autoplay, Pagination, Keyboard, A11y]}
         onSwiper={(s) => {
@@ -260,9 +260,15 @@ function SlideMedia({
         alt={altText}
         fill
         priority={priority}
-        sizes="(max-width: 767px) 100vw, min(800px, 100vw)"
+        sizes="(max-width: 767px) 100vw, min(1100px, 100vw)"
         unoptimized
         className={styles.bannerImg}
+        onLoad={(event) => {
+          const img = event.currentTarget
+          const frame = img.closest('[data-banner-frame]')
+          if (!(frame instanceof HTMLElement) || !img.naturalWidth || !img.naturalHeight) return
+          frame.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`
+        }}
       />
     </picture>
   )

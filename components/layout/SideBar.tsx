@@ -248,7 +248,7 @@ const SideBar = ({ sections, locale: localeProp }: SideBarProps) => {
               {t('sidebar.noSections', currentLocale)}
             </p>
           ) : (
-            <div className={styles.menuListScroll}>
+            <div className={styles.menuListFlow}>
               <h3 className="visually-hidden">{t('seo.sidebar.sectionsMap', currentLocale)}</h3>
               <ul className={styles.menuList}>
               {sections.map((section) => {

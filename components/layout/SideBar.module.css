@@ -197,15 +197,8 @@
   z-index: 1;
 }
 
-.menuListScroll {
-  max-height: min(58vh, 520px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 2.35rem 0 2.75rem;
-  margin: -0.35rem 0;
-  padding-inline-end: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(254, 203, 1, 0.45) transparent;
+.menuListFlow {
+  overflow: visible;
 }
 
 .menuList {

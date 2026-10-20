@@ -68,11 +68,11 @@ export default function HomeOpportunitySlot({
   }
 
   return (
-    <section className={styles.card} aria-label={ar ? 'فرصة سياقية' : 'Contextual opportunity'}>
+    <section className={styles.card} aria-label={ar ? 'عنوان رائج' : 'Trending title'}>
       <div className={styles.head}>
         <span className={styles.dot} aria-hidden />
-        <h2>{ar ? 'فرصة من السوق' : 'A market opportunity'}</h2>
-        <span>{ar ? 'واحد في كل مرة' : 'One at a time'}</span>
+        <h2>{ar ? 'عنوان رائج' : 'Trending title'}</h2>
+        <span>{ar ? 'من الخادم · ليس تقديراً' : 'From the server · not an estimate'}</span>
       </div>
       {!item ? (
         <p className={styles.empty}>
