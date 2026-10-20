@@ -23,6 +23,13 @@
   color: #101828;
 }
 
+.railSource {
+  margin: 0;
+  color: #667085;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
 .pulseMark {
   width: 8px;
   height: 8px;

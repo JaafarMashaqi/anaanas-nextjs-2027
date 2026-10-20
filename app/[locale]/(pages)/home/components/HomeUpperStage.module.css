@@ -228,7 +228,7 @@
   }
 }
 
-.searchSlot {
+.searchField {
   min-width: 0;
 }
 
@@ -689,10 +689,6 @@
 }
 
 @media (min-width: 992px) {
-  .searchSlot {
-    display: none;
-  }
-
   .greetTitle {
     font-size: 1.15rem;
   }

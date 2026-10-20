@@ -111,7 +111,7 @@ const TopHeader = () => {
         {/* ==================== DESKTOP SEARCH (center) ==================== */}
         <form
           ref={desktopSearchRef}
-          className="topHeader__search d-none d-lg-flex"
+          className={`topHeader__search d-none ${isHome ? '' : 'd-lg-flex'}`}
           role="search"
           onSubmit={handleSearch}
         >

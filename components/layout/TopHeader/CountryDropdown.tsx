@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap'
-import { BsGlobe2, BsChevronDown, BsCheck2 } from 'react-icons/bs'
+import { BsGlobe2, BsChevronDown, BsCheck2, BsGeoAlt } from 'react-icons/bs'
 
 import { useAppData } from '@/context/AppDataContext'
 import { parseHost, buildCountryHost } from '@/lib/domain'
@@ -95,6 +95,7 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
         title={activeName}
       >
         {/* Flag (or fallback globe/ISO) */}
+        <BsGeoAlt size={14} className="countryDropdown__pin" aria-hidden />
         <span className="countryDropdown__flag">
           {activeFlag ? (
             // Using a plain <img> so we don't need to allowlist each CDN in next.config
@@ -202,6 +203,11 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
         .countryDropdown__toggle:focus-visible {
           outline: 2px solid rgba(255, 193, 7, 0.55);
           outline-offset: 2px;
+        }
+
+        .countryDropdown__pin {
+          color: #101828;
+          flex: 0 0 auto;
         }
 
         .countryDropdown__flag {

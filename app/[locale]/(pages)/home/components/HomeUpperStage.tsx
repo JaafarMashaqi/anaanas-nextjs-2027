@@ -67,7 +67,7 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
       <HomeMomentSlot locale={locale} countryLabel={countryLabel} onOpenComposer={() => openComposer('sale')} />
 
-      <div className={styles.searchSlot}>
+      <div className={styles.searchField}>
         <MobileHeaderSearchBar locale={locale} />
       </div>
 

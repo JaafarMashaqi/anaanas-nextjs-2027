@@ -81,46 +81,13 @@ export default function HomeMomentSlot({
       kind: 'greeting',
       title: displayName ? `${hello}، ${displayName}` : hello,
       line: ar
-        ? `أهلاً بك في أناناس · ${countryLabel}`
-        : `Welcome back to ANANAS · ${countryLabel}`,
+        ? `${countryLabel}. اكتب إعلانك من هذه الصفحة.`
+        : `${countryLabel}. Write your listing from this page.`,
       action: ar ? 'أبيع' : 'Sell',
       composer: true,
     }
-    const product: Slide = {
-      id: 'tools',
-      kind: 'product',
-      title: ar ? 'أدوات جديدة على أناناس' : 'New tools on ANANAS',
-      line: ar ? 'الإعلان الذكي موجود في هذه الصفحة. ليست حملة مدفوعة.' : 'The smart ad is on this page. This is not a paid campaign.',
-      action: ar ? 'جرّبه' : 'Try it',
-      composer: true,
-    }
-    const coffee: Slide = {
-      id: 'coffee',
-      kind: 'concept',
-      title: ar ? 'بن العميد' : 'Al Ameed coffee',
-      line: ar ? 'مفهوم صباحي. ليس شراكة، ولا نقطة بيع مربوطة.' : 'A morning concept. Not a partnership, and no store pin is connected.',
-      action: ar ? 'ابحث عن قهوة' : 'Search coffee',
-      href: `/${locale}/search?q=${encodeURIComponent(ar ? 'قهوة' : 'coffee')}`,
-      store: true,
-    }
-    const car: Slide = {
-      id: 'car',
-      kind: 'concept',
-      title: 'BYD SHARK',
-      line: ar ? 'مفهوم سيارات. البحث يفتح إعلانات حقيقية، وليس وكيلاً.' : 'A car concept. Search opens real listings, not a dealer.',
-      action: ar ? 'ابحث عن سيارات' : 'Search cars',
-      href: `/${locale}/search?q=${encodeURIComponent(ar ? 'سيارات' : 'cars')}`,
-    }
-    const travel: Slide = {
-      id: 'travel',
-      kind: 'concept',
-      title: ar ? 'الخطوط الجوية القطرية' : 'Qatar Airways',
-      line: ar ? 'مفهوم سفر. لا حجز طيران مربوط.' : 'A travel concept. No flight booking is connected.',
-      action: ar ? 'ابحث عن سفر' : 'Search travel',
-      href: `/${locale}/search?q=${encodeURIComponent(ar ? 'سفر' : 'travel')}`,
-    }
-    return [greeting, product, coffee, car, travel]
-  }, [ar, countryLabel, displayName, hello, locale])
+    return [greeting]
+  }, [ar, countryLabel, displayName, hello])
 
   const visible = slides.filter((slide) => slide.id === 'greet' || !dismissed.includes(slide.id))
   const safeIndex = visible.length ? index % visible.length : 0

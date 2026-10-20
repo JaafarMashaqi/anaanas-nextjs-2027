@@ -449,6 +449,11 @@ export default function MarketPulseCardClient({
           </div>
         ))}
       </div>
+      <p className={styles.railSource}>
+        {isArabic
+          ? 'المعروض من أعداد الإعلانات والمزادات والأقسام. المؤشرات غير المرصودة داخل التفاصيل.'
+          : 'Shown counts come from listings, auctions, and sections. Unobserved indicators are inside Details.'}
+      </p>
       {open ? (
         <PulseDrawer
           model={model}

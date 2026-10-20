@@ -232,6 +232,7 @@ function CreatePostHeroShell({
     ? ['ماذا تريد أن تبيع اليوم؟', 'جملة واحدة تكفي للعنوان.', 'الصور والسعر يبقيان في نفس مسار النشر.']
     : ['What do you want to sell today?', 'One clear sentence is enough for a title.', 'Photos and price stay in this same publish flow.']
   const [promptIndex, setPromptIndex] = useState(0)
+  const [assistNote, setAssistNote] = useState<string | null>(null)
 
   useEffect(() => {
     if (expanded || title.trim()) return
@@ -350,7 +351,37 @@ function CreatePostHeroShell({
         <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
           {isArabic ? 'الموقع' : 'Location'}
         </button>
+        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
+          {isArabic ? 'القسم' : 'Category'}
+        </button>
+        <button
+          type="button"
+          className={styles.composerShortcut}
+          onClick={() =>
+            setAssistNote(
+              isArabic
+                ? 'الإملاء الصوتي غير مربوط باستوديو الإعلان. اكتب العنوان هنا.'
+                : 'Voice dictation is not connected to the ad studio. Type the title here.',
+            )
+          }
+        >
+          {isArabic ? 'صوت' : 'Voice'}
+        </button>
+        <button
+          type="button"
+          className={styles.composerShortcut}
+          onClick={() =>
+            setAssistNote(
+              isArabic
+                ? 'اقتراح السعر والعنوان غير مربوط بخدمة. النشر يبقى في المسار الحالي.'
+                : 'Title and price suggestions are not connected. Publishing stays in the current flow.',
+            )
+          }
+        >
+          {isArabic ? 'اقتراح' : 'Suggest'}
+        </button>
       </div>
+      {assistNote ? <p className={styles.composerHeroSub}>{assistNote}</p> : null}
 
       <div className={styles.composerIntentRow} role="group" aria-label={isArabic ? 'نوع الإعلان' : 'Listing intent'}>
         <button

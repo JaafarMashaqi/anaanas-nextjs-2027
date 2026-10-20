@@ -145,8 +145,7 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
           <Image src={searchAvatar} alt={isArabic ? 'محقق أناناس' : 'ANANAS detective'} width={26} height={26} priority className={styles.avatarImg} />
         </span>
       </form>
-      {focused || assist.open ? (
-        <div className={styles.tools} role="group" aria-label={isArabic ? 'أدوات البحث' : 'Search tools'}>
+      <div className={styles.tools} role="group" aria-label={isArabic ? 'أدوات البحث' : 'Search tools'}>
           <button type="button" className={styles.tool} onClick={startVoice}>
             <BsMic aria-hidden />
             {isArabic ? 'صوت الجهاز' : 'Device voice'}
@@ -160,7 +159,6 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
             {isArabic ? 'محادثة' : 'Chat'}
           </button>
         </div>
-      ) : null}
       {toolNote ? (
         <p className={styles.toolNote} role="status">
           {toolNote === 'camera'
