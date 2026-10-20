@@ -88,13 +88,27 @@ function buildMediaRemotePatterns(): RemotePattern[] {
 }
 
 const nextConfig: NextConfig = {
-    /* config options here */
+    /* Dev and `next build` must not share a directory. A production tree in
+       `.next` makes `next dev` 404 its CSS and miss vendor-chunks/next-auth.js. */
+    distDir: process.env.NEXT_DIST_DIR || '.next',
     compress: true,
+    // App Router keeps compiled pages in the dev server. The default buffer (5
+    // pages / 60s) stacked sign-in, search, auctions, and a listing to 2.8GB
+    // on a 4GB machine and did not release them. Keep two, and drop the rest
+    // quickly so the next cold compile does not start from that high-water mark.
+    onDemandEntries: {
+        maxInactiveAge: 15 * 1000,
+        pagesBufferLength: 2,
+    },
     experimental: {
         // Lower peak RAM during `next build` (Next.js 15+).
         webpackMemoryOptimizations: true,
         // Custom webpack config disables the default worker; re-enable to split memory.
         webpackBuildWorker: true,
+        // One worker. Parallel compilers are what push a 4GB sandbox over the edge.
+        cpus: 1,
+        memoryBasedWorkersCount: true,
+        serverSourceMaps: false,
     },
     allowedDevOrigins: [
         '127.0.0.1',
@@ -108,6 +122,10 @@ const nextConfig: NextConfig = {
         'jo.localhost:3000',
     ],
     images: {
+        // The preview sandbox OOMs when Sharp decodes every remote listing
+        // photo inside the dev server. Production builds do not set this env,
+        // so the image optimizer stays on for the real deployment.
+        unoptimized: process.env.ANANAS_PREVIEW_LOW_MEM === '1',
         formats: ['image/avif', 'image/webp'],
         minimumCacheTTL: 60 * 60 * 24 * 7,
         // We only include SVGs that ship with the app (e.g. default user avatar).
