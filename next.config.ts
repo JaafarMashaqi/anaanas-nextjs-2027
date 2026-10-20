@@ -97,6 +97,9 @@ const nextConfig: NextConfig = {
         webpackBuildWorker: true,
     },
     allowedDevOrigins: [
+        '127.0.0.1',
+        'localhost:8080',
+        '127.0.0.1:8080',
         'demo.anaanas.com',
         'demo.localhost',
         'localhost:3000',
