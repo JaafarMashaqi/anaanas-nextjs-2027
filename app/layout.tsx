@@ -68,7 +68,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#fffdf7',
+  themeColor: '#101828',
 }
 
 function resolveLocaleFromHeaderList(headersList: { get(name: string): string | null }): SupportedLocale {
@@ -80,8 +80,8 @@ function resolveLocaleFromHeaderList(headersList: { get(name: string): string | 
 }
 
 const localeStylesheetMap: Record<SupportedLocale, string> = {
-  ar: '/styles/lang-ar.css',
-  en: '/styles/lang-en.css',
+  ar: '/styles/lang-ar.css?v=neo1',
+  en: '/styles/lang-en.css?v=neo1',
 }
 
 function SplashScreen() {

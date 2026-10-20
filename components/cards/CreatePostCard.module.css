@@ -1333,10 +1333,10 @@
   width: 100%;
   border-radius: 18px;
   padding: 0.7rem 0.75rem 0.65rem;
-  background:
-    radial-gradient(120% 80% at 100% 0%, rgba(255, 201, 40, 0.35), transparent 46%),
-    linear-gradient(180deg, #fff8de 0%, #fff3c4 100%);
-  border: 1px solid #f5d98a;
+  background: #ffffff;
+  border: 1px solid #e6e8ef;
+  border-inline-start: 3px solid #f5c518;
+  box-shadow: none;
   color: #101828;
   scroll-margin-top: 96px;
   scroll-margin-bottom: 24px;

@@ -1,0 +1,21 @@
+// ANANAS NEO — depth from navy, surfaces from cloud, yellow only as accent.
+:root {
+  --neo-navy: #101828;
+  --neo-cloud: #f3f5f9;
+  --neo-surface: #ffffff;
+  --neo-yellow: #f5c518;
+  --neo-violet: #6d28d9;
+  --neo-teal: #0f766e;
+  --neo-blue: #1d4ed8;
+  --neo-coral: #e11d48;
+  --neo-green: #15803d;
+  --neo-muted: #667085;
+  --neo-line: #e6e8ef;
+  --neo-shadow: 0 10px 28px rgba(16, 24, 40, 0.06);
+}
+
+body,
+main {
+  background-color: var(--neo-cloud);
+  color: var(--neo-navy);
+}

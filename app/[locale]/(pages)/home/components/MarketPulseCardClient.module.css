@@ -21,9 +21,36 @@
 }
 
 .railMore {
-  color: #101828;
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
   font-size: 0.75rem;
   font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.stamp,
+.source,
+.railEmpty {
+  margin: 0;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: #667085;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+  min-height: 92px;
+  padding: 0.6rem 0.65rem 0.55rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e6e8ef;
+  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.04);
+  color: #101828;
   text-decoration: none;
 }
 
@@ -64,23 +91,9 @@
   }
 }
 
-.metric {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.12rem;
-  min-height: 96px;
-  padding: 0.65rem 0.7rem 0.6rem;
-  border-radius: 14px;
-  background: #fffefb;
-  border: 1px solid #f5d98a;
-  color: #101828;
-  text-decoration: none;
-}
-
 .metric:hover,
 .metric:focus-visible {
-  border-color: #ffc928;
+  border-color: #101828;
   outline: none;
 }
 
@@ -216,5 +229,88 @@
 .barValue em {
   margin-inline-start: 0.25rem;
   font-style: normal;
-  color: #16a34a;
+  color: #15803d;
+}
+
+.drawer {
+  max-height: 240px;
+  overflow: auto;
+  padding: 0.55rem 0.15rem 0.2rem;
+  border-top: 1px solid #e6e8ef;
+}
+
+.drawer h3 {
+  margin: 0.55rem 0 0.25rem;
+  font-size: 0.75rem;
+  color: #101828;
+}
+
+.rank,
+.latest,
+.missing {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.rank a,
+.latest a {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+  gap: 0.35rem;
+  align-items: baseline;
+  color: #101828;
+  text-decoration: none;
+  font-size: 0.74rem;
+}
+
+.rank a span,
+.latest span {
+  color: #667085;
+}
+
+.latest a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #101828;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.rank a em {
+  font-style: normal;
+  color: #0f766e;
+  font-size: 0.68rem;
+}
+
+.latest {
+  gap: 0.4rem;
+}
+
+.latest li,
+.missing li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.latest span,
+.missing li {
+  color: #667085;
+  font-size: 0.68rem;
+}
+
+.fullLink {
+  display: inline-block;
+  margin-top: 0.45rem;
+  color: #1d4ed8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
 }

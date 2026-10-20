@@ -149,7 +149,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
     previous: item.previous_count,
     growthLabel: growthLabel(item),
     href: hrefFor(locale, 'measured', item.slug),
-  }))
+  })).sort((a, b) => b.current - a.current || a.name.localeCompare(b.name))
 
   const unavailable: UnavailableMetric[] = [
     {
@@ -187,6 +187,20 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
       id: 'alerts',
       label: ar ? 'تنبيهات النبض' : 'Pulse alerts',
       reason: ar ? 'لا يوجد اشتراك تنبيه في الخادم.' : 'The server has no alert subscription.',
+    },
+    {
+      id: 'demand',
+      label: ar ? 'طلب مقابل عرض' : 'Demand and supply',
+      reason: ar
+        ? 'current_count ليس طلباً وprevious_count ليس عرضاً. لا يوجد مؤشر طلب منفصل.'
+        : 'current_count is not demand and previous_count is not supply. No separate demand index exists.',
+    },
+    {
+      id: 'history',
+      label: ar ? 'سلسلة زمنية' : 'Movement over time',
+      reason: ar
+        ? 'الخادم يعيد نافذتين فقط، بلا أيام وبدون سلسلة أطول.'
+        : 'The server returns only two windows, with no dates and no longer series.',
     },
   ]
 

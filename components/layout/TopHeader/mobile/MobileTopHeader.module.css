@@ -11,8 +11,8 @@
   width: 100%;
   max-width: 100%;
   flex: 1 1 100%;
-  background: #fffefb;
-  box-shadow: inset 0 -2px 0 #ffc928;
+  background: #ffffff;
+  box-shadow: inset 0 -1px 0 #e6e8ef;
 }
 
 .shellSearchCollapsed {

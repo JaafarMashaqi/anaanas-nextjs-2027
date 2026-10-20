@@ -128,7 +128,7 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
         <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
           {isArabic ? 'أبيع' : 'Sell'}
         </button>
-        <button type="button" data-composer-intent="wanted" className={styles.action} onClick={() => openComposer('wanted')}>
+        <button type="button" data-composer-intent="wanted" className={styles.actionWanted} onClick={() => openComposer('wanted')}>
           {isArabic ? 'مطلوب الآن' : 'Wanted'}
         </button>
         <button type="button" className={styles.actionQuiet} onClick={() => setNote(note === 'map' ? null : 'map')}>

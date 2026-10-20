@@ -3,8 +3,8 @@
   align-items: center;
   gap: 4px;
   padding: 3px;
-  background: #fff8de;
-  border: 1px solid #f5d98a;
+  background: #ffffff;
+  border: 1px solid #e6e8ef;
   border-radius: 999px;
   box-shadow: none;
   width: 100%;
@@ -21,8 +21,8 @@
   height: 34px;
   border-radius: 999px;
   border: 0;
-  background: #ffc928;
-  color: #101828;
+  background: #101828;
+  color: #f5c518;
   cursor: pointer;
   box-shadow: none;
 }

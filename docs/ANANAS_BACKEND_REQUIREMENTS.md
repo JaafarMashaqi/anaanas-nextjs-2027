@@ -67,6 +67,17 @@ A create/delete subscription endpoint. The UI must not pretend a bell saves an a
 
 `window` or `period` on `section-momentum` and the count endpoints (`24h`, `7d`, `30d`), applied server-side. Disabled range options in the UI stay disabled until then.
 
+## Demand, supply, and history
+
+`current_count` and `previous_count` are not demand and supply. Do not chart them as a longer time series. A historical endpoint needs dated buckets:
+
+```json
+{ "section_id": 0, "buckets": [{ "start": "ISO-8601", "end": "ISO-8601", "count": 0 }] }
+```
+
+`GET /api/home/latest-listings` returns a limited list with `is_new`. That flag may be shown on a row. It is not a count of all new listings.
+
 ## Currency
+
 
 Listing payloads often send `country_id` and `country: null`. Currency must keep coming from that listing's country metadata. Do not add a shortcut that uses the portal country when the listing country is missing.

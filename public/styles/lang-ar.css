@@ -258,16 +258,16 @@ main {
   background: #fff;
 }
 body {
-  background: #fffefb;
+  background: #f3f5f9;
 }
 @media (max-width: 991.98px) {
 
   main {
-    background-color: #fffefb;
+    background-color: transparent;
   }
 
   body {
-    background: #fffefb;
+    background: #f3f5f9;
 }
   header {
     height: auto;

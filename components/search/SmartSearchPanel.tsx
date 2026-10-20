@@ -110,7 +110,7 @@ export function useSearchDismiss(
       if (panel?.contains(target)) return
       setOpen(false)
     }
-    const onKey = (event: KeyboardEvent) => {
+    const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
         setOpen(false)

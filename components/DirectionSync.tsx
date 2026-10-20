@@ -6,8 +6,8 @@ import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
 
 const LOCALE_STYLESHEET_MAP: Record<SupportedLocale, string> = {
-  ar: '/styles/lang-ar.css',
-  en: '/styles/lang-en.css',
+  ar: '/styles/lang-ar.css?v=neo1',
+  en: '/styles/lang-en.css?v=neo1',
 }
 
 function getLocaleFromPathname(pathname: string): SupportedLocale {
