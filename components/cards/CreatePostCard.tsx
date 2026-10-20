@@ -230,6 +230,18 @@ function CreatePostHeroShell({
         </div>
       </div>
 
+      <div className={styles.composerIntentRow}>
+        <button type="button" className={styles.composerIntent} onClick={onAddAdClick}>
+          {locale === 'ar' ? 'بيع' : 'Sell'}
+        </button>
+        <Link href={`/${locale}/pages/auction`} className={styles.composerIntent}>
+          {locale === 'ar' ? 'مزاد' : 'Auction'}
+        </Link>
+        <Link href={`/${locale}/stores`} className={styles.composerIntent}>
+          {locale === 'ar' ? 'متجر' : 'Store'}
+        </Link>
+      </div>
+
       {showTags ? (
         <div className={styles.composerHeroTags}>
           {tagItems.map(({ Icon, label }) => (

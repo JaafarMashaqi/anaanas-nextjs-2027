@@ -26,6 +26,7 @@ import HomeInsightsSkeleton from './home/components/HomeInsightsSkeleton'
 import FeaturedPostsStrip from './home/components/FeaturedPostsStrip'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import CreatePostCardLazyClient from './home/components/CreatePostCardLazyClient'
+import HomeCommandStrip from './home/components/HomeCommandStrip'
 import homeDiscoveryStyles from './homeDiscovery.module.css'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
@@ -94,6 +95,8 @@ const Home = async ({
           <h1 className="visually-hidden">
             {t('home.a11y.visuallyHiddenTitle', uiLocale).replace('{{country}}', countryLabel)}
           </h1>
+
+          <HomeCommandStrip locale={uiLocale} countryLabel={countryLabel} />
 
           <HomeBanner locale={uiLocale} />
 

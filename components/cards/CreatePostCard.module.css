@@ -1331,15 +1331,20 @@
 .composerHeroShell {
   position: relative;
   width: 100%;
-  border-radius: 22px;
-  padding: clamp(0.85rem, 2.2vw, 1.25rem) clamp(0.9rem, 2.4vw, 1.35rem) clamp(0.75rem, 2vw, 1.05rem);
-  background: linear-gradient(180deg, #faf4e8 0%, #f6f0e4 45%, #f3ecdf 100%);
-  border: 1px solid rgba(21, 21, 21, 0.06);
+  border-radius: 18px;
+  padding: 0.72rem 0.75rem 0.62rem;
+  background: linear-gradient(180deg, #ffe57a 0%, #ffd53a 42%, #fff4c4 100%);
+  border: 1px solid rgba(21, 21, 21, 0.08);
   box-shadow:
-    0 12px 32px rgba(21, 21, 21, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    0 10px 24px rgba(21, 21, 21, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
 
-    background: #ffd53a;
+@media (min-width: 768px) {
+  .composerHeroShell {
+    padding: clamp(0.85rem, 2.2vw, 1.15rem) clamp(0.9rem, 2.4vw, 1.25rem) 0.85rem;
+    border-radius: 22px;
+  }
 }
 
 .composerHeroDots {
@@ -1371,8 +1376,19 @@
 
 @media (max-width: 767.98px) {
   .composerHeroTop {
-    /* grid-template-columns: 1fr; */
-    gap: 0.75rem;
+    gap: 0.45rem;
+  }
+
+  .composerHeroSub {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .composerHeroHeading {
+    font-size: 1rem;
+    margin-bottom: 0.15rem;
   }
 }
 
@@ -1467,9 +1483,34 @@
     background: #fdc307;
 }
 
+.composerIntentRow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  overflow-x: auto;
+}
 
+.composerIntent {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(21, 21, 21, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  color: #151515;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
 
-
+.composerIntent:hover {
+  background: #151515;
+  color: #ffd53a;
+}
 
 .composerHeroTags {
   display: flex;

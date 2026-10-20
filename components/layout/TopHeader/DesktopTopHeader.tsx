@@ -17,6 +17,7 @@ import LocaleDropdown from './LocaleDropdown'
 import BetaBadge from './BetaBadge'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
+import { rememberSearch, SmartSearchPanel, useSmartSearchAssist } from '@/components/search/SmartSearchPanel'
 
 const TopHeader = () => {
   const { status } = useSession()
@@ -25,6 +26,8 @@ const TopHeader = () => {
   const [query, setQuery] = useState('')
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const mobileInputRef = useRef<HTMLInputElement | null>(null)
+  const desktopSearchRef = useRef<HTMLFormElement | null>(null)
+  const popupSearchRef = useRef<HTMLDivElement | null>(null)
 
   const locale: SupportedLocale = (() => {
     const localeFromParams = Array.isArray(params?.locale) ? params.locale[0] : params?.locale
@@ -34,6 +37,9 @@ const TopHeader = () => {
     return DEFAULT_LOCALE
   })()
 
+  const desktopAssist = useSmartSearchAssist(locale, query)
+  const popupAssist = useSmartSearchAssist(locale, query)
+
   const isArabic = locale === 'ar'
   const isAuthed = status === 'authenticated'
 
@@ -41,8 +47,15 @@ const TopHeader = () => {
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const selected = desktopAssist.open ? desktopAssist.suggestions[desktopAssist.active] : undefined
+    if (selected && selected.group !== 'query') {
+      desktopAssist.choose(selected, closeMobileSearch)
+      return
+    }
     const trimmed = query.trim()
+    if (trimmed) rememberSearch(trimmed)
     closeMobileSearch()
+    desktopAssist.setOpen(false)
     router.push(
       trimmed ? `/${locale}/search?q=${encodeURIComponent(trimmed)}` : `/${locale}/search`,
     )
@@ -87,6 +100,7 @@ const TopHeader = () => {
  
         {/* ==================== DESKTOP SEARCH (center) ==================== */}
         <form
+          ref={desktopSearchRef}
           className="topHeader__search d-none d-lg-flex"
           role="search"
           onSubmit={handleSearch}
@@ -97,13 +111,32 @@ const TopHeader = () => {
               className="form-control"
               type="search"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={searchPlaceholder}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                desktopAssist.setOpen(true)
+              }}
+              onFocus={() => desktopAssist.setOpen(true)}
+              onBlur={() => window.setTimeout(() => desktopAssist.setOpen(false), 140)}
+              onKeyDown={(event) => desktopAssist.onKeyDown(event, closeMobileSearch)}
+              placeholder={isArabic ? 'ابحث في الأقسام والإعلانات' : 'Search sections and listings'}
               aria-label={searchPlaceholder}
+              aria-expanded={desktopAssist.open}
+              aria-controls="ananas-desktop-smart-search"
+              aria-autocomplete="list"
               autoComplete="off"
             />
           </div>
         </form>
+        <SmartSearchPanel
+          locale={locale}
+          open={desktopAssist.open}
+          suggestions={desktopAssist.suggestions}
+          active={desktopAssist.active}
+          anchorRef={desktopSearchRef}
+          listId="ananas-desktop-smart-search"
+          onHover={desktopAssist.setActive}
+          onPick={(suggestion) => desktopAssist.choose(suggestion, closeMobileSearch)}
+        />
 
         {/* ==================== END CLUSTER (actions) ==================== */}
         <div className="topHeader__end">
@@ -190,18 +223,35 @@ const TopHeader = () => {
             <form
               className="topHeader__mobileSearchForm"
               role="search"
-              onSubmit={handleSearch}
+              onSubmit={(event) => {
+                event.preventDefault()
+                const selected = popupAssist.open ? popupAssist.suggestions[popupAssist.active] : undefined
+                if (selected && selected.group !== 'query') {
+                  popupAssist.choose(selected, closeMobileSearch)
+                  return
+                }
+                handleSearch(event)
+              }}
             >
-              <div className="topHeader__searchField topHeader__searchField--popup">
+              <div ref={popupSearchRef} className="topHeader__searchField topHeader__searchField--popup">
                 <BsSearch className="topHeader__searchIcon" aria-hidden />
                 <input
                   ref={mobileInputRef}
                   className="form-control"
                   type="search"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={searchPlaceholder}
+                  onChange={(e) => {
+                    setQuery(e.target.value)
+                    popupAssist.setOpen(true)
+                  }}
+                  onFocus={() => popupAssist.setOpen(true)}
+                  onBlur={() => window.setTimeout(() => popupAssist.setOpen(false), 140)}
+                  onKeyDown={(event) => popupAssist.onKeyDown(event, closeMobileSearch)}
+                  placeholder={isArabic ? 'ابحث في الأقسام والإعلانات' : 'Search sections and listings'}
                   aria-label={searchPlaceholder}
+                  aria-expanded={popupAssist.open}
+                  aria-controls="ananas-popup-smart-search"
+                  aria-autocomplete="list"
                   autoComplete="off"
                 />
               </div>
@@ -215,6 +265,16 @@ const TopHeader = () => {
                 <BsXLg size={14} />
               </button>
             </form>
+            <SmartSearchPanel
+              locale={locale}
+              open={mobileSearchOpen && popupAssist.open}
+              suggestions={popupAssist.suggestions}
+              active={popupAssist.active}
+              anchorRef={popupSearchRef}
+              listId="ananas-popup-smart-search"
+              onHover={popupAssist.setActive}
+              onPick={(suggestion) => popupAssist.choose(suggestion, closeMobileSearch)}
+            />
           </motion.div>
         )}
       </AnimatePresence>

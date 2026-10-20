@@ -8,7 +8,8 @@ import { useAppData } from '@/context/AppDataContext'
 import { parseHost, buildCountryHost } from '@/lib/domain'
 import type { Country } from '@/lib/api/countries'
 import { persistPreferredCountryIso2 } from '@/lib/geo/persistPreferredCountry.client'
-import { isPreviewCountryMode, previewCountrySwitchPath } from '@/lib/preview/countryMode'
+import { readPreferredCountryIsoFromDocumentCookie } from '@/lib/geo/preferredCountryCookie'
+import { isPreviewCountryMode, previewCountrySwitchPath, PREVIEW_DEFAULT_COUNTRY } from '@/lib/preview/countryMode'
 import type { SupportedLocale } from '@/lib/localization'
 
 type Props = {
@@ -50,6 +51,12 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
   }, [selectedCountry, hostCtx, countries])
 
   const previewMode = isPreviewCountryMode()
+  const [previewIso, setPreviewIso] = useState('')
+  useEffect(() => {
+    if (!previewMode) return
+    const fromCookie = readPreferredCountryIsoFromDocumentCookie(document.cookie)
+    setPreviewIso((fromCookie || PREVIEW_DEFAULT_COUNTRY).toUpperCase())
+  }, [previewMode])
 
   const buildCountryUrl = (country: Country): string => {
     const iso = (country.iso2 || country.iso_code || '').toLowerCase()
@@ -65,8 +72,10 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
   const labelAll = isArabic ? 'اختر دولة' : 'Select country'
   const loadingLabel = isArabic ? 'جاري التحميل...' : 'Loading...'
 
-  const activeIso = (activeCountry?.iso2 || activeCountry?.iso_code || '').toUpperCase()
-  const activeFlag = activeCountry?.flag_full_path || `/assets/flags/32x32/${activeIso.toLowerCase()}.png`
+  const activeIso = (activeCountry?.iso2 || activeCountry?.iso_code || previewIso || '').toUpperCase()
+  const activeFlag = activeIso
+    ? activeCountry?.flag_full_path || `/assets/flags/32x32/${activeIso.toLowerCase()}.png`
+    : ''
 
   const activeName = activeCountry?.name || labelAll
 
@@ -98,11 +107,13 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
           )}
         </span>
 
-        {!compact && (
+        {!compact ? (
           <span className="countryDropdown__label">
             {loadingCountries && !activeCountry ? loadingLabel : activeName}
           </span>
-        )}
+        ) : compact && activeIso ? (
+          <span className="countryDropdown__isoChip">{activeIso}</span>
+        ) : null}
 
         <BsChevronDown size={10} className="countryDropdown__chevron" />
       </DropdownToggle>
@@ -115,7 +126,7 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
           <BsGlobe2 size={14} />
           <span>{isArabic ? 'الدولة الحالية' : 'Browsing from'}</span>
           {activeCountry?.name && (
-            <span className="ms-auto fw-semibold text-dark">{activeCountry.name}</span>
+            <span className="countryDropdown__current">{activeCountry.name}</span>
           )}
         </div>
 
@@ -227,6 +238,23 @@ const CountryDropdown = ({ locale = 'ar', compact = false }: Props) => {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+        }
+
+        .countryDropdown__isoChip {
+          font-size: 0.68rem;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          color: #151515;
+          background: #ffd53a;
+          border-radius: 999px;
+          padding: 1px 6px;
+          line-height: 1.4;
+        }
+
+        .countryDropdown__current {
+          margin-inline-start: auto;
+          font-weight: 700;
+          color: #111827;
         }
 
         .countryDropdown__chevron {
