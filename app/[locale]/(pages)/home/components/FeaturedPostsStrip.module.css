@@ -18,6 +18,13 @@
   gap: 0.4rem;
 }
 
+.sub {
+  margin: 0.25rem 0 0;
+  color: #14213d;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
 .scroller {
   display: flex;
   gap: 0.75rem;

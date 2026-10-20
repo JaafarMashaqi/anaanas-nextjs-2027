@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  BsBookmark,
   BsChatDots,
   BsChatFill,
   BsGraphUp,
@@ -93,6 +94,7 @@ export default function PostActions({
   const [selectedReaction, setSelectedReaction] = useState<ReactionKey | null>(postLikedByMe ? (reactionTypeByMe ?? 'like') : null)
   const [showReactions, setShowReactions] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
+  const [saveHint, setSaveHint] = useState(false)
   const reactionWrapRef = useRef<HTMLDivElement | null>(null)
   const hideTimerRef = useRef<number | null>(null)
   const longPressTimerRef = useRef<number | null>(null)
@@ -225,14 +227,15 @@ export default function PostActions({
       onTouchEnd={onTouchLikeEnd}
       onTouchCancel={onTouchLikeEnd}
       data-bs-container="body"
-      data-bs-toggle="tooltip"
-      data-bs-placement="top"
-      data-bs-html="true"
-      data-bs-custom-class="tooltip-text-start"
-      data-bs-title={
-        likeTooltipTitle ||
-        'Frances Guerrero<br> Lori Stevens<br> Billy Vasquez<br> Judy Nguyen<br> Larry Lawson<br> Amanda Reed<br> Louis Crawford'
-      }
+      {...(likeTooltipTitle
+        ? {
+            'data-bs-toggle': 'tooltip',
+            'data-bs-placement': 'top',
+            'data-bs-html': 'true',
+            'data-bs-custom-class': 'tooltip-text-start',
+            'data-bs-title': likeTooltipTitle,
+          }
+        : {})}
     >
       <span className={styles.iconWrap} key={postLikedByMe ? 'liked' : 'not'}>
         <span className={styles.reactionEmoji} aria-hidden>
@@ -394,21 +397,44 @@ export default function PostActions({
 
   if (isMarketplace) {
     return (
-      <div className={styles.marketplaceBar}>
-        {reactionAnchor}
-        {commentButton}
-        {shareButton}
-        {isOwner ? (
-          <>
-            {featureButton}
-            {statsLink}
-          </>
-        ) : (
-          <>
-            {chatButton}
-            {contactButton}
-          </>
-        )}
+      <div>
+        <div className={styles.marketplaceBar}>
+          {reactionAnchor}
+          {commentButton}
+          {shareButton}
+          <button
+            type="button"
+            className={`${styles.action} ${styles.marketplaceAction}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              setSaveHint(true)
+            }}
+            title={locale === 'ar' ? 'الحفظ غير متصل بالخادم' : 'Saving is not connected to the server'}
+          >
+            <span className={styles.iconWrap}>
+              <BsBookmark size={16} aria-hidden />
+            </span>
+            <span className={styles.label}>{locale === 'ar' ? 'حفظ' : 'Save'}</span>
+          </button>
+          {isOwner ? (
+            <>
+              {featureButton}
+              {statsLink}
+            </>
+          ) : (
+            <>
+              {chatButton}
+              {contactButton}
+            </>
+          )}
+        </div>
+        {saveHint ? (
+          <p className={styles.apiNote} role="status">
+            {locale === 'ar'
+              ? 'حفظ الإعلان غير متصل بخدمة. لم يُخزَّن شيء.'
+              : 'Saving a listing is not connected to a service. Nothing was stored.'}
+          </p>
+        ) : null}
       </div>
     )
   }

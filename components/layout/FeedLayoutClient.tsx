@@ -74,7 +74,7 @@ const FeedLayoutClient = ({ children, sidebar, locale }: FeedLayoutClientProps) 
 
 
 
-              <footer className="auth-footer">
+              <footer className="auth-footer d-none d-lg-block">
                 <Container>
                   <Row className="justify-content-center">
                     <Col sm={10} md={8} lg={6}>

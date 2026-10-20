@@ -1,0 +1,35 @@
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.tab,
+.tabActive {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: #14213d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(20, 33, 61, 0.14);
+}
+
+.tabActive {
+  background: #14213d;
+  color: #ffd53a;
+  box-shadow: none;
+}
+
+.note {
+  margin: 0.45rem 0 0;
+  color: #14213d;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}

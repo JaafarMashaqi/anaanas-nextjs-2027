@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { BsStars } from 'react-icons/bs'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
+import { plainListingText } from '@/lib/text/plainListingText'
 import styles from './FeaturedPostsStrip.module.css'
 import type { SupportedLocale } from '@/lib/localization'
 
@@ -22,13 +23,18 @@ export default function FeaturedPostsStripClient({ locale, posts }: Props) {
       <div className={styles.header}>
         <h2 className={styles.title}>
           <BsStars className="text-warning" aria-hidden />
-          {isAr ? 'إعلانات مميزة' : 'Featured ads'}
+          {isAr ? 'صفقات بارزة' : 'Hot deals'}
         </h2>
+        <p className={styles.sub}>
+          {isAr
+            ? 'إعلانات مميزة من الخادم. لا تُحسب درجة سخونة.'
+            : 'Featured ads from the server. No heat score is calculated.'}
+        </p>
       </div>
       <div className={styles.scroller}>
         {posts.map((post) => {
           const id = Number(post.id)
-          const title = String(post.title ?? '')
+          const title = plainListingText(String(post.title ?? ''))
           const image = resolveMediaUrl(
             (post.main_image as string) ||
               ((post.post_images as { image?: string }[] | undefined)?.[0]?.image ?? ''),

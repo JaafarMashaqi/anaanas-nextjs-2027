@@ -326,3 +326,10 @@
     transform: none;
   }
 }
+
+.apiNote {
+  margin: 0.35rem 0 0;
+  color: #14213d;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}

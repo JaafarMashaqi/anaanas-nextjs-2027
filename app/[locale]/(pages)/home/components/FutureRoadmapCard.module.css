@@ -108,6 +108,14 @@
   letter-spacing: 0;
 }
 
+.note {
+  margin: 0.35rem 0 0;
+  color: #14213d;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
 .liveDot {
   flex-shrink: 0;
   width: 8px;

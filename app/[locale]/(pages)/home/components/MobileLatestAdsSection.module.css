@@ -171,11 +171,12 @@
 
 .bottomRow {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 0.35rem;
   margin-top: auto;
   padding-top: 0.15rem;
+  flex-wrap: wrap;
 }
 
 .contact {
@@ -201,15 +202,14 @@
 .priceBlock {
   text-align: end;
   min-width: 0;
+  flex: 1 1 4.5rem;
 }
 
 .priceMain {
   font-size: 0.78rem;
   font-weight: 700;
   color: #111;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
 }
 
 .priceSuffix {

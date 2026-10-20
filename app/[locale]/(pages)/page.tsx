@@ -27,6 +27,7 @@ import FeaturedPostsStrip from './home/components/FeaturedPostsStrip'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import CreatePostCardLazyClient from './home/components/CreatePostCardLazyClient'
 import HomeUpperStage from './home/components/HomeUpperStage'
+import HomeFeedTabs from './home/components/HomeFeedTabs'
 import { fetchTrendingPosts } from '@/lib/api/homeInsights'
 import homeDiscoveryStyles from './homeDiscovery.module.css'
 import homeFlow from './homeFlow.module.css'
@@ -86,6 +87,8 @@ const Home = async ({
   const trending = await fetchTrendingPosts({ countryId, land: locale, limit: 6 })
   const showMobileAiDashboard =   session?.user?.id === MOBILE_AI_PREVIEW_USER_ID || session?.user?.id === MOBILE_AI_PREVIEW_USER_ID_2
   const sp = (await searchParams) ?? {}
+  const viewRaw = sp.view ? (Array.isArray(sp.view) ? sp.view[0] : sp.view) : 'latest'
+  const feedView = viewRaw === 'photos' || viewRaw === 'price' ? viewRaw : 'latest'
   const pageRaw = sp.page ? (Array.isArray(sp.page) ? sp.page[0] : sp.page) : undefined
   const page = pageRaw ? Number(pageRaw) : undefined
 
@@ -127,7 +130,13 @@ const Home = async ({
 
           <MobileLatestAdsSection locale={uiLocale} />
 
-          <FeaturedPostsStrip locale={uiLocale} countryId={countryId} />
+          <div id="home-featured" className={homeFlow.featuredAnchor}>
+            <FeaturedPostsStrip locale={uiLocale} countryId={countryId} />
+          </div>
+
+          <Suspense fallback={null}>
+            <HomeFeedTabs locale={uiLocale} />
+          </Suspense>
 
           <div className={homeFlow.feed}>
             <Feeds
@@ -135,6 +144,8 @@ const Home = async ({
               filters={{
                 page: Number.isFinite(page as any) && (page as number) > 0 ? (page as number) : undefined,
                 basePath: `/${locale}`,
+                hasImages: feedView === 'photos' ? true : undefined,
+                sort: feedView === 'price' ? 'price_asc' : 'newest',
               }}
             />
           </div>

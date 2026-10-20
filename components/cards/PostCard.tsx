@@ -337,7 +337,9 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   const priceLabel = formatListingPrice((post as any)?.price, currencyCode, locale)
   const attributeChips = extractAttributeChips(post as Record<string, unknown>)
   const isUserVerified = Boolean((user as any)?.is_account_verified)
-  const viewsCount = Number((post as any)?.views_count ?? (post as any)?.views ?? 0) || 0
+  const viewsField = (post as any)?.views_count ?? (post as any)?.views
+  const viewsKnown = viewsField != null && viewsField !== ''
+  const viewsCount = Number(viewsField ?? 0) || 0
 
 
 
@@ -1288,7 +1290,10 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                   <h6 className={styles.userName}>
                     <span>{userName}</span>
                     {isUserVerified && (
-                      <BsPatchCheckFill className={styles.verifiedIcon} size={14} aria-label={locale === 'ar' ? 'موثّق' : 'Verified'} />
+                      <span className={styles.verifiedBadge}>
+                        <BsPatchCheckFill size={14} aria-hidden />
+                        {locale === 'ar' ? 'موثّق' : 'Verified'}
+                      </span>
                     )}
                   </h6>
                   <div className={styles.metaRow}>
@@ -1360,13 +1365,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                           {isFeaturedActive && (
                             <span className={styles.listingOverlayBadge}>
                               <BsStars size={11} aria-hidden />
-                              {locale === 'ar' ? 'موصى به' : 'Recommended'}
-                            </span>
-                          )}
-                          {postLikesCount >= 5 && (
-                            <span className={styles.listingOverlayBadge}>
-                              <BsFire size={11} aria-hidden />
-                              {locale === 'ar' ? 'طلب مرتفع' : 'High demand'}
+                              {locale === 'ar' ? 'مميز' : 'Featured'}
                             </span>
                           )}
                         </div>
@@ -1498,7 +1497,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                       <BsEyeFill size={14} aria-hidden />
                     </span>
                     <span className={styles.statValue}>
-                      {viewsCount > 0 ? formatCompactCount(viewsCount) : formatCompactCount(postLikesCount)}
+                      {viewsKnown ? formatCompactCount(viewsCount) : '—'}
                     </span>
                     <span className={styles.statLabel}>{locale === 'ar' ? 'اهتمام' : 'Interest'}</span>
                   </div>

@@ -25,6 +25,11 @@ export default function FutureRoadmapCard({ locale }: { locale: SupportedLocale 
             <span className={styles.titleSub}> · {t('home.comingSoon', locale)}</span>
           </span>
         </h2>
+        <p className={styles.note}>
+          {locale === 'ar'
+            ? 'استوديو الإعلان وهذه العضويات غير مربوطة بالدفع. لا يمكن شراؤها من هنا.'
+            : 'Ad studio and these memberships are not connected to billing. They cannot be purchased here.'}
+        </p>
         <div className={styles.pulseStrip} aria-hidden>
           <span className={styles.pulseBar} />
           <span className={styles.pulseBar} />
