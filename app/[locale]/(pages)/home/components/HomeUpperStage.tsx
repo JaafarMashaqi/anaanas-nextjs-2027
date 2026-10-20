@@ -2,7 +2,10 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 
+import Link from 'next/link'
+
 import type { TrendingPostItem } from '@/lib/api/homeInsights'
+import type { LatestListingItem } from '@/lib/server/fetchLatestListings'
 import type { SupportedLocale } from '@/lib/localization'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
 import HomeMomentSlot from './HomeMomentSlot'
@@ -16,6 +19,7 @@ type Props = {
   locale: SupportedLocale
   countryLabel: string
   trending: TrendingPostItem[]
+  latest?: LatestListingItem[]
   children?: ReactNode
 }
 
@@ -50,7 +54,7 @@ function openComposer(intent: 'sale' | 'wanted') {
   window.setTimeout(retry, 60)
 }
 
-export default function HomeUpperStage({ locale, countryLabel, trending = [], children }: Props) {
+export default function HomeUpperStage({ locale, countryLabel, trending = [], latest = [], children }: Props) {
   const isArabic = locale === 'ar'
   const [note, setNote] = useState<'map' | 'matches' | null>(null)
 
@@ -66,17 +70,11 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
 
   return (
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
+      <HomeMomentSlot locale={locale} countryLabel={countryLabel} onOpenComposer={() => openComposer('sale')} />
+
       <div className={styles.searchField}>
         <MobileHeaderSearchBar locale={locale} />
       </div>
-
-      <HomeMomentSlot locale={locale} countryLabel={countryLabel} onOpenComposer={() => openComposer('sale')} />
-
-      <HomeBanner locale={locale} />
-
-      {children}
-
-      <MarketplaceStories locale={locale} />
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
         <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
@@ -108,6 +106,41 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
               : 'Matches are not connected to a service yet. Use search for current listings.'}
         </p>
       ) : null}
+
+      <MarketplaceStories locale={locale} />
+
+      <section className={styles.wireBlock} aria-label={isArabic ? 'سلك السوق' : 'Market wire'}>
+        <div className={styles.wireHead}>
+          <span className={styles.liveDot} aria-hidden />
+          <h2>{isArabic ? 'سلك السوق' : 'Market wire'}</h2>
+          <span>
+            {latest.length > 0
+              ? isArabic
+                ? `${latest.length} في آخر قائمة · ليست مبيعات`
+                : `${latest.length} in the latest list · not sales`
+              : isArabic
+                ? 'لا عناوين في آخر استجابة'
+                : 'The latest response had no titles'}
+          </span>
+        </div>
+        {latest.length > 0 ? (
+          <div className={styles.wire}>
+            {latest.slice(0, 6).map((item) => (
+              <Link key={item.id} href={`/${locale}/post/${item.id}`} className={styles.wireItem}>
+                <strong>{item.title}</strong>
+                {item.price != null ? <span>{item.price}</span> : null}
+              </Link>
+            ))}
+            <Link href="#home-latest" className={styles.wireItem}>
+              <strong>{isArabic ? 'آخر القائمة' : 'Latest list'}</strong>
+            </Link>
+          </div>
+        ) : null}
+      </section>
+
+      <HomeBanner locale={locale} />
+
+      {children}
 
       <HomeOpportunitySlot locale={locale} trending={trending} />
     </div>

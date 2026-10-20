@@ -299,6 +299,13 @@
   scrollbar-width: none;
 }
 
+.wireBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .actions::-webkit-scrollbar,
 .links::-webkit-scrollbar,
 .stories::-webkit-scrollbar,

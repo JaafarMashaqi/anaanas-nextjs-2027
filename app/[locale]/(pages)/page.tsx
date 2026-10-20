@@ -117,6 +117,7 @@ const Home = async ({
             locale={uiLocale}
             countryLabel={countryLabel}
             trending={trending}
+            latest={latestUnique}
           >
             <Suspense fallback={<HomeInsightsSkeleton />}>
               <MarketPulseCard locale={uiLocale} variant="rail" />
@@ -134,17 +135,6 @@ const Home = async ({
               {showMobileAiDashboard ? <MobileAiPromoGrid locale={uiLocale} /> : null}
             </Col>
           </Row>
-
-          {latestUnique.length > 0 ? (
-            <Link href="#home-latest" className={homeFlow.opportunity}>
-              <span>
-                {uiLocale === 'ar'
-                  ? `${latestUnique.length} إعلانات جديدة في آخر قائمة`
-                  : `${latestUnique.length} new listings in the latest list`}
-              </span>
-              <span>{uiLocale === 'ar' ? 'عرض' : 'View'}</span>
-            </Link>
-          ) : null}
 
           <CreatePostCardLazyClient />
 
