@@ -1,28 +1,30 @@
 .card {
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr);
-  grid-template-areas:
-    'sky mascot copy'
-    'actions actions actions'
-    'dots dots dots';
-  gap: 0.35rem 0.45rem;
+  display: flex;
   align-items: center;
-  min-height: 108px;
-  padding: 0.7rem 0.85rem 0.55rem;
+  gap: 0.75rem;
+  min-height: 0;
+  padding: 0.65rem 0.85rem;
   border-radius: 18px;
-  background: linear-gradient(to left, #fff8de, #fffefb 55%);
+  background: linear-gradient(to left, #e7f6ec, #f4fbf6 42%, #fffefb);
   color: #101828;
 }
 
+.card[data-kind='greeting'] .mascot,
+.card[data-kind='greeting'] .actions,
+.card[data-kind='greeting'] .kicker,
+.card[data-kind='greeting'] .dots {
+  display: none;
+}
+
 .sky {
-  grid-area: sky;
   width: 42px;
   height: 42px;
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: #ffc928;
-  color: #101828;
+  background: #fff4c8;
+  color: #f5a900;
+  flex: 0 0 auto;
 }
 
 .sky[data-sky='night'] {
@@ -38,8 +40,8 @@
 }
 
 .copy {
-  grid-area: copy;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .kicker,

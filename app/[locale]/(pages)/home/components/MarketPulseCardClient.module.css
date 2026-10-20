@@ -120,9 +120,9 @@
 }
 
 .railItem {
-  flex: 0 0 84px;
-  width: 84px;
-  min-width: 84px;
+  flex: 1 1 0;
+  width: auto;
+  min-width: 72px;
   scroll-snap-align: start;
 }
 
@@ -154,12 +154,41 @@
 }
 
 .compact .metricIcon {
-  width: auto;
-  height: auto;
+  width: 34px;
+  height: 34px;
   margin: 0;
-  background: transparent;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #fff4d6;
   color: #f5a900;
 }
+
+.compact.amber .metricIcon,
+.compact.amber .metricValue {
+  color: #f5a900;
+}
+.compact.amber .metricIcon { background: #fff1cc; }
+
+.compact.blue .metricIcon,
+.compact.blue .metricValue { color: #3b82f6; }
+.compact.blue .metricIcon { background: #e7f0ff; }
+
+.compact.green .metricIcon,
+.compact.green .metricValue { color: #16a34a; }
+.compact.green .metricIcon { background: #e5f8ec; }
+
+.compact.navy .metricIcon,
+.compact.navy .metricValue { color: #101828; }
+.compact.navy .metricIcon { background: #eef1f6; }
+
+.compact.violet .metricIcon,
+.compact.violet .metricValue { color: #7c3aed; }
+.compact.violet .metricIcon { background: #f3e8ff; }
+
+.compact.coral .metricIcon,
+.compact.coral .metricValue { color: #ff3347; }
+.compact.coral .metricIcon { background: #ffe8ea; }
 
 .compact .metricValue,
 .compact .metricWord {

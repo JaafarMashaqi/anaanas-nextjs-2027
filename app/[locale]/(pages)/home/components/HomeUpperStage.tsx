@@ -66,11 +66,17 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
 
   return (
     <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
-      <HomeMomentSlot locale={locale} countryLabel={countryLabel} onOpenComposer={() => openComposer('sale')} />
-
       <div className={styles.searchField}>
         <MobileHeaderSearchBar locale={locale} />
       </div>
+
+      <HomeMomentSlot locale={locale} countryLabel={countryLabel} onOpenComposer={() => openComposer('sale')} />
+
+      <HomeBanner locale={locale} />
+
+      {children}
+
+      <MarketplaceStories locale={locale} />
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
         <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
@@ -102,12 +108,6 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
               : 'Matches are not connected to a service yet. Use search for current listings.'}
         </p>
       ) : null}
-
-      <MarketplaceStories locale={locale} />
-
-      <HomeBanner locale={locale} />
-
-      {children}
 
       <HomeOpportunitySlot locale={locale} trending={trending} />
     </div>

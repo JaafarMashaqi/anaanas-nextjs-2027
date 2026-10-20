@@ -142,11 +142,11 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
           autoComplete="off"
         />
         <span className={styles.tools} role="group" aria-label={isArabic ? 'أدوات البحث' : 'Search tools'}>
-          <button type="button" className={styles.iconBtn} onClick={startVoice} aria-label={isArabic ? 'صوت الجهاز' : 'Device voice'}>
-            <BsMic aria-hidden />
-          </button>
           <button type="button" className={styles.iconBtn} onClick={() => setToolNote(toolNote === 'camera' ? null : 'camera')} aria-label={isArabic ? 'بحث بالصورة' : 'Photo search'}>
             <BsCamera aria-hidden />
+          </button>
+          <button type="button" className={styles.iconBtn} onClick={startVoice} aria-label={isArabic ? 'صوت الجهاز' : 'Device voice'}>
+            <BsMic aria-hidden />
           </button>
           <button type="button" className={styles.iconBtn} onClick={() => setToolNote(toolNote === 'assistant' ? null : 'assistant')} aria-label={isArabic ? 'بحث بالمحادثة' : 'Chat search'}>
             <BsStars aria-hidden />

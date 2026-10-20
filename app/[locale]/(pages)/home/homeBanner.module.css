@@ -289,6 +289,10 @@
   background: linear-gradient(to left, rgba(16, 24, 40, 0.82), rgba(16, 24, 40, 0.08) 70%);
 }
 
+.identity .badge {
+  display: none;
+}
+
 .badge {
   position: absolute;
   z-index: 3;

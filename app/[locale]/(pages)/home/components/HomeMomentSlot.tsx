@@ -81,8 +81,8 @@ export default function HomeMomentSlot({
       kind: 'greeting',
       title: displayName ? `${hello}، ${displayName}` : hello,
       line: ar
-        ? `${countryLabel}. اكتب إعلانك من هذه الصفحة.`
-        : `${countryLabel}. Write your listing from this page.`,
+        ? 'نتمنى أن تجد ما تبحث عنه أسرع مما تتوقع.'
+        : 'We hope you find it sooner than you expect.',
       action: ar ? 'أبيع' : 'Sell',
       composer: true,
     }
@@ -135,7 +135,8 @@ export default function HomeMomentSlot({
   return (
     <section
       className={styles.card}
-      aria-label={ar ? 'تحية وحملات' : 'Greeting and campaigns'}
+      data-kind={slide.kind}
+      aria-label={ar ? `تحية · ${countryLabel}` : `Greeting · ${countryLabel}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
