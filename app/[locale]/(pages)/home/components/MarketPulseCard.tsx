@@ -2,7 +2,7 @@ import { headers } from 'next/headers'
 
 import MarketPulseCardClient from './MarketPulseCardClient'
 import { loadMarketPulseSource } from '@/lib/api/marketPulse'
-import { buildMarketPulse } from '@/lib/market/buildMarketPulse'
+import { buildMarketPulse, buildPulseActivity } from '@/lib/market/buildMarketPulse'
 import { fetchLatestListings } from '@/lib/server/fetchLatestListings'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import { isSupportedLocale } from '@/lib/localization'
@@ -26,7 +26,6 @@ export default async function MarketPulseCard({
     fetchLatestListings({ countryId, land: uiLocale, limit: 4 }),
   ])
   const model = buildMarketPulse(source, uiLocale)
-  const generatedAt = new Date().toISOString()
   const latestItems = latest.map((item) => ({
     id: item.id,
     title: item.title,
@@ -38,6 +37,8 @@ export default async function MarketPulseCard({
         ? `${new Intl.NumberFormat(uiLocale === 'ar' ? 'ar-JO' : 'en-US', { maximumFractionDigits: 0 }).format(item.price)}${item.currency ? ` ${item.currency}` : ''}`
         : null,
   }))
+  const activities = buildPulseActivity(source.sections, latestItems, uiLocale)
+  const generatedAt = new Date().toISOString()
 
   return (
     <MarketPulseCardClient
@@ -46,6 +47,7 @@ export default async function MarketPulseCard({
       variant={variant}
       generatedAt={generatedAt}
       latestItems={latestItems}
+      activities={activities}
     />
   )
 }

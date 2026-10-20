@@ -44,6 +44,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.12rem;
+  width: 100%;
   min-height: 92px;
   padding: 0.6rem 0.65rem 0.55rem;
   border-radius: 14px;
@@ -52,6 +53,9 @@
   box-shadow: 0 8px 20px rgba(16, 24, 40, 0.04);
   color: #101828;
   text-decoration: none;
+  text-align: start;
+  font: inherit;
+  cursor: pointer;
 }
 
 .railMore:hover,
@@ -304,6 +308,57 @@
 .missing li {
   color: #667085;
   font-size: 0.68rem;
+}
+
+.activity {
+  list-style: none;
+  margin: 0.3rem 0 0.45rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.activity a {
+  display: block;
+  color: #101828;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.activity li[data-kind='change'] a {
+  color: #0f766e;
+}
+
+.activity li[data-kind='listing'] a {
+  color: #1d4ed8;
+}
+
+.focus {
+  margin: 0.35rem 0 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 12px;
+  background: #f3f5f9;
+}
+
+.focus h3,
+.focus p {
+  margin: 0;
+}
+
+.focus p {
+  color: #667085;
+  font-size: 0.72rem;
+}
+
+.focus a {
+  display: inline-block;
+  margin-top: 0.25rem;
+  color: #1d4ed8;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .fullLink {

@@ -109,6 +109,15 @@ const nextConfig: NextConfig = {
         cpus: 1,
         memoryBasedWorkersCount: true,
         serverSourceMaps: false,
+        // Same client fallbacks as `webpack` below. Turbopack warns, and the
+        // dev issue badge appears, when webpack is set and this block is not.
+        turbo: {
+            resolveAlias: {
+                fs: { browser: './lib/empty-node-module.ts' },
+                net: { browser: './lib/empty-node-module.ts' },
+                tls: { browser: './lib/empty-node-module.ts' },
+            },
+        },
     },
     allowedDevOrigins: [
         '127.0.0.1',

@@ -112,7 +112,9 @@ const Home = async ({
           {/* Original banner stays. The Amman hero is still waiting for an approved asset. */}
           <HomeBanner locale={uiLocale} />
 
-          <MarketPulseCard locale={uiLocale} variant="rail" />
+          <Suspense fallback={<HomeInsightsSkeleton />}>
+            <MarketPulseCard locale={uiLocale} variant="rail" />
+          </Suspense>
 
           <CreatePostCardLazyClient />
 

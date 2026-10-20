@@ -13,6 +13,7 @@ export type PulseMetric = {
   tone: 'navy' | 'amber' | 'violet' | 'green'
   href: string
   sectionSlug?: string
+  raw: number | null
 }
 
 export type PulseSectionBar = {
@@ -83,6 +84,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
           : 'Server total for this country. Not a count of listings posted today.',
       tone: 'navy',
       href: hrefFor(locale, 'listings'),
+      raw: source.listingsError ? null : source.listingsTotal,
     },
     {
       id: 'auctions',
@@ -98,6 +100,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
           : 'Count of auctions with status live. Zero is a real count, not an estimate.',
       tone: 'amber',
       href: hrefFor(locale, 'auctions'),
+      raw: source.auctionsError ? null : source.auctionsTotal,
     },
   ]
 
@@ -112,6 +115,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
         : 'Sections returned by section-momentum. The server does not name the window length.',
       tone: 'violet',
       href: hrefFor(locale, 'sections'),
+      raw: source.sections.length,
     })
   }
 
@@ -138,6 +142,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
       tone: 'green',
       href: hrefFor(locale, 'measured', measured.slug),
       sectionSlug: measured.slug,
+      raw: measured.current_count,
     })
   }
 
@@ -211,4 +216,56 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
     : null
 
   return { metrics, bars, unavailable, insight }
+}
+
+export type PulseActivity = {
+  id: string
+  text: string
+  href: string
+  kind: 'window' | 'change' | 'listing'
+}
+
+/** Real events only. No “may suit you” lines and no invented viewers. */
+export function buildPulseActivity(
+  sections: SectionMomentumItem[],
+  latest: Array<{ id: number; title: string; isNew: boolean; href: string }>,
+  locale: PulseLocale,
+): PulseActivity[] {
+  const ar = locale === 'ar'
+  const events: PulseActivity[] = []
+
+  for (const item of sections) {
+    if (item.previous_count > 0 && Number.isFinite(item.growth_percent)) {
+      const change = growthLabel(item)
+      events.push({
+        id: `change-${item.section_id}`,
+        kind: 'change',
+        href: hrefFor(locale, 'measured', item.slug),
+        text: ar
+          ? `${item.name}: ${item.current_count} الآن مقابل ${item.previous_count} في النافذة السابقة${change ? ` (${change})` : ''}`
+          : `${item.name}: ${item.current_count} now versus ${item.previous_count} in the previous window${change ? ` (${change})` : ''}`,
+      })
+    } else if (item.current_count > 0) {
+      events.push({
+        id: `window-${item.section_id}`,
+        kind: 'window',
+        href: hrefFor(locale, 'measured', item.slug),
+        text: ar
+          ? `حركة في ${item.name}: ${item.current_count} ضمن نافذة الخادم، بلا نافذة سابقة`
+          : `Movement in ${item.name}: ${item.current_count} in the server window, with no previous window`,
+      })
+    }
+  }
+
+  for (const item of latest) {
+    if (!item.isNew) continue
+    events.push({
+      id: `listing-${item.id}`,
+      kind: 'listing',
+      href: item.href,
+      text: ar ? `إعلان يحمل شارة جديد: ${item.title}` : `Listing flagged new: ${item.title}`,
+    })
+  }
+
+  return events.slice(0, 6)
 }

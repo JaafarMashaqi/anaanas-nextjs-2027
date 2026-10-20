@@ -1,10 +1,10 @@
 'use client'
 
-import { useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import Link from 'next/link'
 import { BsBarChart, BsGrid, BsGraphUpArrow, BsHammer } from 'react-icons/bs'
 
-import type { MarketPulseModel, PulseMetric } from '@/lib/market/buildMarketPulse'
+import type { MarketPulseModel, PulseActivity, PulseMetric, PulseMetricId } from '@/lib/market/buildMarketPulse'
 import type { SupportedLocale } from '@/lib/localization'
 import { t } from '@/lib/translations'
 import styles from './MarketPulseCardClient.module.css'
@@ -36,22 +36,77 @@ function formatStamp(iso: string, locale: SupportedLocale) {
   }).format(date)
 }
 
-function MetricCard({ metric }: { metric: PulseMetric }) {
+function LiveFigure({
+  raw,
+  fallback,
+  storageKey,
+  locale,
+}: {
+  raw: number | null
+  fallback: string
+  storageKey: string
+  locale: SupportedLocale
+}) {
+  const [shown, setShown] = useState(fallback)
+
+  useEffect(() => {
+    if (raw == null) {
+      setShown(fallback)
+      return
+    }
+    const format = (value: number) =>
+      new Intl.NumberFormat(locale === 'ar' ? 'ar-JO' : 'en-US', { maximumFractionDigits: 0 }).format(value)
+    const key = `ananas.pulse.${storageKey}`
+    const previous = Number(window.sessionStorage.getItem(key))
+    window.sessionStorage.setItem(key, String(raw))
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!Number.isFinite(previous) || previous === raw || reduce) {
+      setShown(format(raw))
+      return
+    }
+    const from = previous
+    const start = performance.now()
+    let frame = 0
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / 420)
+      setShown(format(Math.round(from + (raw - from) * progress)))
+      if (progress < 1) frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [raw, fallback, storageKey, locale])
+
+  return <strong className={styles.metricValue}>{shown}</strong>
+}
+
+function MetricCard({
+  metric,
+  locale,
+  pressed,
+  onOpen,
+}: {
+  metric: PulseMetric
+  locale: SupportedLocale
+  pressed: boolean
+  onOpen: (id: PulseMetricId) => void
+}) {
   const Icon = ICONS[metric.id]
   return (
-    <Link
-      href={metric.href}
+    <button
+      type="button"
       className={`${styles.metric} ${styles[metric.tone]}`}
       title={metric.hint}
+      aria-pressed={pressed}
       aria-label={`${metric.label}. ${metric.value}. ${metric.period}. ${metric.hint}`}
+      onClick={() => onOpen(metric.id)}
     >
       <span className={styles.metricIcon} aria-hidden>
         <Icon size={15} />
       </span>
       <span className={styles.metricLabel}>{metric.label}</span>
-      <strong className={styles.metricValue}>{metric.value}</strong>
+      <LiveFigure raw={metric.raw} fallback={metric.value} storageKey={metric.id} locale={locale} />
       <span className={styles.metricPeriod}>{metric.period}</span>
-    </Link>
+    </button>
   )
 }
 
@@ -60,15 +115,22 @@ function PulseDrawer({
   locale,
   generatedAt,
   latestItems,
+  activities,
+  focus,
   drawerId,
 }: {
   model: MarketPulseModel
   locale: SupportedLocale
   generatedAt: string
   latestItems: PulseLatestItem[]
+  activities: PulseActivity[]
+  focus: PulseMetricId | null
   drawerId: string
 }) {
   const ar = locale === 'ar'
+  const focused = focus ? model.metrics.find((item) => item.id === focus) : null
+  const showRanks = !focus || focus === 'sections' || focus === 'measured'
+  const showLatest = !focus || focus === 'listings'
   return (
     <div className={styles.drawer} id={drawerId}>
       <p className={styles.source}>
@@ -76,50 +138,78 @@ function PulseDrawer({
         {' · '}
         {ar ? 'المصدر:' : 'Source:'} /api/posts, /api/auctions, /api/home/section-momentum, /api/home/latest-listings
       </p>
-      <ol className={styles.rank}>
-        {model.bars.map((bar, index) => (
-          <li key={bar.sectionId}>
-            <Link href={bar.href}>
-              <span>{index + 1}</span>
-              <strong>{bar.name}</strong>
-              <em>
-                {bar.current}
-                {bar.growthLabel ? ` ${bar.growthLabel}` : ar ? ' · بلا نافذة سابقة' : ' · no earlier window'}
-              </em>
-            </Link>
-          </li>
-        ))}
-      </ol>
-      <h3>{ar ? 'أحدث ما أعاده الخادم' : 'Latest returned by the server'}</h3>
-      {latestItems.length === 0 ? (
-        <p className={styles.railEmpty}>{ar ? 'لا توجد إعلانات في آخر استجابة.' : 'The latest-listings response was empty.'}</p>
+      {focused ? (
+        <div className={styles.focus}>
+          <h3>{focused.label}</h3>
+          <p>{focused.hint}</p>
+          <p>{focused.period}</p>
+          <Link href={focused.href}>{ar ? 'افتح هذا المؤشر' : 'Open this metric'}</Link>
+        </div>
+      ) : null}
+      <h3>{ar ? 'ما الذي تغيّر فعلاً' : 'What actually changed'}</h3>
+      {activities.length === 0 ? (
+        <p className={styles.railEmpty}>{ar ? 'لا توجد أحداث في هذه الاستجابة.' : 'This response has no activity events.'}</p>
       ) : (
-        <ul className={styles.latest}>
-          {latestItems.map((item) => (
-            <li key={item.id}>
-              <Link href={item.href}>{item.title}</Link>
-              <span>
-                {item.location}
-                {item.priceLabel ? ` · ${item.priceLabel}` : ''}
-                {item.isNew ? (ar ? ' · جديد' : ' · new') : ''}
-              </span>
+        <ul className={styles.activity}>
+          {activities.map((item) => (
+            <li key={item.id} data-kind={item.kind}>
+              <Link href={item.href}>{item.text}</Link>
             </li>
           ))}
         </ul>
       )}
-      <p className={styles.railEmpty}>
-        {ar
-          ? 'شارة «جديد» تأتي من الحقل is_new. عددها ليس إجمالي الإعلانات الجديدة.'
-          : 'The new badge is the is_new field. It is not a total of new listings.'}
-      </p>
-      <ul className={styles.missing}>
-        {model.unavailable.map((item) => (
-          <li key={item.id}>
-            <strong>{item.label}.</strong> {item.reason}
-          </li>
-        ))}
-      </ul>
-      <Link href={`/${locale}/market-pulse`} className={styles.fullLink}>
+      {showRanks ? (
+        <ol className={styles.rank}>
+          {model.bars.map((bar, index) => (
+            <li key={bar.sectionId}>
+              <Link href={bar.href}>
+                <span>{index + 1}</span>
+                <strong>{bar.name}</strong>
+                <em>
+                  {bar.current}
+                  {bar.growthLabel ? ` ${bar.growthLabel}` : ar ? ' · بلا نافذة سابقة' : ' · no earlier window'}
+                </em>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      ) : null}
+      {showLatest ? (
+        <>
+          <h3>{ar ? 'أحدث ما أعاده الخادم' : 'Latest returned by the server'}</h3>
+          {latestItems.length === 0 ? (
+            <p className={styles.railEmpty}>{ar ? 'لا توجد إعلانات في آخر استجابة.' : 'The latest-listings response was empty.'}</p>
+          ) : (
+            <ul className={styles.latest}>
+              {latestItems.map((item) => (
+                <li key={item.id}>
+                  <Link href={item.href}>{item.title}</Link>
+                  <span>
+                    {item.location}
+                    {item.priceLabel ? ` · ${item.priceLabel}` : ''}
+                    {item.isNew ? (ar ? ' · جديد' : ' · new') : ''}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className={styles.railEmpty}>
+            {ar
+              ? 'شارة «جديد» تأتي من الحقل is_new. عددها ليس إجمالي الإعلانات الجديدة.'
+              : 'The new badge is the is_new field. It is not a total of new listings.'}
+          </p>
+        </>
+      ) : null}
+      {!focus ? (
+        <ul className={styles.missing}>
+          {model.unavailable.map((item) => (
+            <li key={item.id}>
+              <strong>{item.label}.</strong> {item.reason}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <Link href={focused?.href || `/${locale}/market-pulse`} className={styles.fullLink}>
         {ar ? 'صفحة النبض الكاملة' : 'Full pulse page'}
       </Link>
     </div>
@@ -132,15 +222,18 @@ export default function MarketPulseCardClient({
   variant = 'card',
   generatedAt,
   latestItems,
+  activities,
 }: {
   model: MarketPulseModel
   locale: SupportedLocale
   variant?: 'card' | 'rail'
   generatedAt: string
   latestItems: PulseLatestItem[]
+  activities: PulseActivity[]
 }) {
   const scroller = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
+  const [focus, setFocus] = useState<PulseMetricId | null>(null)
   const drawerId = variant === 'rail' ? 'market-pulse-drawer-rail' : 'market-pulse-drawer-stack'
   const isArabic = locale === 'ar'
   const detailsLabel = open ? (isArabic ? 'إخفاء' : 'Hide') : isArabic ? 'التفاصيل' : 'Details'
@@ -158,6 +251,11 @@ export default function MarketPulseCardClient({
     node.scrollBy({ left: delta, behavior: reduce ? 'auto' : 'smooth' })
   }
 
+  const openMetric = (id: PulseMetricId) => {
+    setFocus(id)
+    setOpen(true)
+  }
+
   const head = (
     <div className={styles.railHead}>
       <h2>{t('home.marketPulse', locale)}</h2>
@@ -166,7 +264,10 @@ export default function MarketPulseCardClient({
         className={styles.railMore}
         aria-expanded={open}
         aria-controls={drawerId}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          setFocus(null)
+          setOpen((value) => !value)
+        }}
       >
         {detailsLabel}
       </button>
@@ -190,7 +291,7 @@ export default function MarketPulseCardClient({
         >
           {model.metrics.map((metric) => (
             <div key={metric.id} className={styles.railItem} role="listitem">
-              <MetricCard metric={metric} />
+              <MetricCard metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
             </div>
           ))}
         </div>
@@ -198,7 +299,7 @@ export default function MarketPulseCardClient({
         <>
           <div className={styles.stackList}>
             {model.metrics.map((metric) => (
-              <MetricCard key={metric.id} metric={metric} />
+              <MetricCard key={metric.id} metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
             ))}
           </div>
           {model.bars.length === 0 ? (
@@ -227,6 +328,8 @@ export default function MarketPulseCardClient({
           locale={locale}
           generatedAt={generatedAt}
           latestItems={latestItems}
+          activities={activities}
+          focus={focus}
           drawerId={drawerId}
         />
       ) : null}
