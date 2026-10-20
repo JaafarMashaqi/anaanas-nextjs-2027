@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { cloneElement, isValidElement, type ReactElement } from 'react'
 
 import {
   BsBell,
@@ -35,7 +36,6 @@ import { useLayoutContext } from '@/context/useLayoutContext'
 import type { ChildrenType } from '@/types/component'
 import Messaging from '@/components/layout/Messaging'
 import AuthFooterSocialLinks from '@/components/layout/AuthFooterSocialLinks'
-import useViewPort from '@/hooks/useViewPort'
 import Link from 'next/link'
 
 type FeedLayoutClientProps = ChildrenType & {
@@ -45,29 +45,17 @@ type FeedLayoutClientProps = ChildrenType & {
 
 const FeedLayoutClient = ({ children, sidebar, locale }: FeedLayoutClientProps) => {
   const { messagingOffcanvas, startOffcanvas } = useLayoutContext()
-  const { width } = useViewPort()
+  const mobileSidebar =
+    startOffcanvas.open && isValidElement(sidebar) ? cloneElement(sidebar as ReactElement) : null
 
   return (
     <>
       <main>
         <Container>
           <Row className="g-md-4">
-            <Col lg={3}>
+            <Col lg={3} className="ananas-desktop-only">
               <nav className="navbar navbar-expand-lg mx-0">
-                {width >= 992 ? (
-                  <div className="d-block px-2 px-lg-0 w-100">
-                    {sidebar}
-                  </div>
-                ) : (
-                  <Offcanvas show={startOffcanvas.open} placement="start" onHide={startOffcanvas.toggle} tabIndex={-1} id="offcanvasSideNavbar">
-                    <OffcanvasHeader closeButton />
-                    <OffcanvasBody className="d-block px-2 px-lg-0 ">
-                      <div>
-                        {sidebar}
-                      </div>
-                    </OffcanvasBody>
-                  </Offcanvas>
-                )}
+                <div className="d-block px-2 px-lg-0 w-100">{sidebar}</div>
               </nav>
 
 
@@ -101,6 +89,19 @@ const FeedLayoutClient = ({ children, sidebar, locale }: FeedLayoutClientProps) 
           </Row>
         </Container>
       </main>
+      <Offcanvas
+        show={startOffcanvas.open}
+        placement="start"
+        onHide={startOffcanvas.toggle}
+        tabIndex={-1}
+        id="offcanvasSideNavbar"
+        className="ananas-mobile-only"
+      >
+        <OffcanvasHeader closeButton />
+        <OffcanvasBody className="d-block px-2 px-lg-0">
+          <div>{mobileSidebar}</div>
+        </OffcanvasBody>
+      </Offcanvas>
 
       <div className="d-none d-سlg-block">
         <a

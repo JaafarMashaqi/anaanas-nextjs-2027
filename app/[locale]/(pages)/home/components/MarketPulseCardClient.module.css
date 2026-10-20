@@ -16,6 +16,17 @@
   font-weight: 800;
 }
 
+.railHead h2::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-inline-end: 0.35rem;
+  border-radius: 99px;
+  background: #ff3347;
+  vertical-align: middle;
+}
+
 .railEmpty {
   margin: 0;
   font-size: 0.78rem;

@@ -7,7 +7,7 @@ import { BsSearch } from 'react-icons/bs'
 
 import searchAvatar from '@/assets/images/icon/s200.png'
 import type { SupportedLocale } from '@/lib/localization'
-import { rememberSearch, SmartSearchPanel, useSmartSearchAssist } from '@/components/search/SmartSearchPanel'
+import { rememberSearch, SmartSearchPanel, useSearchDismiss, useSearchFieldToggle, useSmartSearchAssist } from '@/components/search/SmartSearchPanel'
 
 import styles from './MobileHeaderSearchBar.module.css'
 
@@ -20,11 +20,13 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
   const anchorRef = useRef<HTMLFormElement | null>(null)
   const [query, setQuery] = useState('')
   const assist = useSmartSearchAssist(locale, query)
+  const listId = 'ananas-mobile-smart-search'
+  const fieldToggle = useSearchFieldToggle(assist.open, assist.setOpen)
+  useSearchDismiss(assist.open, assist.setOpen, anchorRef, listId, true)
 
   const isArabic = locale === 'ar'
   const placeholder = isArabic ? 'ابحث في الأقسام والإعلانات' : 'Search sections and listings'
   const submitLabel = isArabic ? 'بحث' : 'Search'
-  const listId = 'ananas-mobile-smart-search'
 
   const goToSearch = (value: string) => {
     const trimmed = value.trim()
@@ -63,8 +65,9 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
             setQuery(e.target.value)
             assist.setOpen(true)
           }}
-          onFocus={() => assist.setOpen(true)}
-          onBlur={() => window.setTimeout(() => assist.setOpen(false), 140)}
+          onMouseDown={fieldToggle.onMouseDown}
+          onFocus={fieldToggle.onFocus}
+          onClick={fieldToggle.onClick}
           onKeyDown={(event) => assist.onKeyDown(event)}
           placeholder={placeholder}
           aria-label={placeholder}

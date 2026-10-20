@@ -17,7 +17,7 @@ import LocaleDropdown from './LocaleDropdown'
 import BetaBadge from './BetaBadge'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
-import { rememberSearch, SmartSearchPanel, useSmartSearchAssist } from '@/components/search/SmartSearchPanel'
+import { rememberSearch, SmartSearchPanel, useSearchDismiss, useSearchFieldToggle, useSmartSearchAssist } from '@/components/search/SmartSearchPanel'
 
 const TopHeader = () => {
   const { status } = useSession()
@@ -39,6 +39,11 @@ const TopHeader = () => {
 
   const desktopAssist = useSmartSearchAssist(locale, query)
   const popupAssist = useSmartSearchAssist(locale, query)
+  const desktopToggle = useSearchFieldToggle(desktopAssist.open, desktopAssist.setOpen)
+  const popupToggle = useSearchFieldToggle(popupAssist.open, popupAssist.setOpen)
+  useSearchDismiss(desktopAssist.open, desktopAssist.setOpen, desktopSearchRef, 'ananas-desktop-smart-search', false)
+  useSearchDismiss(popupAssist.open, popupAssist.setOpen, popupSearchRef, 'ananas-popup-smart-search', false)
+  useSearchDismiss(mobileSearchOpen, setMobileSearchOpen, popupSearchRef, 'topHeaderMobileSearch', true)
 
   const isArabic = locale === 'ar'
   const isAuthed = status === 'authenticated'
@@ -115,8 +120,9 @@ const TopHeader = () => {
                 setQuery(e.target.value)
                 desktopAssist.setOpen(true)
               }}
-              onFocus={() => desktopAssist.setOpen(true)}
-              onBlur={() => window.setTimeout(() => desktopAssist.setOpen(false), 140)}
+              onMouseDown={desktopToggle.onMouseDown}
+              onFocus={desktopToggle.onFocus}
+              onClick={desktopToggle.onClick}
               onKeyDown={(event) => desktopAssist.onKeyDown(event, closeMobileSearch)}
               placeholder={isArabic ? 'ابحث في الأقسام والإعلانات' : 'Search sections and listings'}
               aria-label={searchPlaceholder}
@@ -148,7 +154,8 @@ const TopHeader = () => {
             title={openSearchAria}
             aria-expanded={mobileSearchOpen}
             aria-controls="topHeaderMobileSearch"
-            onClick={() => setMobileSearchOpen(true)}
+            data-search-toggle="1"
+            onClick={() => setMobileSearchOpen((open) => !open)}
           >
             <BsSearch size={15} />
           </button>
@@ -244,8 +251,9 @@ const TopHeader = () => {
                     setQuery(e.target.value)
                     popupAssist.setOpen(true)
                   }}
-                  onFocus={() => popupAssist.setOpen(true)}
-                  onBlur={() => window.setTimeout(() => popupAssist.setOpen(false), 140)}
+                  onMouseDown={popupToggle.onMouseDown}
+                  onFocus={popupToggle.onFocus}
+                  onClick={popupToggle.onClick}
                   onKeyDown={(event) => popupAssist.onKeyDown(event, closeMobileSearch)}
                   placeholder={isArabic ? 'ابحث في الأقسام والإعلانات' : 'Search sections and listings'}
                   aria-label={searchPlaceholder}

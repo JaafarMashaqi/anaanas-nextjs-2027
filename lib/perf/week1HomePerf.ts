@@ -10,4 +10,4 @@ export const ANNOUNCEMENT_SHOW_DELAY_MS = 8_000
 export const SPLASH_ENABLE_DELAY_MS = 400
 
 /** Force-hide splash even if hydration is slow (prevents splash becoming LCP). */
-export const SPLASH_MAX_VISIBLE_MS = 2_500
+export const SPLASH_MAX_VISIBLE_MS = 700

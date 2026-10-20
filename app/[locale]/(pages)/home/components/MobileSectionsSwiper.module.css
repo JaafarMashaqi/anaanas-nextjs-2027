@@ -119,7 +119,7 @@
  * shaped clearly as squares (not circles), with a small inset highlight.
  */
 .tile {
-  --tile-bg: #ffffff;
+  --tile-bg: #fff8de;
   position: relative;
   width: 100%;
   max-width: 100%;

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState, type KeyboardEvent, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { useAppData } from '@/context/AppDataContext'
@@ -74,6 +74,73 @@ export function useSmartSearchAssist(locale: SupportedLocale, query: string) {
   }
 
   return { open, setOpen, active, setActive, suggestions, choose, onKeyDown }
+}
+
+/** Second press on an already-open field closes it. Focus still opens a closed field. */
+export function useSearchFieldToggle(open: boolean, setOpen: (next: boolean) => void) {
+  const wasOpen = useRef(false)
+  return {
+    onMouseDown: () => {
+      wasOpen.current = open
+    },
+    onFocus: () => {
+      if (!wasOpen.current) setOpen(true)
+    },
+    onClick: () => {
+      if (wasOpen.current) setOpen(false)
+    },
+  }
+}
+
+export function useSearchDismiss(
+  open: boolean,
+  setOpen: (next: boolean) => void,
+  anchorRef: RefObject<HTMLElement | null>,
+  listId: string,
+  historyBack: boolean,
+) {
+  useEffect(() => {
+    if (!open) return
+    const onPointer = (event: PointerEvent) => {
+      const target = event.target
+      if (!(target instanceof Node)) return
+      if (anchorRef.current?.contains(target)) return
+      if (target instanceof Element && target.closest('[data-search-toggle]')) return
+      const panel = document.getElementById(listId)
+      if (panel?.contains(target)) return
+      setOpen(false)
+    }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setOpen(false)
+      }
+    }
+    document.addEventListener('pointerdown', onPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open, setOpen, anchorRef, listId])
+
+  useEffect(() => {
+    if (!open || !historyBack) return
+    const marker = { ananasSearchOverlay: listId }
+    window.history.pushState(marker, '')
+    let closedByPop = false
+    const onPop = () => {
+      closedByPop = true
+      setOpen(false)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      if (!closedByPop && window.history.state?.ananasSearchOverlay === listId) {
+        window.history.back()
+      }
+    }
+  }, [open, setOpen, listId, historyBack])
 }
 
 export function SmartSearchPanel({
@@ -154,6 +221,11 @@ export function SmartSearchPanel({
           </div>
         )
       })}
+      <p className={styles.honest}>
+        {isArabic
+          ? 'لا تتوفر أرقام حجم البحث من الخادم. الاقتراحات من الأقسام وعمليات البحث المحفوظة على هذا الجهاز.'
+          : 'Search volume is not available from the server. Suggestions come from sections and searches saved on this device.'}
+      </p>
     </div>
   )
 }

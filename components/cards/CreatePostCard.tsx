@@ -110,9 +110,16 @@ function ComposerCardAtmosphere({ children }: { children: ReactNode }) {
 }
 
 /** اقتراحات ذكية «قريباً»: أيقونة واضحة + شريط نص مموّه بدون نص في DOM */
-function SmartChipsComingSoonTeaser() {
+function SmartChipsComingSoonTeaser({ locale }: { locale: string }) {
+  const isArabic = locale === 'ar'
   return (
-    <div className={`${styles.smartChips} ${styles.smartChipsComing}`} aria-hidden="true">
+    <div className={styles.smartChipsComingWrap}>
+      <p className={styles.composerToolsNote}>
+        {isArabic
+          ? 'التسعير الذكي والجمهور وتوقع الطلب غير متصلة بالخادم.'
+          : 'Smart pricing, audience, and demand prediction are not connected.'}
+      </p>
+      <div className={`${styles.smartChips} ${styles.smartChipsComing}`} aria-hidden="true">
       {SMART_CHIP_COMING_MIN_WIDTHS.map((minW, idx) => {
         const Icon = SMART_CHIP_COMING_ICONS[idx]
         return (
@@ -128,6 +135,7 @@ function SmartChipsComingSoonTeaser() {
           </span>
         )
       })}
+      </div>
     </div>
   )
 }
@@ -218,6 +226,20 @@ function CreatePostHeroShell({
   }, [expanded, intent])
 
   const isArabic = locale === 'ar'
+  const prompts = isArabic
+    ? ['ماذا تريد أن تبيع اليوم؟', 'جملة واحدة تكفي للعنوان.', 'الصور والسعر يبقيان في نفس مسار النشر.']
+    : ['What do you want to sell today?', 'One clear sentence is enough for a title.', 'Photos and price stay in this same publish flow.']
+  const [promptIndex, setPromptIndex] = useState(0)
+
+  useEffect(() => {
+    if (expanded || title.trim()) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) return
+    const timer = window.setInterval(() => {
+      setPromptIndex((index) => (index + 1) % prompts.length)
+    }, 4600)
+    return () => window.clearInterval(timer)
+  }, [expanded, prompts.length, title])
 
   return (
     <div
@@ -231,7 +253,20 @@ function CreatePostHeroShell({
       <div className={styles.composerHeroTop} dir={rowDir}>
         <div className={styles.composerHeroCopy}>
           <h2 className={styles.composerHeroHeading}>{t('createPost.heroTitle', locale as any)}</h2>
-          <p className={styles.composerHeroSub}>{t('createPost.heroSubtitle', locale as any)}</p>
+          <p className={styles.composerHeroSub}>
+            {expanded || title.trim()
+              ? t('createPost.heroSubtitle', locale as any)
+              : prompts[promptIndex % prompts.length]}
+          </p>
+          <p className={styles.composerProgress} aria-live="polite">
+            {title.trim()
+              ? isArabic
+                ? 'العنوان جاهز. الوصف والصور والقسم والسعر ما زالت خطوات النشر الحالية.'
+                : 'Title is ready. Description, photos, category, and price are still the current publish steps.'
+              : isArabic
+                ? 'بانتظار عنوان الإعلان.'
+                : 'Waiting for a listing title.'}
+          </p>
         </div>
 
         <div className={styles.composerHeroFieldCol}>
@@ -299,6 +334,18 @@ function CreatePostHeroShell({
             </div>
           ) : null}
         </div>
+      </div>
+
+      <div className={styles.composerShortcuts} aria-label={isArabic ? 'اختصارات الإعلان' : 'Listing shortcuts'}>
+        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
+          {isArabic ? 'صور' : 'Photos'}
+        </button>
+        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
+          {isArabic ? 'السعر' : 'Price'}
+        </button>
+        <button type="button" className={styles.composerShortcut} onClick={onAddAdClick}>
+          {isArabic ? 'الموقع' : 'Location'}
+        </button>
       </div>
 
       <div className={styles.composerIntentRow} role="group" aria-label={isArabic ? 'نوع الإعلان' : 'Listing intent'}>
@@ -1799,7 +1846,7 @@ const [step, setStep] = useState(1)
                           )}
                         </div>
 
-                        <SmartChipsComingSoonTeaser />
+                        <SmartChipsComingSoonTeaser locale={locale} />
 
                         <div className={styles.wizardNavRow}>
                           <span aria-hidden="true" />

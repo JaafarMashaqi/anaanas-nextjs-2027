@@ -1332,18 +1332,20 @@
   position: relative;
   width: 100%;
   border-radius: 18px;
-  padding: 0.55rem 0.7rem;
-  background: #fff8de;
-  border: 1px solid #e7e9ee;
+  padding: 0.7rem 0.75rem 0.65rem;
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgba(255, 201, 40, 0.35), transparent 46%),
+    linear-gradient(180deg, #fff8de 0%, #fff3c4 100%);
+  border: 1px solid #f5d98a;
   color: #101828;
   scroll-margin-top: 96px;
   scroll-margin-bottom: 24px;
   box-shadow: none;
 }
 
-.composerHeroCollapsed .composerHeroSub,
 .composerHeroCollapsed .composerHeroTags,
-.composerHeroCollapsed .composerModeNote {
+.composerHeroCollapsed .composerModeNote,
+.composerHeroCollapsed .composerProgress {
   display: none;
 }
 
@@ -1432,10 +1434,11 @@
 
 .composerHeroSub {
   margin: 0;
-  font-size: clamp(0.8rem, 2vw, 0.92rem);
-  line-height: 1.45;
-  color: rgba(21, 21, 21, 0.62);
-  font-weight: 500;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: #667085;
+  font-weight: 650;
+  min-height: 1.4em;
 }
 
 .composerHeroFieldCol {
@@ -1506,6 +1509,49 @@
   white-space: nowrap;
   color: #ffc928;
   background: #101828;
+}
+
+.composerProgress {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #667085;
+}
+
+.composerShortcuts {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.composerShortcuts::-webkit-scrollbar {
+  display: none;
+}
+
+.composerShortcut {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid #f5d98a;
+  background: #ffffff;
+  color: #101828;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.composerToolsNote {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #667085;
+}
+
+.smartChipsComingWrap {
+  margin-top: 0.65rem;
 }
 
 .composerIntentRow {

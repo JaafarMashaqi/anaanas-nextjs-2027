@@ -116,46 +116,19 @@
 
 .messageScroll {
   text-align: start;
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 10px,
-    #000 calc(100% - 10px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    #000 10px,
-    #000 calc(100% - 10px),
-    transparent 100%
-  );
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 [dir='rtl'] .messageScroll {
-  -webkit-mask-image: linear-gradient(
-    to left,
-    transparent 0,
-    #000 10px,
-    #000 calc(100% - 10px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to left,
-    transparent 0,
-    #000 10px,
-    #000 calc(100% - 10px),
-    transparent 100%
-  );
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
-.messageScroll .messageTrack {
+.messageScroll .messageTrack,
+[dir='rtl'] .messageScroll .messageTrack {
   animation: none;
   transform: none;
-}
-
-[dir='rtl'] .messageScroll .messageTrack {
-  animation-name: messageTickerRtl;
 }
 
 .messageInner {
@@ -171,11 +144,8 @@
   animation: none;
 }
 
-.messageScroll .messageInner {
-  max-width: none;
-  overflow: visible;
-  text-overflow: clip;
-  padding-inline-end: 2.75rem;
+.messageInner[data-ticker-copy='duplicate'] {
+  display: none;
 }
 
 /* ===== "New" pill ===== */

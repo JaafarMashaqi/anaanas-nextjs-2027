@@ -77,7 +77,7 @@ html {
 
 html.js-splash #splash-screen {
   display: flex;
-  pointer-events: auto;
+  pointer-events: none;
   visibility: visible;
 }
 

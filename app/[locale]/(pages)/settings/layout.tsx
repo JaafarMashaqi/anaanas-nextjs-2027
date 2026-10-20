@@ -2,13 +2,11 @@
 import { settingPanelLinksData } from '@/assets/data/layout'
 import SettingPanel from '@/components/layout/SettingPanel'
 import { useLayoutContext } from '@/context/useLayoutContext'
-import useViewPort from '@/hooks/useViewPort'
 import type { ChildrenType } from '@/types/component'
 import { Col, Container, Offcanvas, OffcanvasBody, OffcanvasHeader, Row } from 'react-bootstrap'
 import { FaSlidersH } from 'react-icons/fa'
 
 const SettingLayout = ({ children }: ChildrenType) => {
-  const { width } = useViewPort()
   const { startOffcanvas } = useLayoutContext()
   return (
     <main>
@@ -30,20 +28,24 @@ const SettingLayout = ({ children }: ChildrenType) => {
               </button>
             </div>
             <nav className="navbar navbar-light navbar-expand-lg mx-0">
-              {width >= 992 ? (
-                <div className="p-0">
-                  <SettingPanel links={settingPanelLinksData} />
-                </div>
-              ) : (
-                <Offcanvas show={startOffcanvas.open} onHide={startOffcanvas.toggle} placement="start" tabIndex={-1} id="offcanvasNavbar">
-                  <OffcanvasHeader closeButton />
-                  <OffcanvasBody className="p-0">
-                    <div>
-                      <SettingPanel links={settingPanelLinksData} />
-                    </div>
-                  </OffcanvasBody>
-                </Offcanvas>
-              )}
+              <div className="ananas-desktop-only p-0">
+                <SettingPanel links={settingPanelLinksData} />
+              </div>
+              <Offcanvas
+                show={startOffcanvas.open}
+                onHide={startOffcanvas.toggle}
+                placement="start"
+                tabIndex={-1}
+                id="offcanvasNavbar"
+                className="ananas-mobile-only"
+              >
+                <OffcanvasHeader closeButton />
+                <OffcanvasBody className="p-0">
+                  <div>
+                    {startOffcanvas.open ? <SettingPanel links={settingPanelLinksData} /> : null}
+                  </div>
+                </OffcanvasBody>
+              </Offcanvas>
             </nav>
           </Col>
           <Col lg={6} className="vstack gap-4">

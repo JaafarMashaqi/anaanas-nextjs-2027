@@ -97,14 +97,14 @@ export function buildSmartSuggestions(opts: {
     }))
 
   if (!query) {
-    const recentItems = recents.map<SmartSuggestion>((item) => ({
+    const recentItems = recents.slice(0, 3).map<SmartSuggestion>((item) => ({
       id: `recent-${item}`,
       group: 'recent',
       label: item,
       hint: isArabic ? 'بحث سابق على هذا الجهاز' : 'Recent on this device',
       href: searchHref(locale, item),
     }))
-    return [...recentItems, ...sectionItems, ...places]
+    return [...recentItems, ...sectionItems.slice(0, 3), ...places.slice(0, 2)]
   }
 
   const typed: SmartSuggestion = {

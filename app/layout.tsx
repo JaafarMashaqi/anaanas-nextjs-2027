@@ -197,12 +197,13 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
         {/* Splash delayed so LCP can target real page content, not the logo overlay. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `setTimeout(function(){document.documentElement.classList.add("js-splash")},${SPLASH_ENABLE_DELAY_MS})`,
+            __html: `setTimeout(function(){var root=document.getElementById("__next_splash");if(!root||root.childNodes.length===0){document.documentElement.classList.add("js-splash")}},${SPLASH_ENABLE_DELAY_MS})`,
           }}
         />
         <noscript>
           <style>{`#splash-screen{display:none!important;visibility:hidden!important;pointer-events:none!important}`}</style>
         </noscript>
+        <style>{`@media (max-width:991.98px){.ananas-desktop-only{display:none!important}}@media (min-width:992px){.ananas-mobile-only{display:none!important}}#splash-screen{pointer-events:none!important}`}</style>
         {/* Blocking load: locale CSS (RTL/LTR tweaks, container, etc.) must apply reliably — async print→all can miss onLoad when cached. */}
         <link rel="stylesheet" href={localeStylesheet} />
       </head>

@@ -14,10 +14,10 @@ import styles from './ResponsiveTopHeader.module.css'
 const ResponsiveTopHeader = () => {
   return (
     <>
-      <div className={styles.desktopOnly}>
+      <div className={`${styles.desktopOnly} ananas-desktop-only`}>
         <TopHeader />
       </div>
-      <div className={styles.mobileOnly}>
+      <div className={`${styles.mobileOnly} ananas-mobile-only`}>
         <MobileTopHeader />
       </div>
     </>
