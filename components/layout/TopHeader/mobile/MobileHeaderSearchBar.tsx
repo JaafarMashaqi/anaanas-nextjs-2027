@@ -2,8 +2,8 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useRef, useState, type FormEvent } from 'react'
-import { BsSearch } from 'react-icons/bs'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { BsCamera, BsMic, BsSearch, BsStars } from 'react-icons/bs'
 
 import searchAvatar from '@/assets/images/icon/s200.png'
 import type { SupportedLocale } from '@/lib/localization'
@@ -15,23 +15,71 @@ type Props = {
   locale: SupportedLocale
 }
 
+const PROMPTS = {
+  ar: [
+    'ماذا تبحث عنه اليوم؟',
+    'تبحث عن سيارة بسعر مناسب؟',
+    'اكتشف أحدث الفرص بالقرب منك',
+    'ماذا يعرض الناس في مدينتك؟',
+    'ابحث عن عقار، وظيفة أو خدمة',
+    'هل تبحث عن شيء مستعمل بحالة ممتازة؟',
+  ],
+  en: [
+    'What are you looking for today?',
+    'Looking for a car at a fair price?',
+    'See what is newly listed',
+    'What are people offering in your city?',
+    'Search a home, a job, or a service',
+    'Looking for something used, in good shape?',
+  ],
+} as const
+
+type SpeechCtor = new () => {
+  lang: string
+  start: () => void
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null
+  onerror: (() => void) | null
+}
+
+function speechCtor(): SpeechCtor | null {
+  if (typeof window === 'undefined') return null
+  const host = window as Window & { SpeechRecognition?: SpeechCtor; webkitSpeechRecognition?: SpeechCtor }
+  return host.SpeechRecognition || host.webkitSpeechRecognition || null
+}
+
 const MobileHeaderSearchBar = ({ locale }: Props) => {
   const router = useRouter()
   const anchorRef = useRef<HTMLFormElement | null>(null)
   const [query, setQuery] = useState('')
+  const [focused, setFocused] = useState(false)
+  const [promptIndex, setPromptIndex] = useState(0)
+  const [toolNote, setToolNote] = useState<'camera' | 'assistant' | 'voice' | null>(null)
   const assist = useSmartSearchAssist(locale, query)
   const listId = 'ananas-mobile-smart-search'
   const fieldToggle = useSearchFieldToggle(assist.open, assist.setOpen)
   useSearchDismiss(assist.open, assist.setOpen, anchorRef, listId, true)
 
   const isArabic = locale === 'ar'
-  const placeholder = isArabic ? 'ابحث في الأقسام والإعلانات' : 'Search sections and listings'
+  const prompts = PROMPTS[isArabic ? 'ar' : 'en']
+  const stableLabel = isArabic ? 'ابحث في الأقسام والإعلانات' : 'Search sections and listings'
   const submitLabel = isArabic ? 'بحث' : 'Search'
+  const showPrompt = !query && !focused
+  const placeholder = showPrompt ? prompts[promptIndex] : stableLabel
+
+  useEffect(() => {
+    if (!showPrompt) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setInterval(() => {
+      setPromptIndex((index) => (index + 1) % prompts.length)
+    }, 4200)
+    return () => window.clearInterval(timer)
+  }, [showPrompt, prompts.length])
 
   const goToSearch = (value: string) => {
     const trimmed = value.trim()
     if (trimmed) rememberSearch(trimmed)
     assist.setOpen(false)
+    setToolNote(null)
     router.push(trimmed ? `/${locale}/search?q=${encodeURIComponent(trimmed)}` : `/${locale}/search`)
   }
 
@@ -45,18 +93,30 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
     goToSearch(query)
   }
 
+  const startVoice = () => {
+    const Ctor = speechCtor()
+    if (!Ctor) {
+      setToolNote('voice')
+      return
+    }
+    const recognition = new Ctor()
+    recognition.lang = isArabic ? 'ar-JO' : 'en-US'
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript?.trim()
+      if (!transcript) return
+      setQuery(transcript)
+      goToSearch(transcript)
+    }
+    recognition.onerror = () => setToolNote('voice')
+    recognition.start()
+  }
+
   return (
-    <>
-      <form
-        ref={anchorRef}
-        className={styles.bar}
-        role="search"
-        onSubmit={handleSubmit}
-      >
+    <div className={styles.wrap}>
+      <form ref={anchorRef} className={styles.bar} role="search" onSubmit={handleSubmit}>
         <button type="submit" className={styles.submit} aria-label={submitLabel} title={submitLabel}>
           <BsSearch aria-hidden />
         </button>
-
         <input
           type="search"
           className={styles.input}
@@ -66,21 +126,56 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
             assist.setOpen(true)
           }}
           onMouseDown={fieldToggle.onMouseDown}
-          onFocus={fieldToggle.onFocus}
+          onFocus={(event) => {
+            setFocused(true)
+            fieldToggle.onFocus()
+            event.currentTarget.placeholder = stableLabel
+          }}
+          onBlur={() => setFocused(false)}
           onClick={fieldToggle.onClick}
           onKeyDown={(event) => assist.onKeyDown(event)}
           placeholder={placeholder}
-          aria-label={placeholder}
+          aria-label={stableLabel}
           aria-expanded={assist.open}
           aria-controls={listId}
           aria-autocomplete="list"
           autoComplete="off"
         />
-
-        <span className={styles.avatar} aria-hidden>
-          <Image src={searchAvatar} alt="" width={26} height={26} priority className={styles.avatarImg} />
+        <span className={styles.avatar} title={isArabic ? 'محقق أناناس' : 'ANANAS detective'}>
+          <Image src={searchAvatar} alt={isArabic ? 'محقق أناناس' : 'ANANAS detective'} width={26} height={26} priority className={styles.avatarImg} />
         </span>
       </form>
+      {focused || assist.open ? (
+        <div className={styles.tools} role="group" aria-label={isArabic ? 'أدوات البحث' : 'Search tools'}>
+          <button type="button" className={styles.tool} onClick={startVoice}>
+            <BsMic aria-hidden />
+            {isArabic ? 'صوت الجهاز' : 'Device voice'}
+          </button>
+          <button type="button" className={styles.tool} onClick={() => setToolNote(toolNote === 'camera' ? null : 'camera')}>
+            <BsCamera aria-hidden />
+            {isArabic ? 'صورة' : 'Photo'}
+          </button>
+          <button type="button" className={styles.tool} onClick={() => setToolNote(toolNote === 'assistant' ? null : 'assistant')}>
+            <BsStars aria-hidden />
+            {isArabic ? 'محادثة' : 'Chat'}
+          </button>
+        </div>
+      ) : null}
+      {toolNote ? (
+        <p className={styles.toolNote} role="status">
+          {toolNote === 'camera'
+            ? isArabic
+              ? 'التعرف على الصور غير مربوط. اكتب ما تبحث عنه وسيُستخدم بحث الكلمات.'
+              : 'Photo recognition is not connected. Type what you want and keyword search will be used.'
+            : toolNote === 'assistant'
+              ? isArabic
+                ? 'المحادثة الذكية غير مربوطة بخدمة. الاقتراحات الحالية من الأقسام والمدن وبحث هذا الجهاز.'
+                : 'Conversational search is not connected. Current suggestions come from sections, cities, and this device.'
+              : isArabic
+                ? 'الميكروفون غير متاح في هذا المتصفح. اكتب البحث بدلاً من ذلك.'
+                : 'The microphone is not available in this browser. Type the search instead.'}
+        </p>
+      ) : null}
       <SmartSearchPanel
         locale={locale}
         open={assist.open}
@@ -90,8 +185,11 @@ const MobileHeaderSearchBar = ({ locale }: Props) => {
         listId={listId}
         onHover={assist.setActive}
         onPick={(suggestion) => assist.choose(suggestion)}
+        onForget={assist.forget}
+        onClearRecents={assist.clearRecents}
+        query={query}
       />
-    </>
+    </div>
   )
 }
 

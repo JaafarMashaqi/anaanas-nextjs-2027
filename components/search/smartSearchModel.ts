@@ -1,7 +1,7 @@
 import type { Section } from '@/lib/api/sections'
 import type { SupportedLocale } from '@/lib/localization'
 
-export type SmartSuggestionGroup = 'query' | 'recent' | 'section' | 'go'
+export type SmartSuggestionGroup = 'query' | 'recent' | 'section' | 'city' | 'go'
 
 export type SmartSuggestion = {
   id: string
@@ -38,6 +38,25 @@ export function rememberSearch(query: string) {
   }
 }
 
+export function clearRecentSearches() {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(RECENT_KEY)
+  } catch {
+    /* storage may be blocked */
+  }
+}
+
+export function forgetSearch(query: string) {
+  if (typeof window === 'undefined') return
+  const next = readRecentSearches().filter((item) => item !== query)
+  try {
+    window.localStorage.setItem(RECENT_KEY, JSON.stringify(next))
+  } catch {
+    /* storage may be blocked */
+  }
+}
+
 function searchHref(locale: string, query?: string) {
   const trimmed = query?.trim()
   if (!trimmed) return `/${locale}/search`
@@ -48,9 +67,10 @@ export function buildSmartSuggestions(opts: {
   locale: SupportedLocale
   query: string
   sections: Section[]
+  cities: Array<{ id: number; name: string }>
   recents: string[]
 }): SmartSuggestion[] {
-  const { locale, sections, recents } = opts
+  const { locale, sections, cities, recents } = opts
   const query = opts.query.trim()
   const isArabic = locale === 'ar'
   const needle = query.toLocaleLowerCase()
@@ -96,6 +116,17 @@ export function buildSmartSuggestions(opts: {
       href: `/${locale}/sections/${section.slug}`,
     }))
 
+  const cityItems = cities
+    .filter((city) => !needle || city.name.toLocaleLowerCase().includes(needle))
+    .slice(0, needle ? 3 : 2)
+    .map<SmartSuggestion>((city) => ({
+      id: `city-${city.id}`,
+      group: 'city',
+      label: city.name,
+      hint: isArabic ? 'مدينة في البلد المختار' : 'City in the selected country',
+      href: searchHref(locale, city.name),
+    }))
+
   if (!query) {
     const recentItems = recents.slice(0, 3).map<SmartSuggestion>((item) => ({
       id: `recent-${item}`,
@@ -104,7 +135,7 @@ export function buildSmartSuggestions(opts: {
       hint: isArabic ? 'بحث سابق على هذا الجهاز' : 'Recent on this device',
       href: searchHref(locale, item),
     }))
-    return [...recentItems, ...sectionItems.slice(0, 3), ...places.slice(0, 2)]
+    return [...recentItems, ...sectionItems.slice(0, 3), ...cityItems.slice(0, 2), ...places.slice(0, 1)]
   }
 
   const typed: SmartSuggestion = {
@@ -116,5 +147,5 @@ export function buildSmartSuggestions(opts: {
   }
 
   const matchedPlaces = places.filter((place) => place.label.toLocaleLowerCase().includes(needle))
-  return [typed, ...sectionItems, ...matchedPlaces]
+  return [typed, ...sectionItems, ...cityItems, ...matchedPlaces]
 }

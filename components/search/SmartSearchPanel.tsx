@@ -8,6 +8,8 @@ import type { SupportedLocale } from '@/lib/localization'
 
 import {
   buildSmartSuggestions,
+  clearRecentSearches,
+  forgetSearch,
   readRecentSearches,
   rememberSearch,
   type SmartSuggestion,
@@ -17,7 +19,7 @@ import styles from './SmartSearchPanel.module.css'
 type Box = { top: number; left: number; width: number }
 
 export function useSmartSearchAssist(locale: SupportedLocale, query: string) {
-  const { sections } = useAppData()
+  const { sections, cities } = useAppData()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
@@ -29,8 +31,8 @@ export function useSmartSearchAssist(locale: SupportedLocale, query: string) {
   }, [open])
 
   const suggestions = useMemo(
-    () => buildSmartSuggestions({ locale, query, sections, recents }),
-    [locale, query, sections, recents],
+    () => buildSmartSuggestions({ locale, query, sections, cities, recents }),
+    [locale, query, sections, cities, recents],
   )
 
   useEffect(() => {
@@ -73,7 +75,17 @@ export function useSmartSearchAssist(locale: SupportedLocale, query: string) {
     }
   }
 
-  return { open, setOpen, active, setActive, suggestions, choose, onKeyDown }
+  const refreshRecents = () => setRecents(readRecentSearches())
+  const forget = (label: string) => {
+    forgetSearch(label)
+    refreshRecents()
+  }
+  const clearRecents = () => {
+    clearRecentSearches()
+    refreshRecents()
+  }
+
+  return { open, setOpen, active, setActive, suggestions, choose, onKeyDown, forget, clearRecents, query }
 }
 
 /** Second press on an already-open field closes it. Focus still opens a closed field. */
@@ -152,6 +164,9 @@ export function SmartSearchPanel({
   listId,
   onHover,
   onPick,
+  onForget,
+  onClearRecents,
+  query,
 }: {
   locale: SupportedLocale
   open: boolean
@@ -161,6 +176,9 @@ export function SmartSearchPanel({
   listId: string
   onHover: (index: number) => void
   onPick: (suggestion: SmartSuggestion) => void
+  onForget: (label: string) => void
+  onClearRecents: () => void
+  query: string
 }) {
   const [box, setBox] = useState<Box | null>(null)
   const isArabic = locale === 'ar'
@@ -188,6 +206,7 @@ export function SmartSearchPanel({
   const groupLabel = (group: SmartSuggestion['group']) => {
     if (group === 'recent') return isArabic ? 'عمليات بحث سابقة' : 'Recent searches'
     if (group === 'section') return isArabic ? 'أقسام' : 'Sections'
+    if (group === 'city') return isArabic ? 'مدن' : 'Cities'
     if (group === 'go') return isArabic ? 'انتقال' : 'Go to'
     return isArabic ? 'بحث' : 'Search'
   }
@@ -205,28 +224,65 @@ export function SmartSearchPanel({
         lastGroup = suggestion.group
         return (
           <div key={suggestion.id}>
-            {showGroup ? <div className={styles.group}>{groupLabel(suggestion.group)}</div> : null}
-            <button
-              type="button"
-              role="option"
-              aria-selected={index === active}
-              className={`${styles.option} ${index === active ? styles.optionActive : ''}`}
-              onMouseEnter={() => onHover(index)}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => onPick(suggestion)}
-            >
-              <span className={styles.label}>{suggestion.label}</span>
-              <span className={styles.hint}>{suggestion.hint}</span>
-            </button>
+            {showGroup ? (
+              <div className={styles.group}>
+                <span>{groupLabel(suggestion.group)}</span>
+                {suggestion.group === 'recent' ? (
+                  <button type="button" className={styles.clear} onMouseDown={(event) => event.preventDefault()} onClick={onClearRecents}>
+                    {isArabic ? 'مسح' : 'Clear'}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            <div className={styles.optionRow}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={index === active}
+                className={`${styles.option} ${index === active ? styles.optionActive : ''}`}
+                onMouseEnter={() => onHover(index)}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => onPick(suggestion)}
+              >
+                <span className={styles.label}>{highlightMatch(suggestion.label, query)}</span>
+                <span className={styles.hint}>{suggestion.hint}</span>
+              </button>
+              {suggestion.group === 'recent' ? (
+                <button
+                  type="button"
+                  className={styles.forget}
+                  aria-label={isArabic ? `حذف ${suggestion.label}` : `Remove ${suggestion.label}`}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => onForget(suggestion.label)}
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
           </div>
         )
       })}
       <p className={styles.honest}>
         {isArabic
-          ? 'لا تتوفر أرقام حجم البحث من الخادم. الاقتراحات من الأقسام وعمليات البحث المحفوظة على هذا الجهاز.'
-          : 'Search volume is not available from the server. Suggestions come from sections and searches saved on this device.'}
+          ? 'لا تتوفر أرقام حجم البحث. الاقتراحات من الأقسام ومدن البلد وعمليات البحث على هذا الجهاز.'
+          : 'Search volume is not available. Suggestions come from sections, cities in this country, and searches on this device.'}
       </p>
     </div>
+  )
+}
+
+function highlightMatch(label: string, query: string) {
+  const needle = query.trim()
+  if (!needle) return label
+  const index = label.toLocaleLowerCase().indexOf(needle.toLocaleLowerCase())
+  if (index < 0) return label
+  const end = index + needle.length
+  return (
+    <>
+      {label.slice(0, index)}
+      <mark>{label.slice(index, end)}</mark>
+      {label.slice(end)}
+    </>
   )
 }
 

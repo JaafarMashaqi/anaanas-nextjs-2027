@@ -67,7 +67,11 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
   const stable = isArabic ? `سوق أناناس في ${countryLabel}` : `ANANAS market in ${countryLabel}`
   const [greeting, setGreeting] = useState(stable)
   const [sky, setSky] = useState<'day' | 'night' | 'neutral'>('neutral')
+  const [line, setLine] = useState(0)
   const [note, setNote] = useState<'map' | 'matches' | null>(null)
+  const lines = isArabic
+    ? ['ابحث في الإعلانات الحقيقية', 'انشر حين يكتمل العنوان', 'نبض السوق يعرض أرقام الخادم فقط']
+    : ['Search the real listings', 'Publish when the title is ready', 'Market Pulse shows server figures only']
 
   useEffect(() => {
     const onQuickAction = (event: MouseEvent) => {
@@ -92,6 +96,12 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
     setGreeting(part)
   }, [isArabic])
 
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setInterval(() => setLine((index) => (index + 1) % lines.length), 5200)
+    return () => window.clearInterval(timer)
+  }, [lines.length])
+
   const stories = sections.slice(0, 8)
 
   return (
@@ -99,11 +109,11 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
       <div className={styles.greet}>
         <span className={`${styles.sky} ${sky === 'day' ? styles.sun : ''} ${sky === 'night' ? styles.moon : ''}`} aria-hidden>
           {sky === 'night' ? (
-            <svg viewBox="0 0 24 24" width="18" height="18">
+            <svg viewBox="0 0 24 24" width="22" height="22">
               <path fill="currentColor" d="M14.5 2.4a8.8 8.8 0 1 0 7.1 12.2A8 8 0 0 1 14.5 2.4z" />
             </svg>
           ) : (
-            <svg viewBox="0 0 24 24" width="18" height="18">
+            <svg viewBox="0 0 24 24" width="22" height="22">
               <circle cx="12" cy="12" r="4" fill="currentColor" />
               <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
                 <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" />
@@ -116,6 +126,7 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
           <p className={styles.greetHint}>
             {isArabic ? `سوق أناناس في ${countryLabel}` : `ANANAS market in ${countryLabel}`}
           </p>
+          <p className={styles.greetLine} aria-live="off">{lines[line]}</p>
         </div>
         <Image src={mascot} alt="" width={40} height={40} className={styles.mascot} />
       </div>

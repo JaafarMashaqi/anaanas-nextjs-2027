@@ -4,6 +4,7 @@ import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap
 import Feeds from './home/components/Feeds'
 import Followers from './home/components/Followers'
 import HomeBanner from './home/components/HomeBanner'
+import HomeConceptSequence from './home/components/HomeConceptSequence'
 import Link from 'next/link'
 import LoadContentButton from '@/components/LoadContentButton'
 import type { Metadata } from 'next'
@@ -111,6 +112,7 @@ const Home = async ({
 
           {/* CMS campaign slider stays. The Amman still above it is the restored platform identity, not a partner ad. */}
           <HomeBanner locale={uiLocale} />
+          <HomeConceptSequence locale={uiLocale} />
 
           <Suspense fallback={<HomeInsightsSkeleton />}>
             <MarketPulseCard locale={uiLocale} variant="rail" />

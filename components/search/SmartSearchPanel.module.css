@@ -17,10 +17,49 @@
 
 .group {
   margin: 6px 8px 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.01em;
   color: #667085;
+}
+
+.clear,
+.forget {
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.optionRow .option {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.forget {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: #667085;
+  font-size: 1rem;
+}
+
+.panel mark {
+  background: #dbeafe;
+  color: inherit;
+  padding: 0 0.1em;
+  border-radius: 3px;
 }
 
 .option {

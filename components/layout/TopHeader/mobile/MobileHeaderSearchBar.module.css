@@ -1,3 +1,10 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .bar {
   display: flex;
   align-items: center;
@@ -21,8 +28,8 @@
   height: 34px;
   border-radius: 999px;
   border: 0;
-  background: #101828;
-  color: #f5c518;
+  background: #1d4ed8;
+  color: #ffffff;
   cursor: pointer;
   box-shadow: none;
 }
@@ -116,6 +123,35 @@
   height: 100%;
   object-fit: contain;
   display: block;
+}
+
+.tools {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.tool {
+  flex: 1 1 0;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1d4ed8;
+  box-shadow: inset 0 0 0 1px #dbe3f5;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.toolNote {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #667085;
 }
 
 /* Tighten layout on very narrow phones */

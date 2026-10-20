@@ -142,6 +142,9 @@ const TopHeader = () => {
           listId="ananas-desktop-smart-search"
           onHover={desktopAssist.setActive}
           onPick={(suggestion) => desktopAssist.choose(suggestion, closeMobileSearch)}
+          onForget={desktopAssist.forget}
+          onClearRecents={desktopAssist.clearRecents}
+          query={query}
         />
 
         {/* ==================== END CLUSTER (actions) ==================== */}
@@ -282,6 +285,9 @@ const TopHeader = () => {
               listId="ananas-popup-smart-search"
               onHover={popupAssist.setActive}
               onPick={(suggestion) => popupAssist.choose(suggestion, closeMobileSearch)}
+              onForget={popupAssist.forget}
+              onClearRecents={popupAssist.clearRecents}
+              query={query}
             />
           </motion.div>
         )}
