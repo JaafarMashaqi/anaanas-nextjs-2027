@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import clsx from 'clsx'
 
@@ -48,6 +48,7 @@ const SCROLL_UP_REVEAL_ACCUM_PX = 40
 const MobileTopHeader = () => {
   const { status } = useSession()
   const params = useParams<{ locale?: string }>()
+  const pathname = usePathname()
   const [searchCollapsed, setSearchCollapsed] = useState(false)
   const lastScrollY = useRef(0)
   const scrollUpAccum = useRef(0)
@@ -91,6 +92,7 @@ const MobileTopHeader = () => {
     return DEFAULT_LOCALE
   })()
 
+  const isHome = pathname === `/${locale}` || pathname === `/${locale}/`
   const isAuthed = status === 'authenticated'
   // We render the login button by default (when unauthenticated OR while the
   // session is still resolving) so the visitor never sees an empty action
@@ -134,6 +136,7 @@ const MobileTopHeader = () => {
         </div>
         {/* <BetaBadge locale={locale} className=" d-inline-flex m-auto" /> */}
 
+        {!isHome ? (
         <div
           className={clsx(styles.searchRow, searchCollapsed && styles.searchRowCollapsed)}
           aria-hidden={searchCollapsed}
@@ -142,6 +145,7 @@ const MobileTopHeader = () => {
             <MobileHeaderSearchBar locale={locale} />
           </div>
         </div>
+        ) : null}
       </div>
     </StyledHeader>
   )

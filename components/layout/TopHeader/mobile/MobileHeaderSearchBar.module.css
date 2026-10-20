@@ -3,8 +3,8 @@
   align-items: center;
   gap: 6px;
   padding: 4px;
-  background: #fff8e8;
-  border: 1px solid rgba(21, 21, 21, 0.12);
+  background: #fff8de;
+  border: 1px solid rgba(20, 33, 61, 0.12);
   border-radius: 999px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
   width: 100%;
@@ -54,8 +54,9 @@
   border: 0;
   outline: 0;
   background: transparent;
-  font-size: 13px;
-  color: #1f1f1f;
+  font-size: 14px;
+  font-weight: 600;
+  color: #14213d;
   padding: 4px 8px;
   text-align: start;
   height: 38px;

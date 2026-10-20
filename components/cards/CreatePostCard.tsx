@@ -161,6 +161,7 @@ function CreatePostHeroShell({
   const shellDir = isWizardRtl ? 'rtl' : 'ltr'
   const rowDir = isWizardRtl ? 'rtl' : 'ltr'
   const [intent, setIntent] = useState<'sale' | 'wanted'>('sale')
+  const [expanded, setExpanded] = useState(false)
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
     { Icon: BsBrush, label: t('createPost.heroTagDesc', locale as any) },
@@ -171,7 +172,10 @@ function CreatePostHeroShell({
   useEffect(() => {
     const onIntent = (event: Event) => {
       const detail = (event as CustomEvent<string>).detail
-      if (detail === 'sale' || detail === 'wanted') setIntent(detail)
+      if (detail === 'sale' || detail === 'wanted') {
+        setIntent(detail)
+        setExpanded(true)
+      }
     }
     window.addEventListener('ananas:composer-intent', onIntent)
     return () => window.removeEventListener('ananas:composer-intent', onIntent)
@@ -180,7 +184,11 @@ function CreatePostHeroShell({
   const isArabic = locale === 'ar'
 
   return (
-    <div id="ananas-composer" className={styles.composerHeroShell} dir={shellDir}>
+    <div
+      id="ananas-composer"
+      className={clsx(styles.composerHeroShell, !expanded && !title && styles.composerHeroCollapsed)}
+      dir={shellDir}
+    >
     
 
       <div className={styles.composerHeroTop} dir={rowDir}>
@@ -216,6 +224,10 @@ function CreatePostHeroShell({
               }
               aria-invalid={errorText ? true : undefined}
               aria-describedby={errorText ? 'create-post-hero-title-err' : undefined}
+              onFocus={(event) => {
+                setExpanded(true)
+                inputProps.onFocus?.(event)
+              }}
             />
 
 

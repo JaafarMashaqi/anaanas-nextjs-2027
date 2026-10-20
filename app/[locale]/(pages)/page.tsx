@@ -29,6 +29,7 @@ import CreatePostCardLazyClient from './home/components/CreatePostCardLazyClient
 import HomeUpperStage from './home/components/HomeUpperStage'
 import { fetchTrendingPosts } from '@/lib/api/homeInsights'
 import homeDiscoveryStyles from './homeDiscovery.module.css'
+import homeFlow from './homeFlow.module.css'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
 import { getCountryByCodeCached } from '@/lib/server/getCountryByCodeCached'
@@ -93,24 +94,23 @@ const Home = async ({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <FeedLayoutClient locale={locale} sidebar={<SideBar sections={sections} locale={locale} />}>
-        <Col md={8} lg={6} className="gap-4">
+        <Col md={8} lg={6} className={homeFlow.column}>
           <h1 className="visually-hidden">
             {t('home.a11y.visuallyHiddenTitle', uiLocale).replace('{{country}}', countryLabel)}
           </h1>
 
-          <section className="d-flex flex-column gap-2 mb-3" aria-label={uiLocale === 'ar' ? 'مقدمة السوق' : 'Market introduction'}>
-            <HomeUpperStage
-              locale={uiLocale}
-              countryLabel={countryLabel}
-              sections={sections}
-              trending={trending}
-            />
-            <MarketPulseCard locale={uiLocale} variant="rail" />
-          </section>
+          <HomeUpperStage
+            locale={uiLocale}
+            countryLabel={countryLabel}
+            sections={sections}
+            trending={trending}
+          />
 
+          {/* Original banner stays. The Amman hero is still waiting for an approved asset. */}
           <HomeBanner locale={uiLocale} />
 
-          {/* CreatePostCard before discovery row; mobile order: Banner, CreatePost, discovery, latest ads, feeds */}
+          <MarketPulseCard locale={uiLocale} variant="rail" />
+
           <CreatePostCardLazyClient />
 
           <Row className={`g-3 ${homeDiscoveryStyles.discoveryRow} d-md-none`}>
@@ -129,7 +129,7 @@ const Home = async ({
 
           <FeaturedPostsStrip locale={uiLocale} countryId={countryId} />
 
-          <div className="vstack mt-3 gap-4">
+          <div className={homeFlow.feed}>
             <Feeds
               listingsHeading={t('seo.home.feedListings', uiLocale)}
               filters={{

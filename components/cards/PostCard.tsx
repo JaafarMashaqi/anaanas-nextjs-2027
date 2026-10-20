@@ -56,6 +56,7 @@ import type { CommentType } from '@/types/data'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import SharePostModal from '@/components/share/SharePostModal'
 import { deletePost } from '@/lib/api/posts'
+import { plainListingText } from '@/lib/text/plainListingText'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import { linkifyPlainText } from '@/lib/text/linkify'
 import { useCurrentUser } from '@/context/useCurrentUser'
@@ -321,8 +322,8 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
     ((post as any)?.reaction_type_by_me as 'like' | 'love' | 'care' | 'haha' | 'wow' | 'sad' | 'angry' | null | undefined) ?? null
   const initialReactionCounts = normalizeReactionCounts((post as any)?.reaction_counts ?? null)
   const commentsCount = post?.comments_count ?? post?.commentsCount ?? 0
-  const caption = post?.description ?? post?.caption ?? ''
-  const title = post?.title ?? ''
+  const caption = plainListingText(String(post?.description ?? post?.caption ?? ''))
+  const title = plainListingText(String(post?.title ?? ''))
   const postImages = Array.isArray((post as any)?.post_images) ? ((post as any).post_images as any[]) : []
   const image = resolveMediaUrl(postImages[0]?.image_full_url ?? post?.image)
   const imageCount = postImages.length > 0 ? postImages.length : image ? 1 : 0

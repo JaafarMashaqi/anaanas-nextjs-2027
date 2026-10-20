@@ -6,9 +6,17 @@ import type { SupportedLocale } from '@/lib/localization'
 import { t } from '@/lib/translations'
 import styles from './MarketPulseCardClient.module.css'
 
+function pulseValue(item: SectionMomentumItem, locale: SupportedLocale) {
+  if (!item.previous_count || item.previous_count <= 0) {
+    return locale === 'ar' ? 'نشاط جديد' : 'New activity'
+  }
+  const rounded = Math.round(item.growth_percent)
+  if (!Number.isFinite(rounded)) return locale === 'ar' ? 'غير محسوب' : 'Not measured'
+  return `${rounded > 0 ? '+' : ''}${rounded}%`
+}
+
 const RANK_BADGES = ['🚗', '🏠', '📱', '💼', '📦', '⭐']
 
- 
 export default function MarketPulseCardClient({
   items,
   locale,
@@ -38,7 +46,7 @@ export default function MarketPulseCardClient({
                     <img src={src} alt="" width={22} height={22} />
                   ) : null}
                   <span>{item.name}</span>
-                  <strong>{item.growth_percent > 0 ? `+${item.growth_percent}%` : `${item.growth_percent}%`}</strong>
+                  <strong>{pulseValue(item, locale)}</strong>
                 </Link>
               )
             })}
@@ -107,7 +115,7 @@ export default function MarketPulseCardClient({
                     </div>
                   </div>
                 </div>
-                <div className={styles.growth}>+{item.growth_percent}%</div>
+                <div className={styles.growth}>{pulseValue(item, locale)}</div>
               </div>
             )
           })}

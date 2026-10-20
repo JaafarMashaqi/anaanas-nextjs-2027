@@ -9,6 +9,8 @@ import type { Section } from '@/lib/api/sections'
 import { getApiUrl } from '@/lib/api/config'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import type { SupportedLocale } from '@/lib/localization'
+import { plainListingText } from '@/lib/text/plainListingText'
+import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
 import mascot from '@/assets/uiux/mascot_sitting.png'
 
 import styles from './HomeUpperStage.module.css'
@@ -84,7 +86,11 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
             {isArabic ? 'ابحث، انشر، وتابع السوق من هنا' : 'Search, publish, and follow the market from here'}
           </p>
         </div>
-        <Image src={mascot} alt="" width={54} height={54} className={styles.mascot} />
+        <Image src={mascot} alt="" width={40} height={40} className={styles.mascot} />
+      </div>
+
+      <div className={styles.searchSlot}>
+        <MobileHeaderSearchBar locale={locale} />
       </div>
 
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
@@ -172,8 +178,8 @@ export default function HomeUpperStage({ locale, countryLabel, sections, trendin
           <div className={styles.wire}>
             {trending.map((item) => (
               <Link key={item.post_id} href={`/${locale}/post/${item.post_id}`} className={styles.wireItem}>
-                <strong>{item.title}</strong>
-                {item.section_name ? <span>{item.section_name}</span> : null}
+                {item.section_name ? <span>{plainListingText(item.section_name)}</span> : null}
+                <strong>{plainListingText(item.title)}</strong>
               </Link>
             ))}
           </div>
