@@ -57,7 +57,7 @@ import type { CommentType } from '@/types/data'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import SharePostModal from '@/components/share/SharePostModal'
 import { deletePost } from '@/lib/api/posts'
-import { plainListingText } from '@/lib/text/plainListingText'
+import { displayListingTitle, plainListingText } from '@/lib/text/plainListingText'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import { linkifyPlainText } from '@/lib/text/linkify'
 import { useCurrentUser } from '@/context/useCurrentUser'
@@ -326,6 +326,11 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   const commentsCount = post?.comments_count ?? post?.commentsCount ?? 0
   const caption = plainListingText(String(post?.description ?? post?.caption ?? ''))
   const title = plainListingText(String(post?.title ?? ''))
+  const cardTitle = displayListingTitle(title)
+  const captionEchoesTitle =
+    title.length > 18 &&
+    caption.length > 18 &&
+    (caption.startsWith(title.slice(0, 40)) || title.startsWith(caption.slice(0, 40)))
   const postImages = Array.isArray((post as any)?.post_images) ? ((post as any).post_images as any[]) : []
   const image = resolveMediaUrl(postImages[0]?.image_full_url ?? post?.image)
   const imageCount = postImages.length > 0 ? postImages.length : image ? 1 : 0
@@ -1389,7 +1394,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                   (title || hasCaption || priceLabel) && (
                     <div className={styles.listingTextFallback}>
                       {title && <h3 className={styles.title}>{title}</h3>}
-                      {hasCaption && (
+                      {hasCaption && !captionEchoesTitle && (
                         <p className={styles.listingFallbackCaption}>
                           {linkifyPlainText(normalizedCaption, styles.captionLink)}
                         </p>
@@ -1446,13 +1451,15 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
                           className={styles.listingInfoTitleLink}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <h3 className={styles.listingInfoTitle}>{title}</h3>
+                          <h3 className={styles.listingInfoTitle} title={title}>
+                            {cardTitle}
+                          </h3>
                         </Link>
                       )}
                       {listingSubtitleParts.length > 0 && (
                         <p className={styles.listingInfoSubtitle}>{listingSubtitleParts.join(' • ')}</p>
                       )}
-                      {hasCaption && (
+                      {hasCaption && !captionEchoesTitle && (
                         <p className={styles.listingInfoCaption}>
                           {linkifyPlainText(normalizedCaption, styles.captionLink)}
                         </p>

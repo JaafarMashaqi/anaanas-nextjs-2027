@@ -2,6 +2,13 @@
 
 Local commits only. Nothing here was pushed.
 
+## Phase 2 — premium pulse, composer studio, cards
+
+- Market Pulse rail now mixes LIVE counts (published listings, auctions, section activity, measured category) with DEMO cards that display the word Demo, not a number.
+- Tapping a demo or planned card opens a labeled studio. Period chips do not change live totals. Sold stays “unconfirmed” with no count.
+- Sell still publishes through the original composer. Wanted and auction save a browser draft and state that nothing was published.
+- Listing cards shorten a long title for display and hide a caption that repeats it.
+
 ## Already on this branch before this batch
 
 - `d1fe5d1` preview country cookie, no `jo.localhost` redirect.

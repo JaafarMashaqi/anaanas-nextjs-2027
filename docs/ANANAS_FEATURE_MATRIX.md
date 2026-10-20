@@ -15,13 +15,15 @@ Inspected in the original Next.js app. Status is what the code does today, not t
 | الخريطة / المطابقات | Local map and matches | quick actions | blocked | none | P6 | Buttons explain that they are not connected | code |
 | Section stories | Jump to a section | `HomeUpperStage` stories | partial | sections API | P1 | Not account stories. Labels snap fully into view | this batch |
 | Market wire | Real trending titles | `fetchTrendingPosts` | partial | trending endpoint | P3 | Titles from the server, or an empty state | code |
-| Market Pulse | Live counts and activity | `buildMarketPulse.ts`, pulse client | partial | posts, auctions, momentum, latest | P3 | Click opens a drawer of returned rows. Missing metrics stay listed as missing | code, commit `9f13d88` |
+| Market Pulse 3.0 | Signature rail | `buildMarketPulse.ts`, `MarketPulseCardClient.tsx` | LIVE counts for published listings, auctions, and section activity. DEMO panels for new listings, wanted, and opportunities, with no fabricated totals. PLANNED sold count until a confirmed sale event exists. | posts, auctions, section-momentum | P3 | Tapping a demo card shows a labeled studio. Live cards still show server numbers. | this batch |
+| Smart composer 2.0 | Publish or rehearse | `CreatePostCard.tsx`, `AdStudioDemo.tsx` | LIVE sell path still uses `/api/post`. Wanted and auction are DEMO drafts in sessionStorage and never claim a publish. Advanced studio says no model calculates an outcome. | original wizard | P4 | أبيع still focuses the title. Wanted save says it was not published. | this batch |
+| Listing card 2.0 | Readable social post | `PostCard.tsx`, `plainListingText.ts` | LIVE data. Long titles are shortened only on the card. Repeated captions are hidden. Currency and Arabic time stay. | post payload | P5 | A long Arabic title does not repeat in the caption. No invented stats. | this batch |
 | Hero banner | Campaign creative | `HomeBanner.tsx` | working | existing banners | — | Original banner remains | prior screenshots |
-| Smart composer | Publish a listing | `CreatePostCard.tsx` | partial | original wizard + `/api/post` | P4 | Collapsed = prompt + title. Expand shows photos, price, location, intent | this batch |
+| AI ad studio | Pricing, demand, quality | `AdStudioDemo.tsx` | DEMO | none | P9 | Copy says no model calculates an outcome | this batch |
 | AI ad studio | Pricing, demand, quality | cipher chips | UI-only | none | P9 | Copy says the tools are not connected | code |
 | Discovery tabs | Latest, photos, price | `HomeFeedTabs.tsx`, `page.tsx` | working | posts filters | P1 | Those three change the query. Wanted, nearby, following sit under More and do not filter | this batch |
 | Featured strip | Promoted listings | `FeaturedPostsStrip.tsx` | working | featured posts | — | Not labeled as heat or demand | code |
-| Listing card | Social commerce post | `PostCard.tsx` | partial | post payload | P5 | Currency from listing country. Arabic relative time. No zero row | this batch |
+| Reactions and comments | Respond to a listing | post API routes | LIVE | Laravel | — | Counts render only when greater than zero | code |
 | Reactions and comments | Respond to a listing | post API routes | working | Laravel | — | Counts render only when greater than zero | code |
 | Save listing | Come back later | — | missing | no saved-listings API found | P6 | Do not fake a bookmark | code |
 | Phone / inquiry | Contact the seller | card actions | partial | phone on the post when present | — | Existing actions stay | code |

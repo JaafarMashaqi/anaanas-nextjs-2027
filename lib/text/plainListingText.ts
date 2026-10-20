@@ -28,3 +28,13 @@ export function plainListingText(value: string) {
 
   return decoded.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 }
+
+/** Shorter card headline. The stored title is not changed. */
+export function displayListingTitle(value: string, max = 72) {
+  const clean = plainListingText(value)
+  if (clean.length <= max) return clean
+  const cut = clean.slice(0, max + 1)
+  const breakAt = Math.max(cut.lastIndexOf(' '), cut.lastIndexOf('،'), cut.lastIndexOf('.'))
+  const head = breakAt > 28 ? cut.slice(0, breakAt) : clean.slice(0, max)
+  return `${head.trim()}…`
+}

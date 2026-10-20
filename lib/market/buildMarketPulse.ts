@@ -2,15 +2,27 @@ import type { SectionMomentumItem } from '@/lib/api/homeInsights'
 
 export type PulseLocale = 'ar' | 'en'
 
-export type PulseMetricId = 'listings' | 'auctions' | 'sections' | 'measured'
+export type PulseMetricId =
+  | 'listings'
+  | 'fresh'
+  | 'activity'
+  | 'wanted'
+  | 'auctions'
+  | 'sections'
+  | 'measured'
+  | 'opportunities'
+  | 'sold'
+
+export type PulseLevel = 'live' | 'demo' | 'blocked'
 
 export type PulseMetric = {
   id: PulseMetricId
+  level: PulseLevel
   label: string
   value: string
   period: string
   hint: string
-  tone: 'navy' | 'amber' | 'violet' | 'green'
+  tone: 'navy' | 'amber' | 'violet' | 'green' | 'coral' | 'blue'
   href: string
   sectionSlug?: string
   raw: number | null
@@ -61,7 +73,7 @@ function growthLabel(item: SectionMomentumItem): string | null {
   return `${rounded > 0 ? '+' : ''}${rounded}%`
 }
 
-function hrefFor(locale: string, metric: PulseMetricId, sectionSlug?: string): string {
+function hrefFor(locale: string, metric: 'listings' | 'auctions' | 'sections' | 'measured', sectionSlug?: string): string {
   const params = new URLSearchParams({ metric })
   if (sectionSlug) params.set('section', sectionSlug)
   return `/${locale}/market-pulse?${params.toString()}`
@@ -83,6 +95,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
           ? 'المجموع من الخادم لهذا البلد. ليس عدد إعلانات اليوم.'
           : 'Server total for this country. Not a count of listings posted today.',
       tone: 'navy',
+      level: 'live',
       href: hrefFor(locale, 'listings'),
       raw: source.listingsError ? null : source.listingsTotal,
     },
@@ -99,6 +112,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
           ? 'عدد المزادات ذات الحالة live. الصفر رقم حقيقي وليس تقديراً.'
           : 'Count of auctions with status live. Zero is a real count, not an estimate.',
       tone: 'amber',
+      level: 'live',
       href: hrefFor(locale, 'auctions'),
       raw: source.auctionsError ? null : source.auctionsTotal,
     },
@@ -114,6 +128,7 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
         ? 'عدد الأقسام في section-momentum. الخادم لا يسمّي طول النافذة.'
         : 'Sections returned by section-momentum. The server does not name the window length.',
       tone: 'violet',
+      level: 'live',
       href: hrefFor(locale, 'sections'),
       raw: source.sections.length,
     })
@@ -140,11 +155,81 @@ export function buildMarketPulse(source: MarketPulseSource, locale: PulseLocale)
         ? `${measured.current_count} الآن، ${measured.previous_count} في النافذة السابقة. ليست توقعاً للطلب.`
         : `${measured.current_count} now, ${measured.previous_count} in the previous window. Not a demand forecast.`,
       tone: 'green',
+      level: 'live',
       href: hrefFor(locale, 'measured', measured.slug),
       sectionSlug: measured.slug,
       raw: measured.current_count,
     })
   }
+
+  const activeSections = source.sections.filter((item) => item.current_count > 0).length
+  metrics.splice(1, 0, {
+    id: 'fresh',
+    level: 'demo',
+    label: ar ? 'إعلانات جديدة' : 'New listings',
+    value: ar ? 'تجريبي' : 'Demo',
+    period: ar ? 'لا نافذة ٢٤ ساعة' : 'No 24-hour window',
+    hint: ar
+      ? 'لا يوجد إجمالي للإعلانات الجديدة. اللوحة واجهة تجريبية، وشارة is_new ليست هذا الإجمالي.'
+      : 'There is no total of new listings. The panel is a demo, and is_new is not that total.',
+    tone: 'blue',
+    href: `/${locale}/search`,
+    raw: null,
+  })
+  metrics.splice(2, 0, {
+    id: 'activity',
+    level: 'live',
+    label: ar ? 'حركة الأقسام' : 'Section activity',
+    value: count(source.sectionsError ? null : activeSections, locale, source.sectionsError),
+    period: ar ? 'أقسام بعدد أكبر من صفر' : 'Sections with a count above zero',
+    hint: ar
+      ? 'من section-momentum. ليس نشاط السوق لحظة بلحظة.'
+      : 'From section-momentum. Not a live tick of the whole market.',
+    tone: 'coral',
+    href: hrefFor(locale, 'sections'),
+    raw: source.sectionsError ? null : activeSections,
+  })
+  metrics.splice(3, 0, {
+    id: 'wanted',
+    level: 'demo',
+    label: ar ? 'طلب / مطلوب' : 'Wanted demand',
+    value: ar ? 'تجريبي' : 'Demo',
+    period: ar ? 'لا نوع مطلوب' : 'No wanted type',
+    hint: ar
+      ? 'لا عدّاد طلب. الفتح يعرض لوحة تجريبية ولا ينشر إعلاناً.'
+      : 'No demand count. Opening this shows a demo panel and publishes nothing.',
+    tone: 'violet',
+    href: `/${locale}`,
+    raw: null,
+  })
+  metrics.push(
+    {
+      id: 'opportunities',
+      level: 'demo',
+      label: ar ? 'فرص' : 'Opportunities',
+      value: ar ? 'تجريبي' : 'Demo',
+      period: ar ? 'لا مطابقة للمستخدم' : 'No user matching',
+      hint: ar
+        ? 'لا قائمة فرص شخصية. اللوحة شكل للواجهة فقط.'
+        : 'There is no personal opportunity list. The panel is an interface sketch only.',
+      tone: 'violet',
+      href: `/${locale}/search`,
+      raw: null,
+    },
+    {
+      id: 'sold',
+      level: 'blocked',
+      label: ar ? 'مباع' : 'Sold',
+      value: ar ? 'غير مؤكد' : 'Unconfirmed',
+      period: ar ? 'بانتظار حدث بيع' : 'Waiting for a sale event',
+      hint: ar
+        ? 'لا نعرض عدداً. الخادم لا يعيد بيعاً مؤكداً.'
+        : 'No number is shown. The server does not return a confirmed sale.',
+      tone: 'green',
+      href: `/${locale}/market-pulse`,
+      raw: null,
+    },
+  )
 
   const bars: PulseSectionBar[] = source.sections.map((item) => ({
     sectionId: item.section_id,

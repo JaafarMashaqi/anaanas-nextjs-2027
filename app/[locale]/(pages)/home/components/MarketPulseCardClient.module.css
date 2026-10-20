@@ -236,8 +236,125 @@
   color: #15803d;
 }
 
+.metricTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.levelLive,
+.levelDemo,
+.levelBlocked {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  padding: 0.08rem 0.4rem;
+}
+
+.levelLive {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.levelDemo {
+  color: #6d28d9;
+  background: #f3e8ff;
+}
+
+.levelBlocked {
+  color: #667085;
+  background: #f3f4f6;
+}
+
+.metricWord {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #101828;
+}
+
+.blue .metricIcon {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.coral .metricIcon {
+  background: #ffe4e6;
+  color: #e11d48;
+}
+
+.studio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+}
+
+.studioBanner {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  background: #f5f3ff;
+  color: #5b21b6;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.studioNote {
+  margin: 0;
+  color: #667085;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.periods,
+.studioActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.period,
+.periodOn,
+.studioActions button,
+.studioActions a {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #e7e9ee;
+  background: #fff;
+  color: #101828;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.periodOn {
+  background: #101828;
+  color: #ffc928;
+  border-color: #101828;
+}
+
+.sketch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.sketch span {
+  display: block;
+  height: 8px;
+  border-radius: 99px;
+  background: repeating-linear-gradient(90deg, #e9e5f7, #e9e5f7 8px, #f5f3ff 8px, #f5f3ff 14px);
+}
+
 .drawer {
-  max-height: 240px;
+  max-height: min(440px, 58vh);
   overflow: auto;
   padding: 0.55rem 0.15rem 0.2rem;
   border-top: 1px solid #e6e8ef;

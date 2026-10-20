@@ -1,0 +1,92 @@
+.studio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+  padding: 0.65rem;
+  border-radius: 14px;
+  background: #f8f7ff;
+  border: 1px solid #e9e5f7;
+}
+
+.banner,
+.hint,
+.status {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.banner {
+  color: #5b21b6;
+  font-weight: 800;
+}
+
+.hint,
+.status {
+  color: #667085;
+}
+
+.progress {
+  height: 6px;
+  border-radius: 99px;
+  background: #eceaf3;
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: #7c3aed;
+}
+
+.suggestions,
+.actions,
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.suggestions button,
+.quiet,
+.primary {
+  min-height: 34px;
+  border-radius: 999px;
+  border: 1px solid #e7e9ee;
+  background: #fff;
+  color: #101828;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.7rem;
+  cursor: pointer;
+}
+
+.primary {
+  background: #101828;
+  color: #ffc928;
+  border-color: #101828;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1 1 120px;
+  min-width: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #101828;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border: 1px solid #e7e9ee;
+  border-radius: 10px;
+  padding: 0.4rem 0.5rem;
+  font: inherit;
+  background: #fff;
+  color: #101828;
+}

@@ -33,22 +33,8 @@
   background: #fff8de;
 }
 
-:global(html.ananas-has-product-nav) body {
-  padding-bottom: calc(68px + env(safe-area-inset-bottom));
-}
-
 @media (max-width: 991.98px) {
   .nav {
     display: grid;
-  }
-
-  :global(body):has(.nav) {
-    padding-bottom: calc(68px + env(safe-area-inset-bottom));
-  }
-}
-
-@media (min-width: 992px) {
-  :global(html.ananas-has-product-nav) body {
-    padding-bottom: 0;
   }
 }

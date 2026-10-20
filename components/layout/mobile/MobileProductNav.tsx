@@ -49,7 +49,9 @@ export default function MobileProductNav() {
   if (hidden) return null
 
   return (
-    <nav className={styles.nav} aria-label={locale === 'ar' ? 'تنقل أناناس' : 'ANANAS navigation'}>
+    <>
+      <style>{`@media (max-width:991.98px){html.ananas-has-product-nav body{padding-bottom:calc(68px + env(safe-area-inset-bottom))}}@media (min-width:992px){html.ananas-has-product-nav body{padding-bottom:0}}`}</style>
+      <nav className={styles.nav} aria-label={locale === 'ar' ? 'تنقل أناناس' : 'ANANAS navigation'}>
       {ITEMS.map((item) => {
         const Icon = item.icon
         const active = isActive(pathname, locale, item.path)
@@ -66,5 +68,6 @@ export default function MobileProductNav() {
         )
       })}
     </nav>
+    </>
   )
 }

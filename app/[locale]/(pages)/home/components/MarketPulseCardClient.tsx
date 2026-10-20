@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import Link from 'next/link'
-import { BsBarChart, BsGrid, BsGraphUpArrow, BsHammer } from 'react-icons/bs'
+import { BsBagCheck, BsBarChart, BsBullseye, BsGrid, BsGraphUpArrow, BsHammer, BsLightning, BsSearch, BsStars } from 'react-icons/bs'
 
 import type { MarketPulseModel, PulseActivity, PulseMetric, PulseMetricId } from '@/lib/market/buildMarketPulse'
 import type { SupportedLocale } from '@/lib/localization'
@@ -11,9 +11,14 @@ import styles from './MarketPulseCardClient.module.css'
 
 const ICONS = {
   listings: BsGrid,
+  fresh: BsStars,
+  activity: BsLightning,
+  wanted: BsSearch,
   auctions: BsHammer,
   sections: BsBarChart,
   measured: BsGraphUpArrow,
+  opportunities: BsBullseye,
+  sold: BsBagCheck,
 } as const
 
 export type PulseLatestItem = {
@@ -91,22 +96,132 @@ function MetricCard({
   onOpen: (id: PulseMetricId) => void
 }) {
   const Icon = ICONS[metric.id]
+  const ar = locale === 'ar'
+  const levelLabel =
+    metric.level === 'live' ? (ar ? 'مباشر' : 'Live') : metric.level === 'demo' ? (ar ? 'تجريبي' : 'Demo') : ar ? 'مخطط' : 'Planned'
   return (
     <button
       type="button"
       className={`${styles.metric} ${styles[metric.tone]}`}
       title={metric.hint}
       aria-pressed={pressed}
-      aria-label={`${metric.label}. ${metric.value}. ${metric.period}. ${metric.hint}`}
+      aria-label={`${levelLabel}. ${metric.label}. ${metric.value}. ${metric.period}. ${metric.hint}`}
       onClick={() => onOpen(metric.id)}
     >
-      <span className={styles.metricIcon} aria-hidden>
-        <Icon size={15} />
+      <span className={styles.metricTop}>
+        <span className={styles.metricIcon} aria-hidden>
+          <Icon size={15} />
+        </span>
+        <span className={metric.level === 'live' ? styles.levelLive : metric.level === 'demo' ? styles.levelDemo : styles.levelBlocked}>
+          {levelLabel}
+        </span>
       </span>
       <span className={styles.metricLabel}>{metric.label}</span>
-      <LiveFigure raw={metric.raw} fallback={metric.value} storageKey={metric.id} locale={locale} />
+      {metric.level === 'live' ? (
+        <LiveFigure raw={metric.raw} fallback={metric.value} storageKey={metric.id} locale={locale} />
+      ) : (
+        <strong className={styles.metricWord}>{metric.value}</strong>
+      )}
       <span className={styles.metricPeriod}>{metric.period}</span>
     </button>
+  )
+}
+
+function PulseStudio({
+  metric,
+  locale,
+  latestItems,
+  bars,
+}: {
+  metric: PulseMetric
+  locale: SupportedLocale
+  latestItems: PulseLatestItem[]
+  bars: MarketPulseModel['bars']
+}) {
+  const ar = locale === 'ar'
+  const periods = ['24h', '7d', '30d'] as const
+  const [period, setPeriod] = useState<(typeof periods)[number]>('24h')
+  const [notice, setNotice] = useState<string | null>(null)
+  const flagged = latestItems.filter((item) => item.isNew).slice(0, 3)
+
+  return (
+    <div className={styles.studio}>
+      <p className={styles.studioBanner}>
+        {metric.level === 'demo'
+          ? ar
+            ? 'تجريبي — هذه لوحة واجهة. لا أرقام سوق هنا.'
+            : 'Demo — this is an interface panel. There are no market numbers here.'
+          : ar
+            ? 'مخطط — لا نعرض عدداً قبل وجود سجل مؤكد.'
+            : 'Planned — no count is shown until a confirmed record exists.'}
+      </p>
+      <p>{metric.hint}</p>
+      {metric.level === 'demo' ? (
+        <div className={styles.periods} role="group" aria-label={ar ? 'نافذة الواجهة' : 'Interface window'}>
+          {periods.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className={period === item ? styles.periodOn : styles.period}
+              onClick={() => {
+                setPeriod(item)
+                setNotice(
+                  ar
+                    ? 'الخادم لا يصفّي النبض بهذه النافذة. الاختيار لا يغيّر الأرقام المباشرة.'
+                    : 'The server does not filter pulse by this window. The choice does not change live numbers.',
+                )
+              }}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {notice ? <p className={styles.studioNote}>{notice}</p> : null}
+      {metric.id === 'fresh' && flagged.length > 0 ? (
+        <ul className={styles.latest}>
+          {flagged.map((item) => (
+            <li key={item.id}>
+              <Link href={item.href}>{item.title}</Link>
+              <span>{ar ? 'شارة is_new في آخر قائمة، ليست الإجمالي' : 'is_new on the latest list, not the total'}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {metric.level === 'demo' ? (
+        <div className={styles.sketch} aria-hidden>
+          <span style={{ width: '72%' }} />
+          <span style={{ width: '48%' }} />
+          <span style={{ width: '34%' }} />
+        </div>
+      ) : null}
+      {bars.length > 0 ? (
+        <p className={styles.studioNote}>
+          {ar ? 'أقسام حقيقية يمكن فتحها:' : 'Real sections you can open:'}{' '}
+          {bars.slice(0, 3).map((bar, index) => (
+            <Link key={bar.sectionId} href={bar.href}>
+              {bar.name}
+              {index < Math.min(2, bars.length - 1) ? ' · ' : ''}
+            </Link>
+          ))}
+        </p>
+      ) : null}
+      <div className={styles.studioActions}>
+        <Link href={metric.href}>{ar ? 'افتح مساراً حقيقياً' : 'Open a real route'}</Link>
+        <button
+          type="button"
+          onClick={() =>
+            setNotice(
+              ar
+                ? 'التنبيه يبقى في هذه الجلسة فقط. الخادم لا يحفظ اشتراكاً.'
+                : 'The alert stays in this session only. The server does not save a subscription.',
+            )
+          }
+        >
+          {ar ? 'نبهني هنا' : 'Alert me here'}
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -129,8 +244,9 @@ function PulseDrawer({
 }) {
   const ar = locale === 'ar'
   const focused = focus ? model.metrics.find((item) => item.id === focus) : null
-  const showRanks = !focus || focus === 'sections' || focus === 'measured'
-  const showLatest = !focus || focus === 'listings'
+  const showRanks = (!focus || focus === 'sections' || focus === 'measured') && (!focused || focused.level === 'live')
+  const showLatest = (!focus || focus === 'listings') && (!focused || focused.level === 'live')
+  const showLiveBody = !focused || focused.level === 'live'
   return (
     <div className={styles.drawer} id={drawerId}>
       <p className={styles.source}>
@@ -138,7 +254,10 @@ function PulseDrawer({
         {' · '}
         {ar ? 'المصدر:' : 'Source:'} /api/posts, /api/auctions, /api/home/section-momentum, /api/home/latest-listings
       </p>
-      {focused ? (
+      {focused && focused.level !== 'live' ? (
+        <PulseStudio metric={focused} locale={locale} latestItems={latestItems} bars={model.bars} />
+      ) : null}
+      {focused && focused.level === 'live' ? (
         <div className={styles.focus}>
           <h3>{focused.label}</h3>
           <p>{focused.hint}</p>
@@ -146,10 +265,11 @@ function PulseDrawer({
           <Link href={focused.href}>{ar ? 'افتح هذا المؤشر' : 'Open this metric'}</Link>
         </div>
       ) : null}
-      <h3>{ar ? 'ما الذي تغيّر فعلاً' : 'What actually changed'}</h3>
-      {activities.length === 0 ? (
+      {showLiveBody ? <h3>{ar ? 'ما الذي تغيّر فعلاً' : 'What actually changed'}</h3> : null}
+      {showLiveBody && activities.length === 0 ? (
         <p className={styles.railEmpty}>{ar ? 'لا توجد أحداث في هذه الاستجابة.' : 'This response has no activity events.'}</p>
-      ) : (
+      ) : null}
+      {showLiveBody && activities.length > 0 ? (
         <ul className={styles.activity}>
           {activities.map((item) => (
             <li key={item.id} data-kind={item.kind}>
@@ -157,7 +277,7 @@ function PulseDrawer({
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
       {showRanks ? (
         <ol className={styles.rank}>
           {model.bars.map((bar, index) => (

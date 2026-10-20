@@ -40,6 +40,7 @@ import LoginRequiredDialog from '@/components/dialogs/LoginRequiredDialog'
 import PostSuccessCelebrationModal from '@/components/dialogs/PostSuccessCelebrationModal'
 import { dispatchPostCreated } from '@/lib/postCreated'
 import WizardPostPhotosStep from './WizardPostPhotosStep'
+import AdStudioDemo from './AdStudioDemo'
 import clsx from 'clsx'
 import {
   BsBullseye,
@@ -153,10 +154,10 @@ type CreatePostHeroShellProps = {
   limitOverlay?: ReactNode
 }
 
-function readQueuedComposerIntent(): 'sale' | 'wanted' | null {
+function readQueuedComposerIntent(): 'sale' | 'wanted' | 'auction' | null {
   if (typeof document === 'undefined') return null
   const value = document.documentElement.dataset.composerIntent
-  return value === 'sale' || value === 'wanted' ? value : null
+  return value === 'sale' || value === 'wanted' || value === 'auction' ? value : null
 }
 
 /** واجهة البطل الافتراضية (ضيف / عنوان فارغ) — تصميم موحّد للموبايل والشاشات العريضة */
@@ -175,7 +176,8 @@ function CreatePostHeroShell({
   const shellDir = isWizardRtl ? 'rtl' : 'ltr'
   const rowDir = isWizardRtl ? 'rtl' : 'ltr'
   const queuedIntent = readQueuedComposerIntent()
-  const [intent, setIntent] = useState<'sale' | 'wanted'>(queuedIntent ?? 'sale')
+  const [intent, setIntent] = useState<'sale' | 'wanted' | 'auction'>(queuedIntent ?? 'sale')
+  const [studioOpen, setStudioOpen] = useState(false)
   const [expanded, setExpanded] = useState(queuedIntent !== null || title.trim().length > 0)
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
@@ -187,7 +189,7 @@ function CreatePostHeroShell({
   useEffect(() => {
     const onIntent = (event: Event) => {
       const detail = (event as CustomEvent<string>).detail
-      if (detail === 'sale' || detail === 'wanted') {
+      if (detail === 'sale' || detail === 'wanted' || detail === 'auction') {
         setIntent(detail)
         setExpanded(true)
       }
@@ -366,14 +368,21 @@ function CreatePostHeroShell({
           className={clsx(styles.composerIntent, intent === 'wanted' && styles.composerIntentActive)}
           onClick={() => {
             setIntent('wanted')
-            onAddAdClick()
+            setExpanded(true)
           }}
         >
           {isArabic ? 'مطلوب' : 'Wanted'}
         </button>
-        <Link href={`/${locale}/pages/auction`} className={styles.composerIntent}>
+        <button
+          type="button"
+          className={clsx(styles.composerIntent, intent === 'auction' && styles.composerIntentActive)}
+          onClick={() => {
+            setIntent('auction')
+            setExpanded(true)
+          }}
+        >
           {isArabic ? 'مزاد' : 'Auction'}
-        </Link>
+        </button>
         <Link href={`/${locale}/stores`} className={styles.composerIntent}>
           {isArabic ? 'متجر' : 'Store'}
         </Link>
@@ -381,12 +390,31 @@ function CreatePostHeroShell({
       <p className={styles.composerModeNote}>
         {intent === 'wanted'
           ? isArabic
-            ? 'وضع مطلوب يجهّز العنوان فقط. النشر ما زال مسار الإعلان الحالي، لأن الخادم لا يملك نوع «مطلوب» منفصلاً.'
-            : 'Wanted mode only prepares the title. Publishing still uses the current listing flow, because the server has no separate wanted type.'
-          : isArabic
-            ? 'الصور تُضاف في خطوة الصور داخل نفس المعالج.'
-            : 'Photos are added in the photo step of this same composer.'}
+            ? 'مطلوب مسار تجريبي. لا يُنشئ نوع إعلان على الخادم.'
+            : 'Wanted is a demo path. It does not create a listing type on the server.'
+          : intent === 'auction'
+            ? isArabic
+              ? 'مزاد هنا مسودة تجريبية. المزادات المباشرة تبقى في صفحتها.'
+              : 'Auction here is a demo draft. Live auctions stay on their own page.'
+            : isArabic
+              ? 'البيع يكمل في مسار النشر الحالي: الوصف والصور والسعر.'
+              : 'Sell continues in the current publish flow: description, photos, and price.'}
       </p>
+      <div className={styles.composerStudioSlot}>
+          {intent === 'sale' ? (
+            <button type="button" className={styles.composerShortcut} onClick={() => setStudioOpen((open) => !open)}>
+              {isArabic ? 'استوديو متقدم' : 'Advanced studio'}
+            </button>
+          ) : null}
+          {intent !== 'sale' || studioOpen ? (
+            <AdStudioDemo
+              locale={locale}
+              mode={intent}
+              title={title}
+              onUseTitle={(value) => onChange({ target: { value } } as ChangeEvent<HTMLInputElement>)}
+            />
+          ) : null}
+        </div>
 
       {showTags ? (
         <div className={styles.composerHeroTags}>
