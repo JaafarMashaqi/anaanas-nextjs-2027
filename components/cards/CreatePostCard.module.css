@@ -1333,8 +1333,8 @@
   width: 100%;
   border-radius: 18px;
   padding: 0.72rem 0.75rem 0.62rem;
-  background: linear-gradient(180deg, #ffe57a 0%, #ffd53a 42%, #fff4c4 100%);
-  border: 1px solid rgba(21, 21, 21, 0.08);
+  background: linear-gradient(180deg, #fff9ee 0%, #fff3d8 100%);
+  border: 1px solid rgba(232, 184, 42, 0.55);
   box-shadow:
     0 10px 24px rgba(21, 21, 21, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
@@ -1507,9 +1507,17 @@
   cursor: pointer;
 }
 
-.composerIntent:hover {
+.composerIntent:hover,
+.composerIntentActive {
   background: #151515;
   color: #ffd53a;
+}
+
+.composerModeNote {
+  margin: 0.45rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: rgba(21, 21, 21, 0.68);
 }
 
 .composerHeroTags {

@@ -1,0 +1,226 @@
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding: 0.85rem 0.8rem 0.7rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fff8e4 0%, #fffdf8 70%);
+  color: #151515;
+}
+
+.greet {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.sky {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: #151515;
+}
+
+.sun {
+  color: #b8860b;
+  animation: spin 18s linear infinite;
+}
+
+.moon {
+  color: #3d4d73;
+}
+
+.greetCopy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.greetTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.greetHint {
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
+  color: rgba(21, 21, 21, 0.62);
+}
+
+.mascot {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.actions,
+.links,
+.stories,
+.wire {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.action,
+.actionQuiet {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.action {
+  background: #151515;
+  color: #ffd53a;
+}
+
+.actionQuiet {
+  background: transparent;
+  color: #151515;
+  box-shadow: inset 0 0 0 1px rgba(21, 21, 21, 0.16);
+}
+
+.note,
+.empty {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(21, 21, 21, 0.72);
+}
+
+.links a {
+  flex: 0 0 auto;
+  color: #151515;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.blockHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.blockHead h2 {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.blockHead span {
+  font-size: 0.68rem;
+  color: rgba(21, 21, 21, 0.55);
+  text-align: end;
+}
+
+.story {
+  flex: 0 0 auto;
+  width: 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  color: #151515;
+  text-decoration: none;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.story span:last-child {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storyRing {
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #ffd53a;
+  overflow: hidden;
+}
+
+.storyRing img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+.wireItem {
+  flex: 0 0 auto;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #151515;
+  text-decoration: none;
+}
+
+.wireItem strong,
+.wireItem span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wireItem strong {
+  font-size: 0.78rem;
+}
+
+.wireItem span {
+  font-size: 0.68rem;
+  color: rgba(21, 21, 21, 0.55);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sun {
+    animation: none;
+  }
+}
+
+@media (min-width: 992px) {
+  .stage {
+    padding: 1rem 1rem 0.85rem;
+  }
+
+  .greetTitle {
+    font-size: 1.15rem;
+  }
+}

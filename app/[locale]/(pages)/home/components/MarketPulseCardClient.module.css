@@ -1,3 +1,59 @@
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.railHead {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.railHead h2 {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.railEmpty {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(21, 21, 21, 0.62);
+}
+
+.railTrack {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+}
+
+.railChip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #151515;
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.railChip img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.railChip strong {
+  font-size: 0.72rem;
+  color: #8a6500;
+}
+
 .root {
   position: relative;
   border-radius: 22px;

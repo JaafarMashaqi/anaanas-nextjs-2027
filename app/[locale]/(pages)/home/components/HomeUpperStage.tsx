@@ -1,0 +1,184 @@
+'use client'
+
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+
+import type { TrendingPostItem } from '@/lib/api/homeInsights'
+import type { Section } from '@/lib/api/sections'
+import { getApiUrl } from '@/lib/api/config'
+import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
+import type { SupportedLocale } from '@/lib/localization'
+import mascot from '@/assets/uiux/mascot_sitting.png'
+
+import styles from './HomeUpperStage.module.css'
+
+type Props = {
+  locale: SupportedLocale
+  countryLabel: string
+  sections: Section[]
+  trending: TrendingPostItem[]
+}
+
+function sectionIcon(icon?: string | null) {
+  if (!icon) return null
+  if (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('//')) {
+    return resolveMediaUrl(icon)
+  }
+  const path = icon.startsWith('/') ? icon : `/${icon}`
+  return resolveMediaUrl(getApiUrl(path))
+}
+
+function openComposer(intent: 'sale' | 'wanted') {
+  window.dispatchEvent(new CustomEvent('ananas:composer-intent', { detail: intent }))
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  document.getElementById('ananas-composer')?.scrollIntoView({
+    behavior: reduced ? 'auto' : 'smooth',
+    block: 'center',
+  })
+  window.setTimeout(() => document.getElementById('create-post-title')?.focus(), reduced ? 0 : 280)
+}
+
+export default function HomeUpperStage({ locale, countryLabel, sections, trending }: Props) {
+  const isArabic = locale === 'ar'
+  const stable = isArabic ? `سوق أناناس في ${countryLabel}` : `ANANAS market in ${countryLabel}`
+  const [greeting, setGreeting] = useState(stable)
+  const [sky, setSky] = useState<'day' | 'night' | 'neutral'>('neutral')
+  const [note, setNote] = useState<'map' | 'matches' | null>(null)
+
+  useEffect(() => {
+    const hour = new Date().getHours()
+    const day = hour >= 6 && hour < 18
+    setSky(day ? 'day' : 'night')
+    if (isArabic) {
+      const part = hour < 12 ? 'صباح الخير' : hour < 17 ? 'نهارك سعيد' : 'مساء الخير'
+      setGreeting(`${part} في ${countryLabel}`)
+      return
+    }
+    const part = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+    setGreeting(`${part} in ${countryLabel}`)
+  }, [countryLabel, isArabic])
+
+  const stories = sections.slice(0, 8)
+
+  return (
+    <div className={styles.stage} dir={isArabic ? 'rtl' : 'ltr'}>
+      <div className={styles.greet}>
+        <span className={`${styles.sky} ${sky === 'day' ? styles.sun : ''} ${sky === 'night' ? styles.moon : ''}`} aria-hidden>
+          {sky === 'night' ? (
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path fill="currentColor" d="M14.5 2.4a8.8 8.8 0 1 0 7.1 12.2A8 8 0 0 1 14.5 2.4z" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <circle cx="12" cy="12" r="4" fill="currentColor" />
+              <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                <path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19" />
+              </g>
+            </svg>
+          )}
+        </span>
+        <div className={styles.greetCopy}>
+          <p className={styles.greetTitle}>{greeting}</p>
+          <p className={styles.greetHint}>
+            {isArabic ? 'ابحث، انشر، وتابع السوق من هنا' : 'Search, publish, and follow the market from here'}
+          </p>
+        </div>
+        <Image src={mascot} alt="" width={54} height={54} className={styles.mascot} />
+      </div>
+
+      <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
+        <button type="button" className={styles.action} onClick={() => openComposer('sale')}>
+          {isArabic ? 'أبيع' : 'Sell'}
+        </button>
+        <button type="button" className={styles.action} onClick={() => openComposer('wanted')}>
+          {isArabic ? 'مطلوب الآن' : 'Wanted'}
+        </button>
+        <button type="button" className={styles.actionQuiet} onClick={() => setNote(note === 'map' ? null : 'map')}>
+          {isArabic ? 'الخريطة' : 'Map'}
+        </button>
+        <button type="button" className={styles.actionQuiet} onClick={() => setNote(note === 'matches' ? null : 'matches')}>
+          {isArabic ? 'المطابقات' : 'Matches'}
+        </button>
+      </div>
+
+      {note ? (
+        <p className={styles.note} role="status">
+          {note === 'map'
+            ? isArabic
+              ? 'الخريطة غير مربوطة في هذا التطبيق. البلد الحالي يبقى من اختيار الدولة.'
+              : 'A map is not connected in this app. The country still comes from the country selector.'
+            : isArabic
+              ? 'المطابقات غير مربوطة بخدمة بعد. استخدم البحث للوصول إلى الإعلانات الحالية.'
+              : 'Matches are not connected to a service yet. Use search for current listings.'}
+        </p>
+      ) : null}
+
+      <div className={styles.links}>
+        <Link href={`/${locale}/search`}>{isArabic ? 'بحث' : 'Search'}</Link>
+        <Link href={`/${locale}/pages/auction`}>{isArabic ? 'مزادات' : 'Auctions'}</Link>
+        <Link href={`/${locale}/stores`}>{isArabic ? 'متاجر' : 'Stores'}</Link>
+      </div>
+
+      <div className={styles.block}>
+        <div className={styles.blockHead}>
+          <h2>{isArabic ? 'قصص الأقسام' : 'Section stories'}</h2>
+          <span>{isArabic ? 'من الأقسام الحالية، وليست قصص حسابات' : 'Current sections, not account stories'}</span>
+        </div>
+        <div className={styles.stories}>
+          {stories.length === 0 ? (
+            <p className={styles.empty}>{isArabic ? 'لا توجد أقسام للعرض الآن.' : 'No sections to show right now.'}</p>
+          ) : (
+            stories.map((section) => {
+              const icon = sectionIcon(section.icon)
+              return (
+                <Link key={section.id} href={`/${locale}/sections/${section.slug}`} className={styles.story}>
+                  <span className={styles.storyRing}>
+                    {icon ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={icon} alt="" />
+                    ) : (
+                      <Image src={mascot} alt="" width={44} height={44} />
+                    )}
+                  </span>
+                  <span>{section.name}</span>
+                </Link>
+              )
+            })
+          )}
+        </div>
+      </div>
+
+      <div className={styles.block}>
+        <div className={styles.blockHead}>
+          <h2>{isArabic ? 'سلك السوق' : 'Market wire'}</h2>
+          <span>
+            {trending.length
+              ? isArabic
+                ? 'عناوين رائجة من الخادم'
+                : 'Trending titles from the server'
+              : isArabic
+                ? 'لا توجد أرقام تجريبية'
+                : 'No sample numbers'}
+          </span>
+        </div>
+        {trending.length === 0 ? (
+          <p className={styles.empty}>
+            {isArabic
+              ? 'لا توجد إعلانات رائجة مؤكدة من الخادم في هذه اللحظة.'
+              : 'The server has no confirmed trending listings right now.'}
+          </p>
+        ) : (
+          <div className={styles.wire}>
+            {trending.map((item) => (
+              <Link key={item.post_id} href={`/${locale}/post/${item.post_id}`} className={styles.wireItem}>
+                <strong>{item.title}</strong>
+                {item.section_name ? <span>{item.section_name}</span> : null}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

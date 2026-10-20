@@ -12,10 +12,42 @@ const RANK_BADGES = ['🚗', '🏠', '📱', '💼', '📦', '⭐']
 export default function MarketPulseCardClient({
   items,
   locale,
+  variant = 'card',
 }: {
   items: SectionMomentumItem[]
   locale: SupportedLocale
+  variant?: 'card' | 'rail'
 }) {
+  if (variant === 'rail') {
+    return (
+      <div className={styles.rail}>
+        <div className={styles.railHead}>
+          <span className={styles.liveDot} aria-hidden />
+          <h2>{t('home.marketPulse', locale)}</h2>
+        </div>
+        {items.length === 0 ? (
+          <p className={styles.railEmpty}>{t('home.marketPulseEmpty', locale)}</p>
+        ) : (
+          <div className={styles.railTrack}>
+            {items.map((item) => {
+              const src = item.icon_full_path || null
+              return (
+                <Link key={item.section_id} href={`/${locale}/sections/${item.slug}`} className={styles.railChip}>
+                  {src ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={src} alt="" width={22} height={22} />
+                  ) : null}
+                  <span>{item.name}</span>
+                  <strong>{item.growth_percent > 0 ? `+${item.growth_percent}%` : `${item.growth_percent}%`}</strong>
+                </Link>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className={styles.root}>
       <div className={styles.glowOrbs} aria-hidden>

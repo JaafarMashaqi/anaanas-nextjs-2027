@@ -6,7 +6,13 @@ import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHe
 import { isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
 
-export default async function MarketPulseCard({ locale }: { locale: SupportedLocale }) {
+export default async function MarketPulseCard({
+  locale,
+  variant = 'card',
+}: {
+  locale: SupportedLocale
+  variant?: 'card' | 'rail'
+}) {
   const headersList = await headers()
   const headerLocale = headersList.get('x-locale')
   const uiLocale: SupportedLocale =
@@ -15,5 +21,5 @@ export default async function MarketPulseCard({ locale }: { locale: SupportedLoc
   const countryId = await resolveCountryIdFromHeaders()
   const items = await fetchSectionMomentum({ countryId, land: uiLocale })
 
-  return <MarketPulseCardClient items={items} locale={uiLocale} />
+  return <MarketPulseCardClient items={items} locale={uiLocale} variant={variant} />
 }

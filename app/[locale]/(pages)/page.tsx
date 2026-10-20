@@ -26,7 +26,8 @@ import HomeInsightsSkeleton from './home/components/HomeInsightsSkeleton'
 import FeaturedPostsStrip from './home/components/FeaturedPostsStrip'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import CreatePostCardLazyClient from './home/components/CreatePostCardLazyClient'
-import HomeCommandStrip from './home/components/HomeCommandStrip'
+import HomeUpperStage from './home/components/HomeUpperStage'
+import { fetchTrendingPosts } from '@/lib/api/homeInsights'
 import homeDiscoveryStyles from './homeDiscovery.module.css'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/auth'
@@ -81,6 +82,7 @@ const Home = async ({
     fetchSections(locale, { revalidateSeconds: 300 }),
     resolveCountryIdFromHeaders(),
   ])
+  const trending = await fetchTrendingPosts({ countryId, land: locale, limit: 6 })
   const showMobileAiDashboard =   session?.user?.id === MOBILE_AI_PREVIEW_USER_ID || session?.user?.id === MOBILE_AI_PREVIEW_USER_ID_2
   const sp = (await searchParams) ?? {}
   const pageRaw = sp.page ? (Array.isArray(sp.page) ? sp.page[0] : sp.page) : undefined
@@ -96,7 +98,15 @@ const Home = async ({
             {t('home.a11y.visuallyHiddenTitle', uiLocale).replace('{{country}}', countryLabel)}
           </h1>
 
-          <HomeCommandStrip locale={uiLocale} countryLabel={countryLabel} />
+          <section className="d-flex flex-column gap-2 mb-3" aria-label={uiLocale === 'ar' ? 'مقدمة السوق' : 'Market introduction'}>
+            <HomeUpperStage
+              locale={uiLocale}
+              countryLabel={countryLabel}
+              sections={sections}
+              trending={trending}
+            />
+            <MarketPulseCard locale={uiLocale} variant="rail" />
+          </section>
 
           <HomeBanner locale={uiLocale} />
 

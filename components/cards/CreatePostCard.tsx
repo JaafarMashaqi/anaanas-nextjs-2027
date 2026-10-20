@@ -160,6 +160,7 @@ function CreatePostHeroShell({
 }: CreatePostHeroShellProps) {
   const shellDir = isWizardRtl ? 'rtl' : 'ltr'
   const rowDir = isWizardRtl ? 'rtl' : 'ltr'
+  const [intent, setIntent] = useState<'sale' | 'wanted'>('sale')
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
     { Icon: BsBrush, label: t('createPost.heroTagDesc', locale as any) },
@@ -167,8 +168,19 @@ function CreatePostHeroShell({
     { Icon: BsCamera, label: t('createPost.heroTagPhotos', locale as any) },
   ] as const
 
+  useEffect(() => {
+    const onIntent = (event: Event) => {
+      const detail = (event as CustomEvent<string>).detail
+      if (detail === 'sale' || detail === 'wanted') setIntent(detail)
+    }
+    window.addEventListener('ananas:composer-intent', onIntent)
+    return () => window.removeEventListener('ananas:composer-intent', onIntent)
+  }, [])
+
+  const isArabic = locale === 'ar'
+
   return (
-    <div className={styles.composerHeroShell} dir={shellDir}>
+    <div id="ananas-composer" className={styles.composerHeroShell} dir={shellDir}>
     
 
       <div className={styles.composerHeroTop} dir={rowDir}>
@@ -195,7 +207,13 @@ function CreatePostHeroShell({
               className={styles.composerHeroInlineField}
               value={title}
               onChange={onChange}
-              placeholder={t('createPost.heroPlaceholder', locale as any)}
+              placeholder={
+                intent === 'wanted'
+                  ? isArabic
+                    ? 'اكتب ما تبحث عنه…'
+                    : 'Write what you are looking for…'
+                  : t('createPost.heroPlaceholder', locale as any)
+              }
               aria-invalid={errorText ? true : undefined}
               aria-describedby={errorText ? 'create-post-hero-title-err' : undefined}
             />
@@ -230,17 +248,43 @@ function CreatePostHeroShell({
         </div>
       </div>
 
-      <div className={styles.composerIntentRow}>
-        <button type="button" className={styles.composerIntent} onClick={onAddAdClick}>
-          {locale === 'ar' ? 'بيع' : 'Sell'}
+      <div className={styles.composerIntentRow} role="group" aria-label={isArabic ? 'نوع الإعلان' : 'Listing intent'}>
+        <button
+          type="button"
+          className={clsx(styles.composerIntent, intent === 'sale' && styles.composerIntentActive)}
+          onClick={() => {
+            setIntent('sale')
+            onAddAdClick()
+          }}
+        >
+          {isArabic ? 'بيع' : 'Sell'}
+        </button>
+        <button
+          type="button"
+          className={clsx(styles.composerIntent, intent === 'wanted' && styles.composerIntentActive)}
+          onClick={() => {
+            setIntent('wanted')
+            onAddAdClick()
+          }}
+        >
+          {isArabic ? 'مطلوب' : 'Wanted'}
         </button>
         <Link href={`/${locale}/pages/auction`} className={styles.composerIntent}>
-          {locale === 'ar' ? 'مزاد' : 'Auction'}
+          {isArabic ? 'مزاد' : 'Auction'}
         </Link>
         <Link href={`/${locale}/stores`} className={styles.composerIntent}>
-          {locale === 'ar' ? 'متجر' : 'Store'}
+          {isArabic ? 'متجر' : 'Store'}
         </Link>
       </div>
+      <p className={styles.composerModeNote}>
+        {intent === 'wanted'
+          ? isArabic
+            ? 'وضع مطلوب يجهّز العنوان فقط. النشر ما زال مسار الإعلان الحالي، لأن الخادم لا يملك نوع «مطلوب» منفصلاً.'
+            : 'Wanted mode only prepares the title. Publishing still uses the current listing flow, because the server has no separate wanted type.'
+          : isArabic
+            ? 'الصور تُضاف في خطوة الصور داخل نفس المعالج.'
+            : 'Photos are added in the photo step of this same composer.'}
+      </p>
 
       {showTags ? (
         <div className={styles.composerHeroTags}>
