@@ -22,6 +22,7 @@ import { buildPostStructuredData } from '@/lib/seo/buildPostStructuredData'
 import { getSiteOrigin } from '@/lib/seo/origin'
 import { toAbsoluteUrl } from '@/lib/seo/absoluteUrl'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
+import { getCountriesCached } from '@/lib/server/getCountriesCached'
 import { resolveListingCountryId } from '@/lib/server/resolveListingCountryId'
 import {
   fetchPostDetailsSafe,
@@ -288,10 +289,11 @@ export default async function PostDetailsPage({ params }: { params: Promise<{ lo
   const portalCountryId = await resolveCountryIdFromHeaders()
   const filterCountryId = resolveListingCountryId(post, portalCountryId)
 
-  const [similarPosts, morePosts, sections] = await Promise.all([
+  const [similarPosts, morePosts, sections, countries] = await Promise.all([
     fetchSimilarPosts(id, locale, filterCountryId),
     fetchMoreFromSection(id, locale, filterCountryId),
     fetchSections(locale),
+    getCountriesCached(),
   ])
 
   const postImages: Array<{ url: string; alt?: string }> = Array.isArray((post as any)?.post_images)
@@ -329,6 +331,7 @@ export default async function PostDetailsPage({ params }: { params: Promise<{ lo
   const currencyCode = resolveListingCurrency({
     iso2: countryIso2,
     countryId: (post as any)?.country_id ?? (post as any)?.country?.id,
+    countries,
   })
   const priceLabel = hasPrice ? formatDetailsPrice((post as any).price, currencyCode, safeLocale) : null
   const isFeaturedActive = Boolean((post as any)?.is_featured_active || (post as any)?.promotion?.is_active)

@@ -1,7 +1,8 @@
 import { headers } from 'next/headers'
 
 import MarketPulseCardClient from './MarketPulseCardClient'
-import { fetchSectionMomentum } from '@/lib/api/homeInsights'
+import { loadMarketPulseSource } from '@/lib/api/marketPulse'
+import { buildMarketPulse } from '@/lib/market/buildMarketPulse'
 import { resolveCountryIdFromHeaders } from '@/lib/server/resolveCountryIdFromHeaders'
 import { isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
@@ -19,7 +20,8 @@ export default async function MarketPulseCard({
     headerLocale && isSupportedLocale(headerLocale) ? headerLocale : locale
 
   const countryId = await resolveCountryIdFromHeaders()
-  const items = await fetchSectionMomentum({ countryId, land: uiLocale })
+  const source = await loadMarketPulseSource({ countryId, land: uiLocale })
+  const model = buildMarketPulse(source, uiLocale)
 
-  return <MarketPulseCardClient items={items} locale={uiLocale} variant={variant} />
+  return <MarketPulseCardClient model={model} locale={uiLocale} variant={variant} />
 }

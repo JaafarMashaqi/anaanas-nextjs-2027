@@ -1,126 +1,127 @@
 'use client'
 
+import { useRef, type KeyboardEvent } from 'react'
 import Link from 'next/link'
-import type { SectionMomentumItem } from '@/lib/api/homeInsights'
+import { BsBarChart, BsHammer, BsGrid, BsGraphUpArrow } from 'react-icons/bs'
+
+import type { MarketPulseModel, PulseMetric } from '@/lib/market/buildMarketPulse'
 import type { SupportedLocale } from '@/lib/localization'
 import { t } from '@/lib/translations'
 import styles from './MarketPulseCardClient.module.css'
 
-function pulseValue(item: SectionMomentumItem, locale: SupportedLocale) {
-  if (!item.previous_count || item.previous_count <= 0) {
-    return locale === 'ar' ? 'نشاط جديد' : 'New activity'
-  }
-  const rounded = Math.round(item.growth_percent)
-  if (!Number.isFinite(rounded)) return locale === 'ar' ? 'غير محسوب' : 'Not measured'
-  return `${rounded > 0 ? '+' : ''}${rounded}%`
+const ICONS = {
+  listings: BsGrid,
+  auctions: BsHammer,
+  sections: BsBarChart,
+  measured: BsGraphUpArrow,
+} as const
+
+function MetricCard({ metric, locale }: { metric: PulseMetric; locale: SupportedLocale }) {
+  const Icon = ICONS[metric.id]
+  return (
+    <Link
+      href={metric.href}
+      className={`${styles.metric} ${styles[metric.tone]}`}
+      title={metric.hint}
+      aria-label={`${metric.label}. ${metric.value}. ${metric.period}. ${metric.hint}`}
+    >
+      <span className={styles.metricIcon} aria-hidden>
+        <Icon size={15} />
+      </span>
+      <span className={styles.metricLabel}>{metric.label}</span>
+      <strong className={styles.metricValue}>{metric.value}</strong>
+      <span className={styles.metricPeriod}>{metric.period}</span>
+    </Link>
+  )
 }
 
-const RANK_BADGES = ['🚗', '🏠', '📱', '💼', '📦', '⭐']
-
 export default function MarketPulseCardClient({
-  items,
+  model,
   locale,
   variant = 'card',
 }: {
-  items: SectionMomentumItem[]
+  model: MarketPulseModel
   locale: SupportedLocale
   variant?: 'card' | 'rail'
 }) {
+  const scroller = useRef<HTMLDivElement>(null)
+  const isArabic = locale === 'ar'
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+    const node = scroller.current
+    if (!node) return
+    event.preventDefault()
+    const card = node.querySelector<HTMLElement>(`.${styles.metric}`)
+    const width = (card?.offsetWidth ?? 180) + 10
+    const forward = event.key === 'ArrowRight'
+    const delta = isArabic ? (forward ? -width : width) : forward ? width : -width
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    node.scrollBy({ left: delta, behavior: reduce ? 'auto' : 'smooth' })
+  }
+
   if (variant === 'rail') {
     return (
-      <div className={styles.rail}>
+      <section className={styles.rail} aria-label={t('home.marketPulse', locale)}>
         <div className={styles.railHead}>
-          <span className={styles.liveDot} aria-hidden />
           <h2>{t('home.marketPulse', locale)}</h2>
+          <Link href={`/${locale}/market-pulse`} className={styles.railMore}>
+            {isArabic ? 'التفاصيل' : 'Details'}
+          </Link>
         </div>
-        {items.length === 0 ? (
-          <p className={styles.railEmpty}>{t('home.marketPulseEmpty', locale)}</p>
-        ) : (
-          <div className={styles.railTrack}>
-            {items.map((item) => {
-              const src = item.icon_full_path || null
-              return (
-                <Link key={item.section_id} href={`/${locale}/sections/${item.slug}`} className={styles.railChip}>
-                  {src ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={src} alt="" width={22} height={22} />
-                  ) : null}
-                  <span>{item.name}</span>
-                  <strong>{pulseValue(item, locale)}</strong>
-                </Link>
-              )
-            })}
-          </div>
-        )}
-      </div>
+        <div
+          ref={scroller}
+          className={styles.railTrack}
+          tabIndex={0}
+          role="list"
+          aria-label={isArabic ? 'مؤشرات النبض' : 'Pulse metrics'}
+          onKeyDown={onKeyDown}
+        >
+          {model.metrics.map((metric) => (
+            <div key={metric.id} className={styles.railItem} role="listitem">
+              <MetricCard metric={metric} locale={locale} />
+            </div>
+          ))}
+        </div>
+      </section>
     )
   }
 
+  const max = Math.max(1, ...model.bars.map((bar) => Math.max(bar.current, bar.previous)))
+
   return (
-    <div className={styles.root}>
-      <div className={styles.glowOrbs} aria-hidden>
-        <span className={`${styles.orb} ${styles.orb1}`} />
-        <span className={`${styles.orb} ${styles.orb2}`} />
-        <span className={`${styles.orb} ${styles.orb3}`} />
+    <section className={styles.stack} aria-label={t('home.marketPulse', locale)}>
+      <div className={styles.railHead}>
+        <h2>{t('home.marketPulse', locale)}</h2>
+        <Link href={`/${locale}/market-pulse`} className={styles.railMore}>
+          {isArabic ? 'التفاصيل' : 'Details'}
+        </Link>
       </div>
-
-      <div className={styles.header}>
-        <h2 className={styles.title}>
-          <span className={styles.liveDot} aria-hidden />
-          {t('home.marketPulse', locale)}
-        </h2>
-        <div className={styles.pulseStrip} aria-hidden>
-          <span className={styles.pulseBar} />
-          <span className={styles.pulseBar} />
-          <span className={styles.pulseBar} />
-          <span className={styles.pulseBar} />
-        </div>
+      <div className={styles.stackList}>
+        {model.metrics.map((metric) => (
+          <MetricCard key={metric.id} metric={metric} locale={locale} />
+        ))}
       </div>
-
-      {items.length === 0 ? (
-        <p className={styles.empty}>{t('home.marketPulseEmpty', locale)}</p>
+      {model.bars.length === 0 ? (
+        <p className={styles.railEmpty}>{t('home.marketPulseEmpty', locale)}</p>
       ) : (
-        <div className={styles.rows}>
-          {items.map((item, index) => {
-            const barPct = Math.min(100, Math.max(0, item.growth_percent))
-            const src =item.icon_full_path || null ;
-            return (
-              <div key={item.section_id} className={styles.row}>
-                <div className={styles.left}>
-                  <div className={styles.iconWrap}>
-                    {src ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={src}
-                        alt=""
-                        width={24}
-                        height={24}
-                        className={styles.iconImg}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <span aria-hidden>{RANK_BADGES[index % RANK_BADGES.length]}</span>
-                    )}
-                  </div>
-                  <div className={styles.textBlock}>
-                    <Link href={`/${locale}/sections/${item.slug}`} className={styles.name}>
-                      {item.name}
-                    </Link>
-                    <div className={styles.meta}>
-                      {item.current_count} · {t('home.marketPulseGrowth', locale)}
-                    </div>
-                    <div className={styles.barTrack} role="presentation">
-                      <div className={styles.barFill} style={{ width: `${barPct}%` }} />
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.growth}>{pulseValue(item, locale)}</div>
-              </div>
-            )
-          })}
-        </div>
+        <ul className={styles.bars}>
+          {model.bars.map((bar) => (
+            <li key={bar.sectionId}>
+              <Link href={bar.href} className={styles.barLink} title={bar.growthLabel ?? (isArabic ? 'لا توجد نافذة سابقة' : 'No previous window')}>
+                <span className={styles.barName}>{bar.name}</span>
+                <span className={styles.barTrack} aria-hidden>
+                  <span className={styles.barFill} style={{ width: `${Math.round((bar.current / max) * 100)}%` }} />
+                </span>
+                <span className={styles.barValue}>
+                  {bar.current}
+                  {bar.growthLabel ? <em>{bar.growthLabel}</em> : null}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       )}
-    </div>
+    </section>
   )
 }

@@ -1,0 +1,252 @@
+.page {
+  min-width: 0;
+  padding-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0.2rem 0 0.25rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #101828;
+}
+
+.header p,
+.hint,
+.note,
+.countryLock {
+  margin: 0;
+  color: #667085;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.back {
+  color: #101828;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin: 0.8rem 0 0.55rem;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #667085;
+}
+
+.filters select,
+.filters button {
+  min-height: 36px;
+  border-radius: 10px;
+  border: 1px solid #e7e9ee;
+  background: #fff;
+  color: #101828;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.45rem;
+}
+
+.filters button {
+  align-self: end;
+  background: #101828;
+  color: #ffc928;
+  font-weight: 800;
+  border: 0;
+}
+
+.note {
+  margin-bottom: 0.45rem;
+}
+
+.heroMetric {
+  margin-top: 0.7rem;
+  padding: 0.8rem 0.85rem;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fff8de 0%, #fffefb 100%);
+  border: 1px solid #f5d98a;
+}
+
+.heroMetric h2 {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #667085;
+}
+
+.heroMetric strong {
+  display: block;
+  margin: 0.15rem 0;
+  font-size: 1.8rem;
+  letter-spacing: -0.04em;
+  color: #101828;
+}
+
+.heroMetric p {
+  margin: 0;
+}
+
+.metricRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.metricOn,
+.metricOff {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #101828;
+  background: #fff;
+  border: 1px solid #e7e9ee;
+  font-size: 0.72rem;
+}
+
+.metricOn {
+  border-color: #ffc928;
+  background: #fff8de;
+}
+
+.metricOn strong,
+.metricOff strong {
+  font-size: 1rem;
+}
+
+.chart,
+.results,
+.unavailable {
+  margin-top: 1rem;
+}
+
+.chart h2,
+.results h2,
+.unavailable h2 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: #101828;
+}
+
+.chartList,
+.results ul,
+.unavailable ul {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.chartHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.chartHead a {
+  color: #101828;
+  text-decoration: none;
+}
+
+.chartHead span {
+  color: #667085;
+  font-weight: 600;
+  text-align: end;
+}
+
+.chartTrack {
+  position: relative;
+  height: 8px;
+  margin-top: 0.25rem;
+  border-radius: 99px;
+  background: #f3f4f6;
+}
+
+.chartTrack span,
+.chartTrack i {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  height: 8px;
+  border-radius: inherit;
+}
+
+.chartTrack span {
+  background: #ffc928;
+}
+
+.chartTrack i {
+  top: 2px;
+  height: 4px;
+  background: #101828;
+  opacity: 0.55;
+}
+
+.insight {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e7e9ee;
+}
+
+.mascot {
+  width: 64px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.insight p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #101828;
+}
+
+.results li,
+.unavailable li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.results a {
+  color: #101828;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.results span,
+.unavailable span {
+  color: #667085;
+  font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .filters {
+    grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  }
+
+  .metricRow {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

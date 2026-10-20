@@ -17,6 +17,8 @@ import {
 import type { PostRecord } from '@/lib/api/posts'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import { isPubliclyPublishedStatus } from '@/lib/postStatus'
+import { useAppData } from '@/context/AppDataContext'
+import { resolveListingCurrency } from '@/lib/seo/countryCurrency'
 import type { SupportedLocale } from '@/lib/localization'
 import { timeSince } from '@/utils/date'
 import styles from './myPosts.module.css'
@@ -30,14 +32,16 @@ type Props = {
   onDelete: (postId: number) => void
 }
 
-function formatPrice(price: unknown, locale: SupportedLocale): string | null {
+function formatPrice(price: unknown, currency: string | null, locale: SupportedLocale): string | null {
   if (price == null || price === '') return null
   const n = typeof price === 'number' ? price : Number(String(price).replace(/,/g, ''))
   if (!Number.isFinite(n) || n <= 0) return null
   const formatted = new Intl.NumberFormat(locale === 'ar' ? 'ar-JO' : 'en-US', {
     maximumFractionDigits: 0,
   }).format(n)
-  return locale === 'ar' ? `${formatted} د.أ` : `${formatted} JOD`
+  if (currency === 'JOD') return locale === 'ar' ? `${formatted} د.أ` : `${formatted} JOD`
+  if (currency) return `${formatted} ${currency}`
+  return formatted
 }
 
 function getStatusMeta(status: string, featured: boolean, isAr: boolean) {
@@ -63,6 +67,7 @@ export default function MyPostListItem({
   onFeature,
   onDelete,
 }: Props) {
+  const { countries } = useAppData()
   const isAr = locale === 'ar'
   const postId = Number(post.id)
   const status = String(post.status ?? '')
@@ -75,7 +80,15 @@ export default function MyPostListItem({
   const cityName = String((post as any)?.city?.name ?? (post as any)?.city_name ?? '')
   const createdAtRaw = (post as any)?.publish_date || post?.created_at || post?.createdAt
   const createdAtDate = createdAtRaw ? new Date(String(createdAtRaw)) : null
-  const priceLabel = formatPrice((post as any)?.price, locale)
+  const priceLabel = formatPrice(
+    (post as any)?.price,
+    resolveListingCurrency({
+      iso2: (post as any)?.country?.iso2 || (post as any)?.country?.iso_code,
+      countryId: (post as any)?.country_id ?? (post as any)?.country?.id,
+      countries,
+    }),
+    locale,
+  )
 
   const views = Number((post as any)?.views_count ?? (post as any)?.views ?? 0) || 0
   const likes = Number((post as any)?.likes_count ?? (post as any)?.reactions_count ?? 0) || 0

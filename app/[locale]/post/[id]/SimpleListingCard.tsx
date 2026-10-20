@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
+import { useAppData } from '@/context/AppDataContext'
 import { resolveListingCurrency } from '@/lib/seo/countryCurrency'
 import type { SupportedLocale } from '@/lib/localization'
 import styles from './SimpleListingCard.module.css'
@@ -39,11 +40,13 @@ export default function SimpleListingCard({ post, locale }: { post: SimpleListin
         ? post?.category?.name?.ar || post?.category?.name?.en || ''
         : post?.category?.name?.en || post?.category?.name?.ar || ''
 
+  const { countries } = useAppData()
   const cta = locale === 'ar' ? 'عرض التفاصيل' : 'View details'
   const arrow = locale === 'ar' ? '←' : '→'
   const currency = resolveListingCurrency({
     iso2: post.country?.iso2 || post.country?.iso_code,
     countryId: post.country_id ?? post.country?.id,
+    countries,
   })
   const numericPrice = Number(String(post.price ?? '').replace(/,/g, ''))
   const priceLabel =

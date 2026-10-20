@@ -42,6 +42,7 @@ import {
   BsXCircle,
 } from 'react-icons/bs'
 import { resolveListingCurrency } from '@/lib/seo/countryCurrency'
+import { useAppData } from '@/context/AppDataContext'
 import GlightBox from '../GlightBox'
 import LoadContentButton from '../LoadContentButton'
 import CommentItem from './components/CommentItem'
@@ -303,6 +304,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   const pathname = usePathname()
   const params = useParams<{ locale?: string }>()
   const router = useRouter()
+  const { countries } = useAppData()
   const localeFromParams = Array.isArray(params?.locale) ? params.locale[0] : params?.locale
   const locale: SupportedLocale = (localeFromParams && isSupportedLocale(localeFromParams)) ? localeFromParams : DEFAULT_LOCALE
   
@@ -336,6 +338,7 @@ const PostCard = ({ post, banner, attributesAndOptions, onDelete: onDeleteCallba
   const currencyCode = resolveListingCurrency({
     iso2: countryIso2,
     countryId: (post as any)?.country_id ?? (post as any)?.country?.id,
+    countries,
   })
   const priceLabel = formatListingPrice((post as any)?.price, currencyCode, locale)
   const attributeChips = extractAttributeChips(post as Record<string, unknown>)

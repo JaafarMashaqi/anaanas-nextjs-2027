@@ -62,10 +62,28 @@ export function iso2ForCountryId(countryId: unknown): string | null {
   return COUNTRY_ID_ISO2[id] ?? null
 }
 
-/** Prefer an explicit ISO on the post. Fall back to the known country id. */
+export type CountryCurrencySource = {
+  id: number
+  iso2?: string | null
+  iso_code?: string | null
+}
+
+/** Prefer the listing's own ISO, then that listing's country in the API catalog. */
 export function resolveListingCurrency(input: {
   iso2?: string | null
   countryId?: unknown
+  /** Countries from `/api/countries`. Never pass the viewer's selected country as a substitute. */
+  countries?: CountryCurrencySource[] | null
 }): string | null {
-  return resolveCurrencyForCountry(input.iso2) ?? resolveCurrencyForCountry(iso2ForCountryId(input.countryId))
+  const direct = resolveCurrencyForCountry(input.iso2)
+  if (direct) return direct
+
+  const id = typeof input.countryId === 'number' ? input.countryId : Number(input.countryId)
+  if (input.countries && Number.isFinite(id) && id > 0) {
+    const match = input.countries.find((country) => country.id === id)
+    const fromCatalog = resolveCurrencyForCountry(match?.iso2 || match?.iso_code)
+    if (fromCatalog) return fromCatalog
+  }
+
+  return resolveCurrencyForCountry(iso2ForCountryId(input.countryId))
 }
