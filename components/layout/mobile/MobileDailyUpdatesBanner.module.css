@@ -9,7 +9,7 @@
  * =========================================================================== */
 
 .root {
-  --mobile-header-offset: 157px;
+  --mobile-header-offset: 72px;
   --m-yellow-cream: #fff7d5;
   --m-yellow: #ffcb05;
   --m-yellow-deep: #ffb700;
@@ -19,8 +19,8 @@
   --m-action-bg: #ffffff;
 
   margin-top: var(--mobile-header-offset);
-  margin-inline: 12px;
-  margin-bottom: 16px;
+  margin-inline: 0;
+  margin-bottom: 2px;
 
   /* Override global `section { padding… }` from assets/scss/custom/_reboot.scss */
   padding: 0 !important;
@@ -31,27 +31,24 @@
   position: relative;
   overflow: hidden;
   margin: 0 0 10px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  color: var(--m-ink);
-  background:
-    radial-gradient(140% 100% at 0% 0%, #fff3a8 0%, transparent 60%),
-    radial-gradient(120% 90% at 100% 100%, #ffe46a 0%, transparent 65%),
-    linear-gradient(135deg, #fff5c2 0%, #fff0a3 50%, #ffe87a 100%);
-  background-size: 220% 220%, 220% 220%, 220% 220%;
-  background-position: 0% 0%, 100% 100%, 0% 50%;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.6) inset,
-    0 10px 28px -10px rgba(255, 183, 0, 0.55),
-    0 4px 12px rgba(15, 23, 42, 0.06);
-  font-size: 0.84rem;
+  padding: 8px 10px;
+  border-radius: 14px;
+  color: #101828;
+  background: #ffffff;
+  border: 1px solid #e7e9ee;
+  box-shadow: none;
+  font-size: 0.78rem;
   line-height: 1.35;
-
-  animation:
-    bannerSlideIn 0.85s cubic-bezier(0.16, 1.2, 0.3, 1) both,
-    bannerGradient 12s ease-in-out infinite 0.85s;
+  animation: none;
   transform-origin: top center;
-  will-change: transform, opacity, background-position;
+  will-change: auto;
+}
+
+.shine,
+.spark,
+.orbit,
+.iconHalo {
+  display: none !important;
 }
 
 /* ===== Content ===== */
@@ -68,18 +65,16 @@
 /* ===== Megaphone icon ===== */
 .iconWrap {
   position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #fff 0%, #fff8d2 100%);
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #fff8de;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  box-shadow:
-    0 2px 6px rgba(255, 183, 0, 0.3),
-    inset 0 0 0 1px rgba(255, 183, 0, 0.18);
-  animation: iconWiggle 3.4s ease-in-out infinite;
+  box-shadow: none;
+  animation: none;
 }
 
 .icon {
@@ -105,15 +100,17 @@
 .message {
   min-width: 0;
   font-weight: 700;
-  font-size: 0.83rem;
-  color: var(--m-ink);
-  text-align: center;
+  font-size: 0.78rem;
+  color: #101828;
+  text-align: start;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .messageTrack {
-  display: inline-flex;
+  display: inline;
   align-items: center;
 }
 
@@ -153,9 +150,8 @@
 }
 
 .messageScroll .messageTrack {
-  --ticker-duration: 16s;
-  animation: messageTickerLtr var(--ticker-duration, 16s) linear infinite;
-  will-change: transform;
+  animation: none;
+  transform: none;
 }
 
 [dir='rtl'] .messageScroll .messageTrack {
@@ -166,25 +162,13 @@
   display: inline-block;
   flex: 0 0 auto;
   white-space: nowrap;
-  text-overflow: ellipsis;
   overflow: hidden;
+  text-overflow: ellipsis;
   max-width: 100%;
-
-  /* Light shimmer applied to the text via background-clip — adds movement
-     without affecting layout. */
-  background: linear-gradient(
-    100deg,
-    var(--m-ink) 0%,
-    var(--m-ink) 40%,
-    #d6961a 50%,
-    var(--m-ink) 60%,
-    var(--m-ink) 100%
-  );
-  background-size: 220% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: textShimmer 4.6s linear infinite;
+  color: #101828;
+  background: none;
+  -webkit-text-fill-color: #101828;
+  animation: none;
 }
 
 .messageScroll .messageInner {
@@ -201,16 +185,13 @@
   gap: 5px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: #ffffff;
-  color: var(--m-ink);
-  font-size: 0.7rem;
+  background: #ffc928;
+  color: #101828;
+  font-size: 0.68rem;
   font-weight: 800;
-  letter-spacing: 0.4px;
   white-space: nowrap;
-  box-shadow:
-    0 4px 10px rgba(255, 183, 0, 0.32),
-    inset 0 0 0 1px rgba(255, 183, 0, 0.18);
-  animation: badgePulse 2.4s ease-in-out infinite;
+  box-shadow: none;
+  animation: none;
   flex: 0 0 auto;
 }
 

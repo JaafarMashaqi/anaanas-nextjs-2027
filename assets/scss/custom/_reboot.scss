@@ -10,10 +10,12 @@ body{
   overflow-x: hidden;
   z-index: 0;
   position: relative;
+  background-color: #fffefb;
+  color: #101828;
 }
 
 main{
-  background-color: var(--#{$prefix}body-bg);
+  background-color: #fffefb;
 }
 
 // Wide layout on xxl viewports — previously only in lang-ar.css / lang-en.css, which load
@@ -63,13 +65,13 @@ video{
 
 // Section padding top and bottom
 section{
-  padding-top: ($spacer * 1.5);
-  padding-bottom: ($spacer * 1.5);
+  padding-top: $spacer;
+  padding-bottom: $spacer;
 }
 
 @include media-breakpoint-down(md) {
   section{
-    padding-top: ($spacer * 4);
-    padding-bottom: ($spacer * 3);
+    padding-top: ($spacer * 0.75);
+    padding-bottom: ($spacer * 0.75);
   }
 }

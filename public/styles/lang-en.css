@@ -171,7 +171,7 @@ a.nav-link.bg-light.icon-md.btn.btn-light{
 }
 
 main {
-  background-color: #f3edef;
+  background-color: #fffefb;
 }
 .card-img{
   height: 350px;
@@ -180,17 +180,17 @@ main {
 }.card {
   background: #fff;
 }body {
-  background: #f3edef;
+  background: #fffefb;
 }
 
 
 @media (max-width: 991.98px) {
 
   body {
-    background: #ffffff;
+    background: #fffefb;
 }
 main {
-  background-color: #ffffff;
+  background-color: #fffefb;
 }
 header {
   height: auto;

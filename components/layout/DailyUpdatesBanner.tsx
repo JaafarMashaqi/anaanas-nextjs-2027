@@ -73,22 +73,15 @@ const DailyUpdatesBanner = ({ locale: localeOverride, className = '' }: Props) =
           width: 100%;
           padding: 9px 14px;
           margin-top:55px;
-          margin-bottom:20px;
+          margin-bottom:8px;
           text-align: center;
-          color: #121212;
-          background: linear-gradient(
-            110deg,
-            #ffd24a 0%,
-            #fedf06 35%,
-            #ffbe0b 65%,
-            #ffd24a 100%
-          );
-          background-size: 220% 100%;
-          animation: dailyBannerSlide 14s linear infinite;
-          box-shadow:
-            0 1px 0 rgba(0, 0, 0, 0.05) inset,
-            0 6px 18px rgba(254, 202, 1, 0.18);
-          font-size: 0.9rem;
+          color: #101828;
+          /* calm market strip */
+          background: #fffefb;
+          border-bottom: 1px solid #e7e9ee;
+          animation: none;
+          box-shadow: none;
+          font-size: 0.84rem;
           line-height: 1.2;
         }
 
@@ -111,11 +104,11 @@ const DailyUpdatesBanner = ({ locale: localeOverride, className = '' }: Props) =
           width: 26px;
           height: 26px;
           border-radius: 999px;
-          background: #1a1a1a;
-          color: #fedf06;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+          background: #ffc928;
+          color: #101828;
+          box-shadow: none;
           flex: 0 0 auto;
-          animation: dailyBannerBell 3.2s ease-in-out infinite;
+          animation: none;
         }
 
         .dailyBanner__eyebrow {
@@ -127,10 +120,10 @@ const DailyUpdatesBanner = ({ locale: localeOverride, className = '' }: Props) =
           font-size: 0.72rem;
           font-weight: 800;
           letter-spacing: 0.4px;
-          text-transform: uppercase;
-          color: #1a1a1a;
-          background: rgba(255, 255, 255, 0.55);
-          border: 1px solid rgba(0, 0, 0, 0.08);
+          color: #101828;
+          background: #ffc928;
+          border: 0;
+          text-transform: none;
         }
 
         .dailyBanner__divider {
@@ -149,20 +142,7 @@ const DailyUpdatesBanner = ({ locale: localeOverride, className = '' }: Props) =
 
         /* Moving "shine" highlight that sweeps across the banner */
         .dailyBanner__shine {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            100deg,
-            transparent 20%,
-            rgba(255, 255, 255, 0.7) 48%,
-            rgba(255, 255, 255, 0.95) 50%,
-            rgba(255, 255, 255, 0.7) 52%,
-            transparent 80%
-          );
-          transform: translateX(-110%);
-          animation: dailyBannerShine 4.8s ease-in-out infinite;
-          pointer-events: none;
-          mix-blend-mode: overlay;
+          display: none;
         }
 
         /* LTR sweeps left→right; RTL sweeps right→left so the motion matches reading direction */

@@ -66,10 +66,8 @@ html {
     linear-gradient(180deg, #FFFDF7 0%, #FFF8EB 55%, #FFF3DC 100%);
 
   transition:
-    opacity .9s cubic-bezier(.22,.61,.36,1),
-    filter .9s cubic-bezier(.22,.61,.36,1),
-    transform .9s cubic-bezier(.22,.61,.36,1),
-    visibility 0s linear .9s;
+    opacity .28s cubic-bezier(.22,.61,.36,1),
+    visibility 0s linear .28s;
 
   @media (prefers-reduced-motion: reduce) {
     transition: opacity .3s ease;
@@ -85,8 +83,8 @@ html.js-splash #splash-screen {
 
 html.js-splash #splash-screen.remove {
   opacity: 0;
-  filter: blur(16px);
-  transform: scale(1.05);
+  filter: none;
+  transform: none;
   visibility: hidden;
   pointer-events: none;
 }

@@ -1,8 +1,8 @@
 .stage {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  color: #14213d;
+  gap: 0.45rem;
+  color: #101828;
 }
 
 .searchSlot {
@@ -43,15 +43,16 @@
 
 .greetTitle {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 800;
-  line-height: 1.3;
+  line-height: 1.25;
+  color: #101828;
 }
 
 .greetHint {
-  margin: 0.1rem 0 0;
-  font-size: 0.75rem;
-  color: rgba(21, 21, 21, 0.62);
+  margin: 0.05rem 0 0;
+  font-size: 0.72rem;
+  color: #667085;
 }
 
 .mascot {
@@ -66,16 +67,23 @@
 .stories,
 .wire {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.4rem;
   overflow-x: auto;
-  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.actions::-webkit-scrollbar,
+.links::-webkit-scrollbar,
+.stories::-webkit-scrollbar,
+.wire::-webkit-scrollbar {
+  display: none;
 }
 
 .action,
 .actionQuiet {
   flex: 0 0 auto;
-  min-height: 36px;
-  padding: 0.3rem 0.8rem;
+  min-height: 34px;
+  padding: 0.28rem 0.78rem;
   border-radius: 999px;
   border: 0;
   font-size: 0.78rem;
@@ -84,14 +92,14 @@
 }
 
 .action {
-  background: #151515;
-  color: #ffd53a;
+  background: #101828;
+  color: #ffc928;
 }
 
 .actionQuiet {
-  background: transparent;
-  color: #151515;
-  box-shadow: inset 0 0 0 1px rgba(21, 21, 21, 0.16);
+  background: #ffffff;
+  color: #101828;
+  box-shadow: inset 0 0 0 1px #e7e9ee;
 }
 
 .note,
@@ -104,9 +112,9 @@
 
 .links a {
   flex: 0 0 auto;
-  color: #151515;
-  font-size: 0.75rem;
-  font-weight: 800;
+  color: #667085;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -137,40 +145,44 @@
 
 .story {
   flex: 0 0 auto;
-  width: 68px;
+  width: 74px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  color: #151515;
+  gap: 0.28rem;
+  color: #101828;
   text-decoration: none;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   text-align: center;
+  line-height: 1.25;
 }
 
 .story span:last-child {
   width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  min-height: 2.5em;
 }
 
 .storyRing {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
-  box-shadow: inset 0 0 0 2px #ffd53a;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1.5px #ffc928;
   overflow: hidden;
 }
 
 .storyRing img {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
 }
 
@@ -196,9 +208,9 @@
 }
 
 .wireItem span {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  color: #8a6500;
+  color: #667085;
 }
 
 @keyframes spin {
