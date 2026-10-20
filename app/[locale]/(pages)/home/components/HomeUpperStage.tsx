@@ -7,6 +7,7 @@ import type { SupportedLocale } from '@/lib/localization'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
 import HomeMomentSlot from './HomeMomentSlot'
 import HomeOpportunitySlot from './HomeOpportunitySlot'
+import HomeBanner from './HomeBanner'
 import MarketplaceStories from './MarketplaceStories'
 
 import styles from './HomeUpperStage.module.css'
@@ -104,26 +105,7 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], ch
 
       <MarketplaceStories locale={locale} />
 
-      <section className={styles.hero} data-hero="amman" aria-label={isArabic ? 'هوية أناناس' : 'ANANAS identity'}>
-        <img src="/brand/hero.jpg" alt="" className={styles.heroImage} />
-        <div className={styles.heroShade} />
-        <div className={styles.heroCopy}>
-          <p className={styles.heroKicker} style={{ color: '#ffe58a' }}>
-            {isArabic ? 'من عمّان · تعريف المنصة' : 'From Amman · platform identity'}
-          </p>
-          <h2 style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.55)' }}>
-            {isArabic ? 'بيع أذكى، من أول سطر' : 'Sell smarter, from the first line'}
-          </h2>
-          <p style={{ color: '#fff', textShadow: '0 1px 8px rgba(16,24,40,0.45)' }}>
-            {isArabic
-              ? 'اكتب ما عندك. أناناس يرتّب الإعلان والحملة.'
-              : 'Write what you have. ANANAS arranges the listing and the campaign.'}
-          </p>
-          <button type="button" onClick={() => openComposer('sale')}>
-            {isArabic ? 'ابدأ الآن' : 'Start now'}
-          </button>
-        </div>
-      </section>
+      <HomeBanner locale={locale} />
 
       {children}
 

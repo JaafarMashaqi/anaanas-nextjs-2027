@@ -7,8 +7,8 @@
     'dots dots dots';
   gap: 0.35rem 0.45rem;
   align-items: center;
-  min-height: 92px;
-  padding: 0.55rem 0.7rem 0.45rem;
+  min-height: 108px;
+  padding: 0.7rem 0.85rem 0.55rem;
   border-radius: 18px;
   background: linear-gradient(to left, #fff8de, #fffefb 55%);
   color: #101828;
@@ -16,8 +16,8 @@
 
 .sky {
   grid-area: sky;
-  width: 28px;
-  height: 28px;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
   border-radius: 999px;
@@ -32,8 +32,8 @@
 
 .mascot {
   grid-area: mascot;
-  width: 46px;
-  height: 46px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
 }
 
@@ -56,8 +56,8 @@
 }
 
 .copy h2 {
-  font-size: 0.98rem;
-  line-height: 1.25;
+  font-size: 1.2rem;
+  line-height: 1.3;
   font-weight: 800;
 }
 

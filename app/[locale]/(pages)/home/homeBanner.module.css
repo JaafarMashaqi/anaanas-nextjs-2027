@@ -26,8 +26,8 @@
 .bannerWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 5;
-  max-height: none;
+  aspect-ratio: 2.45 / 1;
+  max-height: 248px;
   min-height: 0;
   border-radius: 16px;
   overflow: hidden;
@@ -57,6 +57,11 @@
   height: 100%;
   border-radius: 16px;
   overflow: hidden;
+}
+
+.bannerSwiper :global(.swiper-slide),
+.bannerSwiper :global(.swiper-wrapper) {
+  height: 100%;
 }
 
 .bannerSlide {
@@ -259,5 +264,145 @@
   }
   .bannerNavNext {
     inset-inline-end: 8px;
+  }
+}
+
+.identity,
+.adminSlide,
+.fixture {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.identityImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to left, rgba(16, 24, 40, 0.82), rgba(16, 24, 40, 0.08) 70%);
+}
+
+.badge {
+  position: absolute;
+  z-index: 3;
+  top: 0.7rem;
+  inset-inline-start: 0.75rem;
+  max-width: 70%;
+  padding: 0.16rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(16, 24, 40, 0.72);
+  color: #ffe58a;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.hide {
+  position: absolute;
+  z-index: 4;
+  top: 0.55rem;
+  inset-inline-end: 0.7rem;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.stageCopy {
+  position: absolute;
+  z-index: 2;
+  inset-inline-start: 1rem;
+  bottom: 0.85rem;
+  max-width: min(28rem, 78%);
+  color: #fff;
+}
+
+.stageCopy h2,
+.stageCopy p {
+  margin: 0;
+}
+
+.stageCopy h2 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.stageCopy p {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.stageCopy button,
+.stageCopy a {
+  display: inline-flex;
+  margin-top: 0.45rem;
+  min-height: 32px;
+  align-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: #ffc928;
+  color: #101828;
+  padding: 0.15rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.fixture {
+  display: flex;
+  align-items: flex-end;
+  background: #fff8de;
+}
+
+.fixture[data-tone='car'] {
+  background: #101828;
+}
+
+.fixture[data-tone='travel'] {
+  background: #14213d;
+}
+
+.fixture .badge {
+  background: rgba(255, 255, 255, 0.9);
+  color: #101828;
+}
+
+.fixture[data-tone='coffee'] .stageCopy,
+.fixture[data-tone='coffee'] .stageCopy h2,
+.fixture[data-tone='coffee'] .stageCopy p,
+.fixture[data-tone='coffee'] .hide {
+  color: #101828;
+}
+
+.adminOff,
+.loadingNote {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #667085;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 575.98px) {
+  .bannerWrap {
+    max-height: 188px;
+  }
+
+  .stageCopy h2 {
+    font-size: 1rem;
   }
 }

@@ -3,7 +3,6 @@ import { headers } from 'next/headers'
 import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
 import Feeds from './home/components/Feeds'
 import Followers from './home/components/Followers'
-import HomeBanner from './home/components/HomeBanner'
 import Link from 'next/link'
 import LoadContentButton from '@/components/LoadContentButton'
 import type { Metadata } from 'next'
@@ -148,8 +147,6 @@ const Home = async ({
           ) : null}
 
           <CreatePostCardLazyClient />
-
-          <HomeBanner locale={uiLocale} />
 
           <MobileLatestAdsSection locale={uiLocale} items={latestUnique} />
 
