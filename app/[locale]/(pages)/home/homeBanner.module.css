@@ -332,6 +332,7 @@
 .stageCopy h2,
 .stageCopy p {
   margin: 0;
+  text-shadow: 0 1px 8px rgba(16, 24, 40, 0.72);
 }
 
 .stageCopy h2 {
@@ -382,11 +383,11 @@
   color: #101828;
 }
 
-.fixture[data-tone='coffee'] .stageCopy,
 .fixture[data-tone='coffee'] .stageCopy h2,
 .fixture[data-tone='coffee'] .stageCopy p,
 .fixture[data-tone='coffee'] .hide {
   color: #101828;
+  text-shadow: none;
 }
 
 .adminOff,

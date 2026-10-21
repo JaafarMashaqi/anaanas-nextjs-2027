@@ -1,11 +1,12 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import mascot from '@/assets/uiux/mascot_sitting.png'
-import mascotAlt from '@/assets/uiux/mascot_sitting_alt.png'
+import { getApiUrl } from '@/lib/api/config'
+import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './MarketplaceStories.module.css'
@@ -77,7 +78,20 @@ const STORIES: Story[] = [
   },
 ]
 
-export default function MarketplaceStories({ locale }: { locale: SupportedLocale }) {
+function sectionIcon(icon?: string | null) {
+  if (!icon) return null
+  if (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('//')) return resolveMediaUrl(icon)
+  const path = icon.startsWith('/') ? icon : `/${icon}`
+  return resolveMediaUrl(getApiUrl(path))
+}
+
+export default function MarketplaceStories({
+  locale,
+  sections = [],
+}: {
+  locale: SupportedLocale
+  sections?: { id: number; slug: string; name: string; icon: string | null }[]
+}) {
   const ar = locale === 'ar'
   const [openId, setOpenId] = useState<string | null>(null)
   const [liked, setLiked] = useState(false)
@@ -174,7 +188,7 @@ export default function MarketplaceStories({ locale }: { locale: SupportedLocale
                 </button>
               </div>
               <div className={styles.art}>
-                <Image src={story.image === 'sit' ? mascot : mascotAlt} alt="" width={220} height={220} priority />
+                <span className={styles.letter}>{((ar ? story.nameAr : story.nameEn) || 'أ').slice(0, 1)}</span>
                 <button type="button" className={styles.zonePrev} onClick={() => go(index - 1)} aria-label={ar ? 'السابق' : 'Previous'} />
                 <button type="button" className={styles.zoneNext} onClick={() => go(index + 1)} aria-label={ar ? 'التالي' : 'Next'} />
               </div>
@@ -238,15 +252,31 @@ export default function MarketplaceStories({ locale }: { locale: SupportedLocale
           <span className={`${styles.ring} ${styles.add}`}>+</span>
           <span>{ar ? 'أضف قصة' : 'Add story'}</span>
         </button>
-        {STORIES.map((item) => (
-          <button key={item.id} type="button" className={styles.item} onClick={() => setOpenId(item.id)}>
-            <span className={`${styles.ring} ${item.live ? styles.live : ''} ${item.draft ? styles.draft : ''}`}>
-              <Image src={item.image === 'sit' ? mascot : mascotAlt} alt="" width={52} height={52} />
-              {item.live ? <em>LIVE</em> : null}
-            </span>
-            <span>{ar ? item.nameAr : item.nameEn}</span>
-          </button>
-        ))}
+        {sections.slice(0, 8).map((section) => {
+          const icon = sectionIcon(section.icon)
+          return (
+            <Link key={section.id} href={`/${locale}/sections/${section.slug}`} className={styles.item}>
+              <span className={styles.ring}>
+                {icon ? (
+                  <Image src={icon} alt="" width={52} height={52} unoptimized />
+                ) : (
+                  <span className={styles.letter}>{(section.name || 'أ').slice(0, 1)}</span>
+                )}
+              </span>
+              <span>{section.name}</span>
+            </Link>
+          )
+        })}
+        {sections.length === 0
+          ? STORIES.map((item) => (
+              <button key={item.id} type="button" className={styles.item} onClick={() => setOpenId(item.id)}>
+                <span className={`${styles.ring} ${item.draft ? styles.draft : ''}`}>
+                  <span className={styles.letter}>{(ar ? item.nameAr : item.nameEn).slice(0, 1)}</span>
+                </span>
+                <span>{ar ? item.nameAr : item.nameEn}</span>
+              </button>
+            ))
+          : null}
       </div>
       {viewer}
     </section>

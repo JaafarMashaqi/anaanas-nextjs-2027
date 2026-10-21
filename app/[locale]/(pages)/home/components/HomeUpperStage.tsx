@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, Suspense, type ReactNode } from 'react'
 
 import Link from 'next/link'
 
 import type { TrendingPostItem } from '@/lib/api/homeInsights'
 import { demoMarketEvents } from '@/lib/experience/demoMarketEvents'
 import type { SupportedLocale } from '@/lib/localization'
+import type { Section } from '@/lib/api/sections'
 import type { LatestListingItem } from '@/lib/server/fetchLatestListings'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
 import HomeMomentSlot from './HomeMomentSlot'
@@ -23,6 +24,7 @@ type Props = {
   countryLabel: string
   trending: TrendingPostItem[]
   latest?: LatestListingItem[]
+  sections?: Section[]
   children?: ReactNode
 }
 
@@ -57,7 +59,7 @@ function openComposer(intent: 'sale' | 'wanted') {
   window.setTimeout(retry, 60)
 }
 
-export default function HomeUpperStage({ locale, countryLabel, trending = [], latest = [], children }: Props) {
+export default function HomeUpperStage({ locale, countryLabel, trending = [], latest = [], sections = [], children }: Props) {
   const isArabic = locale === 'ar'
   const [hiddenEvents, setHiddenEvents] = useState<string[]>([])
   const events = demoMarketEvents(locale).filter((item) => !hiddenEvents.includes(item.id))
@@ -150,7 +152,7 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
         </p>
       ) : null}
 
-      <MarketplaceStories locale={locale} />
+      <MarketplaceStories locale={locale} sections={sections} />
 
       <div className={styles.place}>
         <span aria-hidden>📍</span>
@@ -187,7 +189,9 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
       ) : null}
 
       <HomeGoldenMoment locale={locale} onSell={() => openComposer('sale')} />
-      <HomeDiscoveryRail locale={locale} />
+      <Suspense fallback={null}>
+        <HomeDiscoveryRail locale={locale} />
+      </Suspense>
 
       <HomeOpportunitySlot locale={locale} trending={trending} />
     </div>

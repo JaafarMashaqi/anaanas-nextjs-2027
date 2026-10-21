@@ -58,10 +58,24 @@
   cursor: pointer;
 }
 
-.chip[data-source='live'] {
+.chipOn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 32px;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid #101828;
   background: #101828;
   color: #ffffff;
-  border-color: #101828;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chip[data-source='demo'] {
+  background: #fff8de;
 }
 
 .chip small {

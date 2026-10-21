@@ -11,14 +11,14 @@
 .opportunity {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   min-width: 0;
   max-width: 100%;
-  padding: 0.4rem 0.7rem;
-  border-radius: 14px;
+  padding: 0.28rem 0.6rem;
+  border-radius: 12px;
   background: #ffffff;
   color: #101828;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
 }
 
 .place strong,

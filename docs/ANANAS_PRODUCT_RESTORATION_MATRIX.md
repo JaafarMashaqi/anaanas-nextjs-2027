@@ -16,4 +16,5 @@ Sources actually opened: this conversation, the attached mobile references, and 
 | Golden moment | Spec 6 | HomeGoldenMoment | Real buyer matching | High | No demand match | One labeled sample, hidden for 24 hours after dismiss. |
 | Composer | Spec 07 | CreatePostCard and AdStudioDemo | Video upload and real price intelligence | High | Existing publish API | Compact composer stays. The studio shows a labeled interface estimate, not a model result. |
 | Social cards | Spec 08 | PostCard listingCard | Follow, offer, wanted variant, opportunity score | High | Reactions and comments already on the post API | Feed image capped and cropped. Stock collage removed from the feed. |
-| Mascot family | Spec 11 | Existing pineapple assets | Distinct category characters | Later | Art, not an API | Not newly drawn |
+| Arabic type | Spec 11 | app/layout.tsx | A custom Noon face is not licensed | High | None | IBM Plex Sans Arabic, SIL Open Font License, on the Arabic UI. |
+| Stories characters | Spec 04 | MarketplaceStories | Greeting, coffee, and auction characters still need original art | High | Section icons from /api/sections | Stories use those category illustrations, not the sunglasses pineapple. |

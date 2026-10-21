@@ -118,6 +118,7 @@ const Home = async ({
             countryLabel={countryLabel}
             trending={trending}
             latest={latestUnique}
+            sections={sections}
           >
             <Suspense fallback={<HomeInsightsSkeleton />}>
               <MarketPulseCard locale={uiLocale} variant="rail" />

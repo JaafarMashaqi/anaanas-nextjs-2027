@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { headers } from 'next/headers'
-import { Cairo, Inter } from 'next/font/google'
+import { IBM_Plex_Sans_Arabic, Inter } from 'next/font/google'
 import NextTopLoader from 'nextjs-toploader'
 import type { ReactNode } from 'react'
 import Script from 'next/script'
@@ -27,9 +27,9 @@ const inter = Inter({
   adjustFontFallback: true,
 })
 
-const cairo = Cairo({
+const arabic = IBM_Plex_Sans_Arabic({
   subsets: ['latin', 'arabic'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
   adjustFontFallback: true,
 })
@@ -208,7 +208,7 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
         <link rel="stylesheet" href={localeStylesheet} />
       </head>
       <body
-        className={`${locale === 'ar' ? cairo.className : inter.className} ${localeClassName}`}
+        className={`${locale === 'ar' ? arabic.className : inter.className} ${localeClassName}`}
         data-locale={locale}
         data-dir={direction}
         suppressHydrationWarning

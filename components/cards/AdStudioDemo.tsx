@@ -90,28 +90,51 @@ export default function AdStudioDemo({
       <p className={styles.hint}>
         {ar ? 'النصوص جاهزة وليست ناتجة عن نموذج.' : 'These phrases are prepared text, not a model output.'}
       </p>
-      {mode !== 'sale' ? (
-        <>
-          <label className={styles.field}>
-            <span>{ar ? 'الوصف' : 'Description'}</span>
-            <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={3} />
-          </label>
-          <div className={styles.row}>
-            <label className={styles.field}>
-              <span>{ar ? 'السعر' : 'Price'}</span>
-              <input value={price} onChange={(event) => setPrice(event.target.value)} inputMode="decimal" />
-            </label>
-            <label className={styles.field}>
-              <span>{ar ? 'المكان' : 'Place'}</span>
-              <input value={place} onChange={(event) => setPlace(event.target.value)} />
-            </label>
-          </div>
-          <label className={styles.field}>
-            <span>{ar ? 'القسم' : 'Category'}</span>
-            <input value={category} onChange={(event) => setCategory(event.target.value)} />
-          </label>
-        </>
-      ) : null}
+      <label className={styles.field}>
+        <span>{ar ? 'الوصف' : 'Description'}</span>
+        <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={3} />
+      </label>
+      <div className={styles.row}>
+        <label className={styles.field}>
+          <span>{ar ? 'السعر' : 'Price'}</span>
+          <input value={price} onChange={(event) => setPrice(event.target.value)} inputMode="decimal" />
+        </label>
+        <label className={styles.field}>
+          <span>{ar ? 'المكان' : 'Place'}</span>
+          <input value={place} onChange={(event) => setPlace(event.target.value)} />
+        </label>
+      </div>
+      <label className={styles.field}>
+        <span>{ar ? 'القسم' : 'Category'}</span>
+        <input value={category} onChange={(event) => setCategory(event.target.value)} />
+      </label>
+      <div className={styles.suggestions} aria-label={ar ? 'باقات' : 'Plans'}>
+        {[
+          { id: 'free', ar: 'مجاني', en: 'Free', live: true },
+          { id: 'featured', ar: 'مميز', en: 'Featured', live: false },
+          { id: 'gold', ar: 'ذهبي', en: 'Gold', live: false },
+          { id: 'pro', ar: 'برو', en: 'PRO', live: false },
+          { id: 'elite', ar: 'إيليت', en: 'Elite', live: false },
+        ].map((plan) => (
+          <button
+            key={plan.id}
+            type="button"
+            onClick={() =>
+              setStatus(
+                plan.live
+                  ? ar
+                    ? 'النشر المجاني هو زر «أضف إعلان». هذه المسودة لا تُرسل وحدها.'
+                    : 'Free publishing is the Add listing button. This draft is not sent by itself.'
+                  : ar
+                    ? `${plan.ar} غير مربوط. لا توجد باقة أو سعر.`
+                    : `${plan.en} is not connected. There is no package or price.`,
+              )
+            }
+          >
+            {ar ? plan.ar : plan.en}
+          </button>
+        ))}
+      </div>
       <div className={styles.row}>
         <label className={styles.field}>
           <span>{ar ? 'ميزانية تجريبية' : 'Demo budget'}</span>
@@ -136,11 +159,9 @@ export default function AdStudioDemo({
           : `Interface estimate: ${sampleReach.toLocaleString('en-US')} demo impressions for a budget of ${budget} over ${days} days. Not a model result and not market analysis.`}
       </p>
       <div className={styles.actions}>
-        {mode === 'sale' ? null : (
-          <button type="button" className={styles.primary} onClick={saveDraft}>
-            {ar ? 'احفظ المسودة التجريبية' : 'Save demo draft'}
-          </button>
-        )}
+        <button type="button" className={styles.primary} onClick={saveDraft}>
+          {ar ? 'احفظ المسودة هنا' : 'Save the draft here'}
+        </button>
         <button
           type="button"
           className={styles.quiet}

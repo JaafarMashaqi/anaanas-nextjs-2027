@@ -1,11 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 
-import mascot from '@/assets/uiux/mascot_sitting.png'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './HomeMomentSlot.module.css'
@@ -183,7 +181,6 @@ export default function HomeMomentSlot({
           </svg>
         )}
       </span>
-      <Image src={mascot} alt="" width={46} height={46} className={styles.mascot} />
       {slide.kind === 'coffee' ? (
         <span className={styles.cup} aria-hidden>
           <span className={styles.steam} />

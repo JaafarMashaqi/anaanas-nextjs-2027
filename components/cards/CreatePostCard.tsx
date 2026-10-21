@@ -316,6 +316,7 @@ function CreatePostHeroShell({
               aria-describedby={errorText ? 'create-post-hero-title-err' : undefined}
               onFocus={(event) => {
                 setExpanded(true)
+                setStudioOpen(true)
                 if (event.currentTarget.dataset.allowFocus === '1') {
                   delete event.currentTarget.dataset.allowFocus
                   return
