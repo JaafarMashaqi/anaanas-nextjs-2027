@@ -40,7 +40,7 @@ import LoginRequiredDialog from '@/components/dialogs/LoginRequiredDialog'
 import PostSuccessCelebrationModal from '@/components/dialogs/PostSuccessCelebrationModal'
 import { dispatchPostCreated } from '@/lib/postCreated'
 import WizardPostPhotosStep from './WizardPostPhotosStep'
-import AdStudioDemo from './AdStudioDemo'
+import AdStudioDemo, { type StudioCatalog } from './AdStudioDemo'
 import clsx from 'clsx'
 import {
   BsBullseye,
@@ -159,6 +159,7 @@ type CreatePostHeroShellProps = {
   onContinue?: () => void
   files?: File[]
   onFilesChange?: (files: File[]) => void
+  catalog?: StudioCatalog
   limitOverlay?: ReactNode
 }
 
@@ -183,6 +184,7 @@ function CreatePostHeroShell({
   onContinue,
   files,
   onFilesChange,
+  catalog,
   limitOverlay,
 }: CreatePostHeroShellProps) {
   const shellDir = isWizardRtl ? 'rtl' : 'ltr'
@@ -508,6 +510,7 @@ function CreatePostHeroShell({
               onContinue={onContinue}
               files={files}
               onFilesChange={onFilesChange}
+              catalog={catalog}
             />
           ) : null}
         </div>
@@ -1719,6 +1722,38 @@ const [step, setStep] = useState(1)
     )
   }
 
+  const studioCatalog: StudioCatalog = {
+    sections: (sections || []).map((section) => ({ id: section.id, name: section.name })),
+    categories: sectionCategories.map((category) => ({ id: category.id, name: category.name })),
+    cities: (Array.isArray(cities) ? cities : []).map((city) => ({ id: city.id, name: city.name })),
+    sectionId: selectedSection?.id ?? null,
+    categoryId: selectedCategory?.id ?? null,
+    cityId: formValues.city ? String(formValues.city) : null,
+    price: formValues.price != null && formValues.price !== '' ? String(formValues.price) : '',
+    countryName: selectedCountry?.name || '',
+    onSection: (id) => {
+      const sectionItem = (sections || []).find((section) => section.id === id)
+      if (!sectionItem) return
+      setSelectedSection(sectionItem)
+      setSelectedCategory(null)
+      setValue('section_id', sectionItem.id, { shouldValidate: true })
+    },
+    onCategory: (id) => {
+      const category = sectionCategories.find((item) => item.id === id)
+      if (!category) return
+      setSelectedCategory(category)
+      setValue('category_id', category.id, { shouldValidate: true })
+    },
+    onCity: (id) => {
+      handleFieldChange('city', id || null, '', false)
+      setValue('city', id || null, { shouldValidate: true })
+    },
+    onPrice: (value) => {
+      handleFieldChange('price', value, '', false)
+      setValue('price', value ? parseFloat(value) : undefined, { shouldValidate: true })
+    },
+  }
+
   if (status === 'unauthenticated' || status === 'loading') {
     return (
       <>
@@ -1735,6 +1770,10 @@ const [step, setStep] = useState(1)
                 autoComplete: 'off',
               }}
               showTags
+              onDescribe={(value) => setDescription(value)}
+              files={images}
+              onFilesChange={setImages}
+              catalog={studioCatalog}
               onAddAdClick={() => setShowLoginAlert(true)}
             />
           </ComposerCardAtmosphere>
@@ -1800,6 +1839,7 @@ const [step, setStep] = useState(1)
                 }}
                 files={images}
                 onFilesChange={setImages}
+                catalog={studioCatalog}
                 onAddAdClick={async () => {
                   if (isCreationBlocked) return
                   if (!(await guardComposerEmailVerification())) return

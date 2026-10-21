@@ -6,6 +6,22 @@ import Link from 'next/link'
 import styles from './AdStudioDemo.module.css'
 
 type Mode = 'sale' | 'wanted' | 'auction'
+type CatalogOption = { id: number; name: string }
+
+export type StudioCatalog = {
+  sections: CatalogOption[]
+  categories: CatalogOption[]
+  cities: CatalogOption[]
+  sectionId: number | null
+  categoryId: number | null
+  cityId: string | null
+  price: string
+  countryName: string
+  onSection: (id: number) => void
+  onCategory: (id: number) => void
+  onCity: (id: string) => void
+  onPrice: (value: string) => void
+}
 
 const SUGGESTIONS = {
   ar: ['خزانة خشب للبيع في عمّان', 'أبحث عن دراجة بحالة جيدة', 'مزاد على طقم كنب'],
@@ -21,6 +37,7 @@ export default function AdStudioDemo({
   onContinue,
   files = [],
   onFilesChange,
+  catalog,
 }: {
   locale: string
   mode: Mode
@@ -30,6 +47,7 @@ export default function AdStudioDemo({
   onContinue?: () => void
   files?: File[]
   onFilesChange?: (files: File[]) => void
+  catalog?: StudioCatalog
 }) {
   const ar = locale === 'ar'
   const storageKey = `ananas.demoComposer.${mode}`
@@ -117,7 +135,11 @@ export default function AdStudioDemo({
   return (
     <div className={styles.studio}>
       <p className={styles.banner}>
-        {mode === 'sale'
+        {catalog
+          ? ar
+            ? 'القسم والمدينة والسعر يُكتبان في نموذج النشر الحالي. لم يُنشر شيء.'
+            : 'Section, city, and price are written into the current publish form. Nothing is published.'
+          : mode === 'sale'
           ? ar
             ? 'استوديو متقدم — تجريبي. النشر الحقيقي يبقى زر «أضف إعلان».'
             : 'Advanced studio — demo. Real publishing stays on Add listing.'
@@ -150,20 +172,100 @@ export default function AdStudioDemo({
           rows={3}
         />
       </label>
-      <div className={styles.row}>
-        <label className={styles.field}>
-          <span>{ar ? 'السعر' : 'Price'}</span>
-          <input value={price} onChange={(event) => setPrice(event.target.value)} inputMode="decimal" />
-        </label>
-        <label className={styles.field}>
-          <span>{ar ? 'المكان' : 'Place'}</span>
-          <input value={place} onChange={(event) => setPlace(event.target.value)} />
-        </label>
-      </div>
-      <label className={styles.field}>
-        <span>{ar ? 'القسم' : 'Category'}</span>
-        <input value={category} onChange={(event) => setCategory(event.target.value)} />
-      </label>
+      {catalog ? (
+        <>
+          <label className={styles.field}>
+            <span>{ar ? 'القسم' : 'Section'}</span>
+            <select
+              value={catalog.sectionId ?? ''}
+              onChange={(event) => {
+                const id = Number(event.target.value)
+                if (id) catalog.onSection(id)
+              }}
+            >
+              <option value="">{ar ? 'اختر القسم' : 'Choose a section'}</option>
+              {catalog.sections.map((section) => (
+                <option key={section.id} value={section.id}>
+                  {section.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.field}>
+            <span>{ar ? 'الفئة' : 'Category'}</span>
+            <select
+              value={catalog.categoryId ?? ''}
+              disabled={!catalog.sectionId}
+              onChange={(event) => {
+                const id = Number(event.target.value)
+                if (id) catalog.onCategory(id)
+              }}
+            >
+              <option value="">{ar ? 'اختر الفئة' : 'Choose a category'}</option>
+              {catalog.categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className={styles.row}>
+            <label className={styles.field}>
+              <span>{ar ? 'المدينة' : 'City'}</span>
+              <select value={catalog.cityId ?? ''} onChange={(event) => catalog.onCity(event.target.value)}>
+                <option value="">{catalog.countryName || (ar ? 'اختر المدينة' : 'Choose a city')}</option>
+                {catalog.cities.map((city) => (
+                  <option key={city.id} value={city.id}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={styles.field}>
+              <span>{ar ? 'السعر' : 'Price'}</span>
+              <input
+                value={catalog.price}
+                onChange={(event) => catalog.onPrice(event.target.value)}
+                inputMode="decimal"
+              />
+            </label>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={styles.row}>
+            <label className={styles.field}>
+              <span>{ar ? 'السعر' : 'Price'}</span>
+              <input value={price} onChange={(event) => setPrice(event.target.value)} inputMode="decimal" />
+            </label>
+            <label className={styles.field}>
+              <span>{ar ? 'المكان' : 'Place'}</span>
+              <input value={place} onChange={(event) => setPlace(event.target.value)} />
+            </label>
+          </div>
+          <label className={styles.field}>
+            <span>{ar ? 'القسم' : 'Category'}</span>
+            <input value={category} onChange={(event) => setCategory(event.target.value)} />
+          </label>
+        </>
+      )}
+      <section className={styles.panel}>
+        <h3>{ar ? 'معاينة المسودة' : 'Draft preview'}</h3>
+        <p>{title.trim() || (ar ? 'بدون عنوان' : 'No title')}</p>
+        <p>{description.trim() || (ar ? 'بدون وصف' : 'No description')}</p>
+        <p>
+          {(catalog?.price || price || (ar ? 'بدون سعر' : 'No price')) +
+            ' · ' +
+            (catalog?.cities.find((city) => String(city.id) === catalog.cityId)?.name ||
+              place ||
+              (ar ? 'بدون مدينة' : 'No city'))}
+        </p>
+        <p>
+          {ar
+            ? `${files.length} صور جاهزة للرفع. ليست منشورة.`
+            : `${files.length} photos are ready to upload. They are not published.`}
+        </p>
+      </section>
       <div className={styles.suggestions} aria-label={ar ? 'باقات' : 'Plans'}>
         {[
           { id: 'free', ar: 'مجاني', en: 'Free', live: true },
