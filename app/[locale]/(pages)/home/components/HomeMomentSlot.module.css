@@ -1,11 +1,10 @@
 .card {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.7rem;
   min-height: 0;
-  padding: 0.65rem 0.85rem;
-  border-radius: 18px;
-  background: linear-gradient(to left, #e7f6ec, #f4fbf6 42%, #fffefb);
+  padding: 0.15rem 0;
+  background: transparent;
   color: #101828;
 }
 
@@ -16,19 +15,25 @@
 }
 
 .sky {
-  width: 42px;
-  height: 42px;
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
-  border-radius: 999px;
-  background: #fff4c8;
-  color: #f5a900;
+  color: #e39b00;
   flex: 0 0 auto;
 }
 
+.sky svg {
+  width: 40px;
+  height: 40px;
+}
+
+.sky[data-sky='day'] {
+  animation: ananas-sun 8s linear infinite;
+}
+
 .sky[data-sky='night'] {
-  background: #243656;
-  color: #fff6d0;
+  color: #243656;
 }
 
 .mascot {
@@ -118,8 +123,14 @@
   100% { transform: translateY(-6px); opacity: 0; }
 }
 
+@keyframes ananas-sun {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .steam { animation: none; opacity: 0.4; }
+  .sky { animation: none; }
 }
 
 .actions {

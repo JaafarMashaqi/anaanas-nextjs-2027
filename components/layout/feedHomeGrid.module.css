@@ -6,8 +6,8 @@
 }
 
 .feedMain {
-  padding-top: 80px;
-  scroll-padding-top: 80px;
+  padding-top: 120px;
+  scroll-padding-top: 120px;
 }
 
 .row {
@@ -17,8 +17,15 @@
 
 @media (max-width: 991.98px) {
   .feedMain {
-    padding-top: 76px;
-    scroll-padding-top: 76px;
+    padding-top: 108px;
+    scroll-padding-top: 108px;
+  }
+}
+
+@media (min-width: 992px) {
+  .feedMain {
+    padding-top: 112px;
+    scroll-padding-top: 112px;
   }
 }
 

@@ -1,3 +1,45 @@
+.menu {
+  position: relative;
+}
+
+.panel {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  inset-inline-start: 0;
+  width: min(220px, 70vw);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e7e9ee;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+}
+
+.panel a,
+.panel button {
+  border: 0;
+  background: transparent;
+  color: #101828;
+  text-align: start;
+  text-decoration: none;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.35rem 0.4rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.panel p {
+  margin: 0;
+  color: #667085;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.4rem;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

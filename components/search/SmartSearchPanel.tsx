@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from 'react'
+import { useEffect, useMemo, useState, type KeyboardEvent, type RefObject } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { useAppData } from '@/context/AppDataContext'
@@ -88,18 +88,17 @@ export function useSmartSearchAssist(locale: SupportedLocale, query: string) {
   return { open, setOpen, active, setActive, suggestions, choose, onKeyDown, forget, clearRecents, query }
 }
 
-/** Second press on an already-open field closes it. Focus still opens a closed field. */
-export function useSearchFieldToggle(open: boolean, setOpen: (next: boolean) => void) {
-  const wasOpen = useRef(false)
+/** Focus and click always open the panel. Closing is outside the field or Escape. */
+export function useSearchFieldToggle(_open: boolean, setOpen: (next: boolean) => void) {
   return {
     onMouseDown: () => {
-      wasOpen.current = open
+      setOpen(true)
     },
     onFocus: () => {
-      if (!wasOpen.current) setOpen(true)
+      setOpen(true)
     },
     onClick: () => {
-      if (wasOpen.current) setOpen(false)
+      setOpen(true)
     },
   }
 }

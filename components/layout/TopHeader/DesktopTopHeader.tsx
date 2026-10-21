@@ -15,7 +15,7 @@ import NotificationsBell from './NotificationsBell'
 import ProfileDropdown from './ProfileDropdown'
 import StyledHeader from './StyledHeader'
 import MobileSectionsDrawer from './MobileSectionsDrawer'
-import LocaleDropdown from './LocaleDropdown'
+import PlaceLanguageBar from './PlaceLanguageBar'
 import BetaBadge from './BetaBadge'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
@@ -169,15 +169,6 @@ const TopHeader = () => {
           </button>
           ) : null}
 
-          <div className="d-none d-lg-inline-flex">
-            <LocaleDropdown />
-          </div>
-          <div className="d-lg-none">
-            <LocaleDropdown compact />
-          </div>
-
-          {/* Messaging (desktop only) — Settings is accessible from the
-              ProfileDropdown menu, so we no longer need a standalone icon. */}
           {isAuthed && (
             <Link
               className="topHeader__iconBtn d-none d-lg-inline-flex"
@@ -189,14 +180,13 @@ const TopHeader = () => {
             </Link>
           )}
 
-          {/* Notifications */}
           {isAuthed && <NotificationsBell locale={locale} />}
 
-          {/* Profile */}
           <ProfileDropdown locale={locale} />
         </div>
-
- 
+      </div>
+      <div className="container placeLanguageSlot">
+        <PlaceLanguageBar />
       </div>
 
       {/* ==================== MOBILE SEARCH POPUP (≤991.98px) ==================== */}
@@ -292,9 +282,17 @@ const TopHeader = () => {
 
       <style jsx global>{`
         /* ----- Header wrapper polish ----- */
-        .topNav {
+        .topNav.navbar {
           padding-top: 0.45rem;
-          padding-bottom: 0.45rem;
+          padding-bottom: 0.35rem;
+          flex-wrap: wrap !important;
+        }
+
+        .topNav .placeLanguageSlot {
+          flex: 1 0 100%;
+          width: 100%;
+          max-width: 100%;
+          order: 2;
         }
 
         .topNav .container.topHeaderGrid {

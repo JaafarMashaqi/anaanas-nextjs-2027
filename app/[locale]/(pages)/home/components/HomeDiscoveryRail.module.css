@@ -34,7 +34,8 @@
   gap: 0.4rem;
   overflow-x: auto;
   scrollbar-width: none;
-  padding-bottom: 0.1rem;
+  padding-bottom: 0.15rem;
+  padding-inline-end: 28px;
 }
 
 .row::-webkit-scrollbar {

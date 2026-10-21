@@ -1,0 +1,33 @@
+:global(.topNav.navbar) {
+  flex-wrap: wrap !important;
+}
+
+:global(.placeLanguageSlot) {
+  flex: 1 0 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  order: 2;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 36px;
+  padding: 0 0.15rem 0.15rem;
+  min-width: 0;
+}
+
+.place {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.pin {
+  display: inline-flex;
+  color: #b58100;
+  flex: 0 0 auto;
+}

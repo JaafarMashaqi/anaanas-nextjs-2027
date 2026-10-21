@@ -9,7 +9,8 @@ import LogoBox from '@/components/LogoBox'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
 
-import LocaleDropdown from '../LocaleDropdown'
+import MobileLoginButton from './MobileLoginButton'
+import PlaceLanguageBar from '../PlaceLanguageBar'
 import MobileSectionsDrawer from '../MobileSectionsDrawer'
 import StyledHeader from '../StyledHeader'
 
@@ -17,7 +18,6 @@ import MobileNotificationsButton from './MobileNotificationsButton'
 import MobileMessagesButton from './MobileMessagesButton'
 import MobileProfileButton from './MobileProfileButton'
 import MobileHeaderSearchBar from './MobileHeaderSearchBar'
-import MobileLoginButton from './MobileLoginButton'
 
 import styles from './MobileTopHeader.module.css'
 import BetaBadge from '../BetaBadge'
@@ -120,12 +120,8 @@ const MobileTopHeader = () => {
           <div className={styles.brand}>
             <LogoBox />
           </div>
-
-          {/* logical-end cluster — one language control */}
-          <div className={styles.end}>
-            <LocaleDropdown compact />
-          </div>
         </div>
+        <PlaceLanguageBar />
         {/* <BetaBadge locale={locale} className=" d-inline-flex m-auto" /> */}
 
         {!isHome ? (
