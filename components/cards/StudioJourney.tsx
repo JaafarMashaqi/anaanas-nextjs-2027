@@ -51,6 +51,7 @@ export default function StudioJourney({
   locale,
   mode,
   title,
+  description: descriptionProp = '',
   onUseTitle,
   onDescribe,
   onContinue,
@@ -61,6 +62,7 @@ export default function StudioJourney({
   locale: string
   mode: Mode
   title: string
+  description?: string
   onUseTitle: (value: string) => void
   onDescribe?: (value: string) => void
   onContinue?: () => void
@@ -70,7 +72,10 @@ export default function StudioJourney({
 }) {
   const ar = locale === 'ar'
   const [step, setStep] = useState(0)
-  const [description, setDescription] = useState('')
+  const [description, setDescription] = useState(descriptionProp)
+  useEffect(() => {
+    if (descriptionProp && !description) setDescription(descriptionProp)
+  }, [descriptionProp, description])
   const [area, setArea] = useState('')
   const [condition, setCondition] = useState('used')
   const [negotiable, setNegotiable] = useState(false)

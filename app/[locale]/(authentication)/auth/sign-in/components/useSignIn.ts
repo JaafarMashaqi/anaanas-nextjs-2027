@@ -72,7 +72,10 @@ const useSignIn = (locale?: SupportedLocale) => {
       })
 
       if (result?.ok) {
-        const redirectTo = queryParams['redirectTo'] ?? `/${resolvedLocale}`
+        const requested = queryParams['redirectTo']
+        const redirectTo = typeof requested === 'string' && requested.startsWith('/') && !requested.startsWith('//')
+          ? requested
+          : `/${resolvedLocale}`
         await redirectAfterAuth(resolvedLocale, push, redirectTo)
         showNotification({ 
           message: resolvedLocale === 'ar' 

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 
-import defaultUserAvatar from '@/assets/images/avatar/user-default.svg'
+import defaultUserAvatar from '@/assets/images/avatar/ananas-host.svg'
 import { useCurrentUser } from '@/context/useCurrentUser'
 import { useClientLogout } from '@/hooks/useClientLogout'
 import type { SupportedLocale } from '@/lib/localization'
@@ -23,7 +23,26 @@ const MobileProfileButton = ({ locale }: Props) => {
   const [open, setOpen] = useState(false)
   const ar = locale === 'ar'
 
-  if (status !== 'authenticated') return null
+  if (status === 'loading') return null
+
+  if (status !== 'authenticated') {
+    return (
+      <div className={styles.menu}>
+        <button type="button" className={styles.btn} aria-expanded={open} aria-label={ar ? 'الحساب' : 'Account'} onClick={() => setOpen((value) => !value)}>
+          <span className={styles.ring}>
+            <Image src={defaultUserAvatar} alt="" width={28} height={28} className={styles.avatar} />
+          </span>
+        </button>
+        {open ? (
+          <div className={styles.panel} role="menu">
+            <Link href={`/${locale}/auth/sign-in`} role="menuitem">{ar ? 'تسجيل الدخول' : 'Sign in'}</Link>
+            <Link href={`/${locale}/auth/sign-up`} role="menuitem">{ar ? 'إنشاء حساب' : 'Create an account'}</Link>
+            <p>{ar ? 'مسودتك تبقى على هذا الجهاز حتى تسجيل الدخول.' : 'Your draft stays on this device until you sign in.'}</p>
+          </div>
+        ) : null}
+      </div>
+    )
+  }
 
   const displayName = session?.user?.name || session?.user?.email || (ar ? 'الملف الشخصي' : 'Profile')
 
@@ -36,10 +55,11 @@ const MobileProfileButton = ({ locale }: Props) => {
       </button>
       {open ? (
         <div className={styles.panel} role="menu">
-          <Link href={`/${locale}/profile/feed`} role="menuitem">{ar ? 'ملفي' : 'My profile'}</Link>
+          <Link href={`/${locale}/profile/feed`} role="menuitem">{ar ? 'الملف الشخصي' : 'Profile'}</Link>
           <Link href={`/${locale}/my-posts`} role="menuitem">{ar ? 'إعلاناتي' : 'My listings'}</Link>
+          <Link href={`/${locale}/settings/account`} role="menuitem">{ar ? 'المحفوظات' : 'Saved'}</Link>
+          <Link href={`/${locale}/settings/account`} role="menuitem">{ar ? 'عضويتي' : 'Membership'}</Link>
           <Link href={`/${locale}/settings/account`} role="menuitem">{ar ? 'الإعدادات' : 'Settings'}</Link>
-          <p>{ar ? 'المحفوظات والعضوية بلا صفحة بعد.' : 'Saved listings and membership have no page yet.'}</p>
           <button type="button" role="menuitem" onClick={() => void logout()} disabled={loggingOut}>
             {loggingOut ? (ar ? 'جارٍ الخروج' : 'Signing out') : ar ? 'تسجيل الخروج' : 'Log out'}
           </button>

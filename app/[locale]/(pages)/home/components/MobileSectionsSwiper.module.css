@@ -71,6 +71,24 @@
  * intrinsic minimum — keeps the grid inside narrow Bootstrap columns.
  * Wider gaps match the reference design.
  */
+.rail {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  width: 100%;
+  padding-bottom: 2px;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.rail > * {
+  flex: 0 0 76px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

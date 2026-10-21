@@ -97,7 +97,9 @@ const SignUpForm = ({ locale: localeProp }: { locale?: SupportedLocale }) => {
         })
 
         if (loginResult?.ok) {
-          await redirectAfterAuth(locale, push)
+          const redirectTo = new URLSearchParams(window.location.search).get('redirectTo')
+          const safeRedirect = redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : undefined
+          await redirectAfterAuth(locale, push, safeRedirect)
         } else {
           push(`/${locale}/auth/sign-in`)
         }

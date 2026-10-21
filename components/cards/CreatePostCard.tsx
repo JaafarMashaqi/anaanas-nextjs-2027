@@ -37,6 +37,7 @@ import type { Section } from '@/lib/api/sections'
 import { createPost, deletePostImage, updatePost, type CreatePostData, type PostRecord } from '@/lib/api/posts'
 import { useSession } from 'next-auth/react'
 import LoginRequiredDialog from '@/components/dialogs/LoginRequiredDialog'
+import { clearGuestDraft, readGuestDraft, readGuestFiles, saveGuestFiles, writeGuestDraft } from '@/lib/experience/guestDraftStore'
 import PostSuccessCelebrationModal from '@/components/dialogs/PostSuccessCelebrationModal'
 import { dispatchPostCreated } from '@/lib/postCreated'
 import WizardPostPhotosStep from './WizardPostPhotosStep'
@@ -156,6 +157,7 @@ type CreatePostHeroShellProps = {
   showTags: boolean
   onAddAdClick: () => void
   onDescribe?: (value: string) => void
+  description?: string
   onContinue?: () => void
   files?: File[]
   onFilesChange?: (files: File[]) => void
@@ -181,6 +183,7 @@ function CreatePostHeroShell({
   showTags,
   onAddAdClick,
   onDescribe,
+  description = '',
   onContinue,
   files,
   onFilesChange,
@@ -193,6 +196,7 @@ function CreatePostHeroShell({
   const [intent, setIntent] = useState<'sale' | 'wanted' | 'auction'>(queuedIntent ?? 'sale')
   const [studioOpen, setStudioOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const shellRef = useRef<HTMLDivElement>(null)
   const skipInitialFocus = useRef(true)
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
@@ -212,6 +216,31 @@ function CreatePostHeroShell({
     window.addEventListener('ananas:composer-intent', onIntent)
     return () => window.removeEventListener('ananas:composer-intent', onIntent)
   }, [])
+
+  useEffect(() => {
+    if (!expanded) return
+    const onPointer = (event: PointerEvent) => {
+      const target = event.target
+      if (!(target instanceof Node)) return
+      if (shellRef.current?.contains(target)) return
+      if (target instanceof Element && target.closest('.modal, [role="dialog"], [role="listbox"], .dropdown-menu')) return
+      setExpanded(false)
+    }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setExpanded(false)
+    }
+    document.addEventListener('pointerdown', onPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [expanded])
+
+  useEffect(() => {
+    if (!title.trim()) return
+    writeGuestDraft({ intent, title })
+  }, [intent, title])
 
   useEffect(() => {
     if (skipInitialFocus.current) {
@@ -248,8 +277,22 @@ function CreatePostHeroShell({
 
   const isArabic = locale === 'ar'
   const prompts = isArabic
-    ? ['ماذا تريد أن تبيع اليوم؟', 'جملة واحدة تكفي للعنوان.', 'الصور والسعر يبقيان في نفس مسار النشر.']
-    : ['What do you want to sell today?', 'One clear sentence is enough for a title.', 'Photos and price stay in this same publish flow.']
+    ? [
+        'ماذا تريد أن تبيع أو تعلن اليوم؟',
+        'لدي سيارة للبيع...',
+        'أبحث عن شقة للإيجار...',
+        'أريد الإعلان عن خدماتي...',
+        'لدي منتجات جديدة في متجري...',
+        'أبحث عن مشتري مناسب...',
+      ]
+    : [
+        'What do you want to sell or advertise today?',
+        'I have a car for sale...',
+        'I am looking for an apartment...',
+        'I want to advertise my services...',
+        'I have new products in my store...',
+        'I am looking for the right buyer...',
+      ]
   const [promptIndex, setPromptIndex] = useState(0)
   const [assistNote, setAssistNote] = useState<string | null>(null)
 
@@ -265,9 +308,10 @@ function CreatePostHeroShell({
 
   return (
     <div
+      ref={shellRef}
       id="ananas-composer"
       data-expanded={expanded ? '1' : undefined}
-      className={clsx(styles.composerHeroShell, !expanded && !title && styles.composerHeroCollapsed)}
+      className={clsx(styles.composerHeroShell, !expanded && styles.composerHeroCollapsed)}
       dir={shellDir}
     >
     
@@ -328,13 +372,7 @@ function CreatePostHeroShell({
               className={styles.composerHeroInlineField}
               value={title}
               onChange={onChange}
-              placeholder={
-                intent === 'wanted'
-                  ? isArabic
-                    ? 'اكتب ما تبحث عنه…'
-                    : 'Write what you are looking for…'
-                  : t('createPost.heroPlaceholder', locale as any)
-              }
+              placeholder={prompts[promptIndex % prompts.length]}
               aria-invalid={errorText ? true : undefined}
               aria-describedby={errorText ? 'create-post-hero-title-err' : undefined}
               onFocus={(event) => {
@@ -379,7 +417,7 @@ function CreatePostHeroShell({
       </div>
 
       <div className={styles.composerIconTools} aria-label={isArabic ? 'أدوات الإعلان' : 'Listing tools'}>
-        <button type="button" className={styles.composerIconBtn} onClick={onAddAdClick} aria-label={isArabic ? 'صور' : 'Photos'}>
+        <button type="button" className={styles.composerIconBtn} onClick={() => { setExpanded(true); onAddAdClick() }} aria-label={isArabic ? 'صور' : 'Photos'}>
           <BsCamera aria-hidden />
         </button>
         <button
@@ -426,7 +464,7 @@ function CreatePostHeroShell({
         >
           <BsMic aria-hidden />
         </button>
-        <button type="button" className={styles.composerIconBtn} onClick={onAddAdClick} aria-label={isArabic ? 'الموقع' : 'Location'}>
+        <button type="button" className={styles.composerIconBtn} onClick={() => { setExpanded(true); onAddAdClick() }} aria-label={isArabic ? 'الموقع' : 'Location'}>
           <BsGeoAlt aria-hidden />
         </button>
         <button
@@ -452,7 +490,7 @@ function CreatePostHeroShell({
           className={clsx(styles.composerIntent, intent === 'sale' && styles.composerIntentActive)}
           onClick={() => {
             setIntent('sale')
-            onAddAdClick()
+            setExpanded(true)
           }}
         >
           {isArabic ? 'بيع' : 'Sell'}
@@ -505,6 +543,7 @@ function CreatePostHeroShell({
               locale={locale}
               mode={intent}
               title={title}
+              description={description}
               onUseTitle={(value) => onChange({ target: { value } } as ChangeEvent<HTMLInputElement>)}
               onDescribe={onDescribe}
               onContinue={onContinue}
@@ -578,6 +617,7 @@ const CreatePostCard = ({ mode = 'create', initialPost, postId, locale: localePr
   const emailVerifiedForComposerRef = useRef(false)
   const [guestDraft, setGuestDraft] = useState('')
   const [showLoginAlert, setShowLoginAlert] = useState(false)
+  const draftRestored = useRef(false)
   // Current user avatar comes from the shared CurrentUserProvider — one fetch, global state.
   const { user: _currentUser, avatarUrl: _resolvedAvatarUrl } = useCurrentUser()
   const currentUserAvatar = _currentUser ? _resolvedAvatarUrl : null
@@ -1075,6 +1115,70 @@ const [step, setStep] = useState(1)
     }
   }, [status, title, guestDraft, isEdit, setValue])
 
+
+  useEffect(() => {
+    if (isEdit || draftRestored.current || status === 'loading') return
+    const draft = readGuestDraft()
+    if (!draft) {
+      draftRestored.current = true
+      return
+    }
+    if (draft.sectionId && !(sections || []).length) return
+    draftRestored.current = true
+    if (!title && !guestDraft && draft.title) {
+      setGuestDraft(draft.title)
+      setTitle(draft.title)
+      setValue('title', draft.title, { shouldValidate: false })
+    }
+    if (!description && draft.description) {
+      setDescription(draft.description)
+      setValue('description', draft.description, { shouldValidate: false })
+    }
+    if (draft.countryId) {
+      const country = (countries || []).find((item) => item.id === draft.countryId)
+      if (country) setSelectedCountry(country)
+    }
+    if (draft.sectionId && !selectedSection) {
+      const section = (sections || []).find((item) => item.id === draft.sectionId)
+      if (section) setSelectedSection(section)
+    }
+    if (draft.cityId || draft.price) {
+      setFormValues((prev) => ({
+        ...prev,
+        ...(draft.cityId ? { city: draft.cityId } : {}),
+        ...(draft.price ? { price: draft.price } : {}),
+      }))
+      if (draft.cityId) setValue('city', draft.cityId, { shouldValidate: false })
+      if (draft.price) setValue('price', Number(draft.price), { shouldValidate: false })
+    }
+    void readGuestFiles().then((files) => {
+      if (files.length) setImages((current) => (current.length ? current : files))
+    })
+  }, [status, isEdit, sections, countries, description, guestDraft, selectedSection, setValue, setSelectedCountry, title])
+
+  useEffect(() => {
+    if (isEdit || selectedCategory) return
+    const draft = readGuestDraft()
+    if (!draft?.categoryId) return
+    const category = sectionCategories.find((item) => item.id === draft.categoryId)
+    if (category) setSelectedCategory(category)
+  }, [sectionCategories, isEdit, selectedCategory])
+
+  useEffect(() => {
+    if (isEdit) return
+    const nextTitle = guestDraft || title
+    if (!nextTitle && !description && !selectedSection) return
+    writeGuestDraft({
+      title: nextTitle,
+      description,
+      sectionId: selectedSection?.id ?? null,
+      categoryId: selectedCategory?.id ?? null,
+      countryId: selectedCountry?.id ?? null,
+      cityId: formValues.city ? String(formValues.city) : null,
+      price: formValues.price != null && formValues.price !== '' ? String(formValues.price) : '',
+    })
+  }, [isEdit, guestDraft, title, description, selectedSection, selectedCategory, selectedCountry, formValues.city, formValues.price])
+
   // عند فتح خطوة القسم/الفئة: التأكد من أن معرفات RHF تطابق الاختيار البصري
   useEffect(() => {
     if (isEdit) return
@@ -1466,6 +1570,7 @@ const [step, setStep] = useState(1)
         setSubStep(1)
         setStep(1)
         setImages([])
+        clearGuestDraft()
         setDropzoneKey((prev) => prev + 1)
         reset()
         setPostSuccessMeta({
@@ -1792,7 +1897,11 @@ const [step, setStep] = useState(1)
               locale={locale}
               isWizardRtl={isWizardRtl}
               title={guestDraft}
-              onChange={(e) => setGuestDraft(e.target.value)}
+              description={description}
+              onChange={(e) => {
+                setGuestDraft(e.target.value)
+                setTitle(e.target.value)
+              }}
               inputProps={{
                 id: 'create-post-title',
                 name: 'title',
@@ -1800,10 +1909,26 @@ const [step, setStep] = useState(1)
               }}
               showTags
               onDescribe={(value) => setDescription(value)}
+              onContinue={() => {
+                writeGuestDraft({
+                  title: guestDraft || title,
+                  description,
+                  sectionId: selectedSection?.id ?? null,
+                  categoryId: selectedCategory?.id ?? null,
+                  countryId: selectedCountry?.id ?? null,
+                  cityId: formValues.city ? String(formValues.city) : null,
+                  price: formValues.price != null && formValues.price !== '' ? String(formValues.price) : '',
+                })
+                void saveGuestFiles(images)
+                setShowLoginAlert(true)
+              }}
               files={images}
-              onFilesChange={setImages}
+              onFilesChange={(next) => {
+                setImages(next)
+                void saveGuestFiles(next)
+              }}
               catalog={studioCatalog}
-              onAddAdClick={() => setShowLoginAlert(true)}
+              onAddAdClick={() => undefined}
             />
           </ComposerCardAtmosphere>
         </Card>
@@ -1812,6 +1937,14 @@ const [step, setStep] = useState(1)
           show={showLoginAlert}
           onHide={() => setShowLoginAlert(false)}
           locale={locale}
+          title={locale === 'ar' ? 'إعلانك جاهز' : 'Your ad is ready'}
+          message={
+            locale === 'ar'
+              ? 'إعلانك جاهز! سجّل دخولك أو أنشئ حساباً لنشره. المسودة محفوظة على هذا الجهاز، والصور تُستعاد إن سمح المتصفح.'
+              : 'Your ad is ready. Sign in or create an account to publish it. The draft stays on this device, and photos are restored when the browser allows it.'
+          }
+          loginUrl={`/${locale}/auth/sign-in?redirectTo=${encodeURIComponent(`/${locale}`)}`}
+          registerUrl={`/${locale}/auth/sign-up?redirectTo=${encodeURIComponent(`/${locale}`)}`}
         />
       </>
     )
@@ -1829,6 +1962,7 @@ const [step, setStep] = useState(1)
                 locale={locale}
                 isWizardRtl={isWizardRtl}
                 title={title}
+                description={description}
                 onChange={(e) => {
                   if (isCreationBlocked) return
                   setTitle(e.target.value)

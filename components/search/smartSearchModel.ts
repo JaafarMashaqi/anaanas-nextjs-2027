@@ -1,7 +1,7 @@
 import type { Section } from '@/lib/api/sections'
 import type { SupportedLocale } from '@/lib/localization'
 
-export type SmartSuggestionGroup = 'query' | 'recent' | 'section' | 'city' | 'go'
+export type SmartSuggestionGroup = 'query' | 'recent' | 'trend' | 'section' | 'city' | 'go'
 
 export type SmartSuggestion = {
   id: string
@@ -135,7 +135,19 @@ export function buildSmartSuggestions(opts: {
       hint: isArabic ? 'بحث سابق على هذا الجهاز' : 'Recent on this device',
       href: searchHref(locale, item),
     }))
-    return [...recentItems, ...sectionItems.slice(0, 3), ...cityItems.slice(0, 2), ...places.slice(0, 1)]
+    const trends: SmartSuggestion[] = [
+      ['كامري', 'Camry'],
+      ['شقة للإيجار', 'Apartment for rent'],
+      ['آيفون', 'iPhone'],
+      ['وظائف', 'Jobs'],
+    ].map(([ar, en]) => ({
+      id: `trend-${en}`,
+      group: 'trend' as const,
+      label: isArabic ? ar : en,
+      hint: isArabic ? 'مثال · وضع العرض' : 'Example · demo mode',
+      href: searchHref(locale, isArabic ? ar : en),
+    }))
+    return [...recentItems, ...trends, ...sectionItems.slice(0, 3), ...cityItems.slice(0, 2), ...places.slice(0, 1)]
   }
 
   const typed: SmartSuggestion = {

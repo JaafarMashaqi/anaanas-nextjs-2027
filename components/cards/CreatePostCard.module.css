@@ -1343,6 +1343,8 @@
 .composerHeroCollapsed .composerHeroTags,
 .composerHeroCollapsed .composerModeNote,
 .composerHeroCollapsed .composerProgress,
+.composerHeroCollapsed .composerHeroCopy,
+.composerHeroCollapsed .composerIntentRow,
 .composerHeroShell:not([data-expanded='1']) .composerStudioSlot {
   display: none;
 }
@@ -1357,7 +1359,9 @@
 }
 
 .composerHeroCollapsed {
-  padding: 0.5rem 0.65rem;
+  padding: 0.55rem 0.7rem 0.4rem;
+  border-inline-start: 3px solid #ffc928;
+  background: linear-gradient(180deg, #fffefb 0%, #fff8de 100%);
 }
 
 .composerHeroCollapsed .composerHeroHeading {

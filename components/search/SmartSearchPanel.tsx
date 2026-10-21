@@ -204,6 +204,7 @@ export function SmartSearchPanel({
   let lastGroup = ''
   const groupLabel = (group: SmartSuggestion['group']) => {
     if (group === 'recent') return isArabic ? 'عمليات بحث سابقة' : 'Recent searches'
+    if (group === 'trend') return isArabic ? 'أمثلة رائجة' : 'Example trends'
     if (group === 'section') return isArabic ? 'أقسام' : 'Sections'
     if (group === 'city') return isArabic ? 'مدن' : 'Cities'
     if (group === 'go') return isArabic ? 'انتقال' : 'Go to'
@@ -263,8 +264,8 @@ export function SmartSearchPanel({
       })}
       <p className={styles.honest}>
         {isArabic
-          ? 'لا تتوفر أرقام حجم البحث. الاقتراحات من الأقسام ومدن البلد وعمليات البحث على هذا الجهاز.'
-          : 'Search volume is not available. Suggestions come from sections, cities in this country, and searches on this device.'}
+          ? 'أمثلة الرواج للعرض فقط وليست حجم بحث حقيقياً. الأقسام والمدن وعمليات هذا الجهاز حقيقية.'
+          : 'Trend examples are for demonstration, not measured search volume. Sections, cities, and this device’s searches are real.'}
       </p>
     </div>
   )

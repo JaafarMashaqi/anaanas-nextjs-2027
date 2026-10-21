@@ -17,6 +17,7 @@ interface LoginRequiredDialogProps {
   message?: string
   loginButtonText?: string
   loginUrl?: string
+  registerUrl?: string
   locale?: SupportedLocale
 }
 
@@ -27,6 +28,7 @@ const LoginRequiredDialog = ({
   message,
   loginButtonText,
   loginUrl,
+  registerUrl,
   locale: localeProp,
 }: LoginRequiredDialogProps) => {
   const [isAnimating, setIsAnimating] = useState(false)
@@ -35,7 +37,7 @@ const LoginRequiredDialog = ({
   const locale: SupportedLocale = localeProp || (localeFromParams && isSupportedLocale(localeFromParams) ? localeFromParams : DEFAULT_LOCALE)
   
   // Build login URL with locale prefix
-  const finalLoginUrl = localeFromParams ? `/${localeFromParams}/auth/sign-in` : (loginUrl || '/auth/sign-in')
+  const finalLoginUrl = loginUrl || (localeFromParams ? `/${localeFromParams}/auth/sign-in` : '/auth/sign-in')
   
   // Use provided props or fallback to translated defaults
   const finalTitle = title ?? t('dialog.loginRequired.title', locale)
@@ -104,6 +106,11 @@ const LoginRequiredDialog = ({
                 <ArrowIcon className={arrowClass} />
               </Button>
             </Link>
+            {registerUrl ? (
+              <Link href={registerUrl} className="login-required-dialog__cancel-btn btn btn-link">
+                {locale === 'ar' ? 'إنشاء حساب' : 'Create an account'}
+              </Link>
+            ) : null}
           </div>
         </div>
       </Modal.Body>

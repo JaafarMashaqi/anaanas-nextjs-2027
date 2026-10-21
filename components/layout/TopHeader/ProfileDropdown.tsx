@@ -10,14 +10,13 @@ import {
   DropdownToggle,
 } from 'react-bootstrap'
 import {
-  BsBoxArrowInRight,
   BsGearFill,
   BsPersonFill,
   BsPower,
   BsStars,
 } from 'react-icons/bs'
 
-import defaultUserAvatar from '@/assets/images/avatar/user-default.svg'
+import defaultUserAvatar from '@/assets/images/avatar/ananas-host.svg'
 import { useCurrentUser } from '@/context/useCurrentUser'
 import { useClientLogout } from '@/hooks/useClientLogout'
 import type { SupportedLocale } from '@/lib/localization'
@@ -72,26 +71,24 @@ const ProfileDropdown = ({ locale = 'ar' }: { locale?: SupportedLocale }) => {
   // ── Unauthenticated: render a login button ───────────────────────────────
   if (status === 'unauthenticated') {
     return (
-      <>
-        {/* Desktop: full-text pill button */}
-        <Link
-          className={`${styles.loginBtn} d-none d-sm-inline-flex`}
-          href={`/${locale}/auth/sign-in`}
-        >
-          <BsBoxArrowInRight size={14} />
-          <span>{t.login}</span>
-        </Link>
-
-        {/* Mobile: compact icon-only button */}
-        <Link
-          className={`${styles.loginIcon} d-inline-flex d-sm-none`}
-          href={`/${locale}/auth/sign-in`}
-          aria-label={t.login}
-          title={t.login}
-        >
-          <BsBoxArrowInRight size={16} />
-        </Link>
-      </>
+      <Dropdown as="li" className="nav-item ms-2" align="end">
+        <DropdownToggle className={`nav-link icon-md ${styles.toggle}`} aria-label={t.login}>
+          <span className={styles.toggleAvatar}>
+            <Image src={defaultUserAvatar} alt="" width={38} height={38} />
+          </span>
+        </DropdownToggle>
+        <DropdownMenu className={styles.menu}>
+          <DropdownItem as={Link} href={`/${locale}/auth/sign-in`} className={styles.item}>
+            <span>{t.login}</span>
+          </DropdownItem>
+          <DropdownItem as={Link} href={`/${locale}/auth/sign-up`} className={styles.item}>
+            <span>{locale === 'ar' ? 'إنشاء حساب' : 'Create an account'}</span>
+          </DropdownItem>
+          <DropdownItem as={Link} href={`/${locale}`} className={styles.item}>
+            <span>{locale === 'ar' ? 'مسوداتي' : 'My drafts'}</span>
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
     )
   }
 
@@ -154,7 +151,13 @@ const ProfileDropdown = ({ locale = 'ar' }: { locale?: SupportedLocale }) => {
           className={styles.item}
         >
           <BsStars aria-hidden />
-          <span>{locale === 'ar' ? 'منشوراتي' : 'My posts'}</span>
+          <span>{locale === 'ar' ? 'إعلاناتي' : 'My listings'}</span>
+        </DropdownItem>
+        <DropdownItem as={Link} href={`/${locale}/settings/account`} className={styles.item}>
+          <span>{locale === 'ar' ? 'المحفوظات' : 'Saved'}</span>
+        </DropdownItem>
+        <DropdownItem as={Link} href={`/${locale}/settings/account`} className={styles.item}>
+          <span>{locale === 'ar' ? 'عضويتي' : 'Membership'}</span>
         </DropdownItem>
 
         <div className={styles.list}>

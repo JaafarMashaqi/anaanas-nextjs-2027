@@ -233,16 +233,14 @@ const AllSectionsModal = ({ open, onClose, sections, locale }: AllSectionsModalP
 
 const MobileSectionsSwiper = ({ sections, locale, visibleCount = DEFAULT_VISIBLE }: MobileSectionsSwiperProps) => {
   const [modalOpen, setModalOpen] = useState(false)
-  const openModal = useCallback(() => setModalOpen(true), [])
+  const [expanded, setExpanded] = useState(false)
   const closeModal = useCallback(() => setModalOpen(false), [])
 
   if (!sections.length) return null
 
   const isArabic = locale === 'ar'
   const hasMore = sections.length > visibleCount
-  const visibleSections = sections.slice(0, visibleCount)
-
-  const ChevronIcon = isArabic ? BsChevronLeft : BsChevronRight
+  const visibleSections = expanded ? sections : sections.slice(0, visibleCount)
 
   return (
     <section className={styles.wrapper} aria-label={isArabic ? 'تصفح الأقسام' : 'Browse sections'}>
@@ -252,16 +250,15 @@ const MobileSectionsSwiper = ({ sections, locale, visibleCount = DEFAULT_VISIBLE
           <button
             type="button"
             className={styles.viewAll}
-            onClick={openModal}
-            aria-haspopup="dialog"
+            onClick={() => setExpanded((value) => !value)}
+            aria-expanded={expanded}
           >
-            <span>{isArabic ? 'عرض الكل' : 'View all'}</span>
-            <ChevronIcon className={styles.viewAllIcon} aria-hidden />
+            <span>{expanded ? (isArabic ? 'عرض أقل' : 'Show less') : isArabic ? 'عرض الكل' : 'View all'}</span>
           </button>
         ) : null}
       </header>
 
-      <div className={styles.grid}>
+      <div className={expanded ? styles.grid : styles.rail}>
         {visibleSections.map((section, index) => (
           <SectionCard
             key={section.id}
