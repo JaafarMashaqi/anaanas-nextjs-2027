@@ -23,17 +23,18 @@ type Lane = {
 const LANES: Lane[] = [
   { id: 'all', ar: 'الكل', en: 'All', kind: 'feed', icon: BsTag, noteAr: 'يعرض كل الإعلانات الحالية.', noteEn: 'Shows the current listings.' },
   { id: 'latest', ar: 'الأحدث', en: 'Latest', kind: 'feed', icon: BsStars, noteAr: 'يعرض أحدث الإعلانات الحقيقية.', noteEn: 'Shows the real latest listings.' },
-  { id: 'live', ar: 'مباشر الآن', en: 'Live now', kind: 'demo', icon: BsBroadcast, noteAr: 'لا بث متصل. هذه علامة واجهة فقط.', noteEn: 'No broadcast is connected. This is an interface mark only.' },
+  { id: 'live', ar: 'مباشر الآن', en: 'Live now', kind: 'route', href: '/live', icon: BsBroadcast, noteAr: 'غرفة عرض، بلا بث.', noteEn: 'A demo room, with no stream.' },
   { id: 'photos', ar: 'Trending', en: 'Trending', kind: 'feed', icon: BsFire, noteAr: 'يبقي الإعلانات التي لها صور.', noteEn: 'Keeps listings that have photos.' },
   { id: 'auctions', ar: 'المزادات', en: 'Auctions', kind: 'route', href: '/pages/auction', icon: BsHammer, noteAr: 'يفتح المزادات الحالية.', noteEn: 'Opens the current auctions.' },
-  { id: 'hot', ar: 'عروض نار', en: 'Hot deals', kind: 'demo', icon: BsFire, noteAr: 'لا درجة للعروض. لن نختلق إعلانات.', noteEn: 'No deal score. Listings are not invented.' },
-  { id: 'nearby', ar: 'بالقرب منك', en: 'Nearby', kind: 'demo', icon: BsGeoAlt, noteAr: 'لا إحداثيات. القرب غير محسوب.', noteEn: 'No coordinates. Nearness is not calculated.' },
-  { id: 'foryou', ar: 'فرص لك', en: 'For you', kind: 'demo', icon: BsStars, noteAr: 'لا مطابقة لحسابك.', noteEn: 'Nothing is matched to your account.' },
-  { id: 'wanted', ar: 'مطلوب الآن', en: 'Wanted', kind: 'demo', icon: BsSearch, noteAr: 'طلبات الشراء لا تُنشر من هذا التبويب.', noteEn: 'Buyer requests are not published from this tab.' },
-  { id: 'following', ar: 'المتابعات', en: 'Following', kind: 'demo', icon: BsPeople, noteAr: 'متابعة الأشخاص غير مربوطة.', noteEn: 'Following people is not connected.' },
-  { id: 'saved', ar: 'المفضلة', en: 'Saved', kind: 'demo', icon: BsHeart, noteAr: 'لا قائمة مفضلة على الخادم.', noteEn: 'There is no saved list on the server.' },
-  { id: 'video', ar: 'الفيديو', en: 'Video', kind: 'demo', icon: BsCameraVideo, noteAr: 'لا مسار فيديو بعد.', noteEn: 'No video route yet.' },
+  { id: 'hot', ar: 'عروض نار', en: 'Hot deals', kind: 'route', href: '/business', icon: BsFire, noteAr: 'محاكاة حملة بلا سعر.', noteEn: 'A campaign simulation with no price.' },
+  { id: 'nearby', ar: 'بالقرب منك', en: 'Nearby', kind: 'route', href: '/intelligence', icon: BsGeoAlt, noteAr: 'لا مسافة محسوبة.', noteEn: 'Distance is not calculated.' },
+  { id: 'foryou', ar: 'فرص لك', en: 'For you', kind: 'route', href: '/intelligence', icon: BsStars, noteAr: 'أمثلة عرض، لا مطابقة حساب.', noteEn: 'Demo examples, not account matching.' },
+  { id: 'wanted', ar: 'مطلوب الآن', en: 'Wanted', kind: 'route', href: '/matching', icon: BsSearch, noteAr: 'نية محفوظة على الجهاز.', noteEn: 'An intent saved on this device.' },
+  { id: 'following', ar: 'المتابعات', en: 'Following', kind: 'route', href: '/seller', icon: BsPeople, noteAr: 'مركز البائع. المتابعة غير مربوطة.', noteEn: 'Seller center. Following is not connected.' },
+  { id: 'saved', ar: 'المفضلة', en: 'Saved', kind: 'route', href: '/saved', icon: BsHeart, noteAr: 'صفحة المحفوظات.', noteEn: 'The saved page.' },
+  { id: 'video', ar: 'الفيديو', en: 'Video', kind: 'route', href: '/reels', icon: BsCameraVideo, noteAr: 'إطار فيديو للعرض.', noteEn: 'A demo video frame.' },
   { id: 'stores', ar: 'المتاجر', en: 'Stores', kind: 'route', href: '/stores', icon: BsShop, noteAr: 'يفتح دليل المتاجر.', noteEn: 'Opens the store directory.' },
+  { id: 'assistant', ar: 'المساعد', en: 'Assistant', kind: 'route', href: '/assistant', icon: BsStars, noteAr: 'تلميح كلمات، وليس نموذجاً.', noteEn: 'A keyword hint, not a model.' },
 ]
 
 export default function HomeDiscoveryRail({ locale }: { locale: SupportedLocale }) {

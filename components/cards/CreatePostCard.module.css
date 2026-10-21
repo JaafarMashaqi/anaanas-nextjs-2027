@@ -1540,7 +1540,8 @@
 }
 
 .composerHeroInlineField::placeholder {
-  color: rgba(21, 21, 21, 0.38);
+  color: #667085;
+  opacity: 1;
 }
 
 /* لاحقة داخل حقل العنوان — نفس لغة لون/ظل غلاف البطل (#composerHeroShell) */
