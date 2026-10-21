@@ -41,6 +41,7 @@ const TopHeader = () => {
   })()
 
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`
+  const isAuth = pathname.includes('/auth/')
   const desktopAssist = useSmartSearchAssist(locale, query)
   const popupAssist = useSmartSearchAssist(locale, query)
   const desktopToggle = useSearchFieldToggle(desktopAssist.open, desktopAssist.setOpen)
@@ -110,7 +111,7 @@ const TopHeader = () => {
         {/* ==================== DESKTOP SEARCH (center) ==================== */}
         <form
           ref={desktopSearchRef}
-          className={`topHeader__search d-none ${isHome ? '' : 'd-lg-flex'}`}
+          className={`topHeader__search d-none ${isHome || isAuth ? '' : 'd-lg-flex'}`}
           role="search"
           onSubmit={handleSearch}
         >
@@ -154,7 +155,7 @@ const TopHeader = () => {
         {/* ==================== END CLUSTER (actions) ==================== */}
         <div className="topHeader__end">
           {/* Mobile search trigger — opens the popup search overlay */}
-          {!isHome ? (
+          {!isHome && !isAuth ? (
           <button
             type="button"
             className="topHeader__iconBtn d-lg-none"
@@ -185,7 +186,7 @@ const TopHeader = () => {
           <ProfileDropdown locale={locale} />
         </div>
       </div>
-      {!isHome ? (
+      {!isHome && !isAuth ? (
         <div className="container placeLanguageSlot">
           <PlaceLanguageBar />
         </div>

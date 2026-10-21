@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { headers } from 'next/headers'
-import { IBM_Plex_Sans_Arabic, Inter } from 'next/font/google'
+import { Tajawal, Inter } from 'next/font/google'
 import NextTopLoader from 'nextjs-toploader'
 import type { ReactNode } from 'react'
 import Script from 'next/script'
@@ -27,9 +27,9 @@ const inter = Inter({
   adjustFontFallback: true,
 })
 
-const arabic = IBM_Plex_Sans_Arabic({
+const arabic = Tajawal({
   subsets: ['latin', 'arabic'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '700', '800'],
   display: 'swap',
   adjustFontFallback: true,
 })

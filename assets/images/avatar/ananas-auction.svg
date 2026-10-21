@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ANANAS auction">
+  <circle cx="32" cy="32" r="32" fill="#FFF6D0"/>
+  <path d="M32 9c2 4 2 6 0 9-2-3-2-5 0-9z" fill="#3F8F4E"/>
+  <path d="M32 18c7 0 12 5 12 12v6c0 6-5 11-12 11s-12-5-12-11v-6c0-7 5-12 12-12z" fill="#F5A900"/>
+  <path d="M20 23c5-5 19-5 24 0 1 5-2 7-5 6-3-1-4 1-7 1s-4-2-7-1c-3 1-6-1-5-6z" fill="#101828"/>
+  <circle cx="27" cy="33" r="1.2" fill="#FFFEFB"/>
+  <circle cx="36" cy="33" r="1.2" fill="#FFFEFB"/>
+  <path d="M46 16l6 6-8 8-6-6z" fill="#FF3347"/>
+  <path d="M42 28l-8 8" stroke="#101828" stroke-width="2" stroke-linecap="round"/>
+</svg>

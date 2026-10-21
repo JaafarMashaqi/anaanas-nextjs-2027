@@ -92,6 +92,7 @@ const MobileTopHeader = () => {
   })()
 
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`
+  const isAuth = pathname.includes('/auth/')
   const isAuthed = status === 'authenticated'
   // We render the login button by default (when unauthenticated OR while the
   // session is still resolving) so the visitor never sees an empty action
@@ -121,10 +122,10 @@ const MobileTopHeader = () => {
             <LogoBox />
           </div>
         </div>
-        {!isHome ? <PlaceLanguageBar /> : null}
+        {!isHome && !isAuth ? <PlaceLanguageBar /> : null}
         {/* <BetaBadge locale={locale} className=" d-inline-flex m-auto" /> */}
 
-        {!isHome ? (
+        {!isHome && !isAuth ? (
         <div
           className={clsx(styles.searchRow, searchCollapsed && styles.searchRowCollapsed)}
           aria-hidden={searchCollapsed}

@@ -5,6 +5,9 @@ import { createPortal } from 'react-dom'
 import Image from 'next/image'
 
 import host from '@/assets/images/avatar/ananas-host.svg'
+import coffee from '@/assets/images/avatar/ananas-coffee.svg'
+import auction from '@/assets/images/avatar/ananas-auction.svg'
+import searcher from '@/assets/images/avatar/ananas-search.svg'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './MarketplaceStories.module.css'
@@ -247,7 +250,7 @@ export default function MarketplaceStories({
         {STORIES.map((item) => (
           <button key={item.id} type="button" className={styles.item} onClick={() => setOpenId(item.id)}>
             <span className={`${styles.ring} ${item.draft ? styles.draft : ''}`} data-tone={item.id}>
-              <Image src={host} alt="" width={48} height={48} />
+              <Image src={item.id === 'homes' ? coffee : item.id === 'phones' ? auction : item.id === 'jobs' ? searcher : host} alt="" width={48} height={48} />
             </span>
             <span>{ar ? item.nameAr : item.nameEn}</span>
           </button>

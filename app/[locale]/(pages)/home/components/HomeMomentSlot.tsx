@@ -104,10 +104,8 @@ export default function HomeMomentSlot({
     const insight: Slide = {
       id: 'insight',
       kind: 'insight',
-      title: ar ? 'فرصة جديدة في سوق السيارات' : 'A new chance in the car market',
-      line: ar
-        ? 'كامري ٢٠٢٤ يظهر في البحث أكثر من غيره هذا الأسبوع.'
-        : 'A 2024 Camry is showing up in search more often this week.',
+      title: ar ? 'الطلب يرتفع على سيارات تويوتا في عمّان' : 'Interest in Toyota cars is rising in Amman',
+      line: ar ? 'شقة للبيع في عبدون تستحق نظرة.' : 'An apartment for sale in Abdoun is worth a look.',
       action: '',
       composer: true,
       ms: 14000,
@@ -115,8 +113,8 @@ export default function HomeMomentSlot({
     const deal: Slide = {
       id: 'deal',
       kind: 'deal',
-      title: ar ? 'عرض مميز على هاتف' : 'A standout phone offer',
-      line: ar ? 'آيفون ضمن العروض التي تستحق نظرة.' : 'An iPhone among the offers worth a look.',
+      title: ar ? 'أفضل وقت مقترح للنشر مساءً' : 'Evening is the suggested time to publish',
+      line: ar ? 'ثلاث تفاصيل واضحة تجعل الإعلان أسهل قراءة.' : 'Three clear details make an ad easier to read.',
       action: '',
       ms: 10000,
     }
