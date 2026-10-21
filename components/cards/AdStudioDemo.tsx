@@ -16,11 +16,15 @@ export default function AdStudioDemo({
   mode,
   title,
   onUseTitle,
+  onDescribe,
+  onContinue,
 }: {
   locale: string
   mode: Mode
   title: string
   onUseTitle: (value: string) => void
+  onDescribe?: (value: string) => void
+  onContinue?: () => void
 }) {
   const ar = locale === 'ar'
   const storageKey = `ananas.demoComposer.${mode}`
@@ -63,7 +67,22 @@ export default function AdStudioDemo({
     )
   }
 
-  const sampleReach = Number(budget) * Number(days) * 40
+  const [photos, setPhotos] = useState<{ id: string; url: string; name: string }[]>([])
+
+  const addPhotos = (list: FileList | null) => {
+    if (!list) return
+    const next = [...list].slice(0, 6).map((file) => ({
+      id: `${file.name}-${file.size}-${file.lastModified}`,
+      url: URL.createObjectURL(file),
+      name: file.name,
+    }))
+    setPhotos((current) => [...current, ...next].slice(0, 6))
+    setStatus(
+      ar
+        ? 'معاينة محلية فقط. الرفع الحقيقي يبدأ في خطوة الصور بعد اكتمال العنوان والوصف.'
+        : 'Local preview only. The real upload starts on the photo step after the title and description are valid.',
+    )
+  }
 
   return (
     <div className={styles.studio}>
@@ -92,7 +111,14 @@ export default function AdStudioDemo({
       </p>
       <label className={styles.field}>
         <span>{ar ? 'الوصف' : 'Description'}</span>
-        <textarea value={description} onChange={(event) => setDescription(event.target.value)} rows={3} />
+        <textarea
+          value={description}
+          onChange={(event) => {
+            setDescription(event.target.value)
+            onDescribe?.(event.target.value)
+          }}
+          rows={3}
+        />
       </label>
       <div className={styles.row}>
         <label className={styles.field}>
@@ -153,12 +179,42 @@ export default function AdStudioDemo({
           </select>
         </label>
       </div>
+      <label className={styles.field}>
+        <span>{ar ? 'صور للمعاينة' : 'Preview photos'}</span>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(event) => {
+            addPhotos(event.target.files)
+            event.target.value = ''
+          }}
+        />
+      </label>
+      {photos.length > 0 ? (
+        <div className={styles.suggestions}>
+          {photos.map((photo, index) => (
+            <button
+              key={photo.id}
+              type="button"
+              onClick={() => setPhotos((current) => current.filter((item) => item.id !== photo.id))}
+            >
+              {index + 1}. {photo.name} · {ar ? 'إزالة' : 'Remove'}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <p className={styles.hint}>
         {ar
-          ? `تقدير الواجهة: ${sampleReach.toLocaleString('ar-JO')} ظهور تجريبي لميزانية ${budget} خلال ${days} أيام. ليست نتيجة نموذج ولا تحليل سوق.`
-          : `Interface estimate: ${sampleReach.toLocaleString('en-US')} demo impressions for a budget of ${budget} over ${days} days. Not a model result and not market analysis.`}
+          ? `اكتمال المسودة ${progress}٪. هذا ليس تقييم جودة من نموذج. أفضل نافذة مقترحة من الواجهة: مساءً بعد السادسة بتوقيت عمّان، وليست نتيجة حملات.`
+          : `Draft completeness ${progress}%. This is not a model quality score. The interface suggests evenings after 18:00 Amman time, not a campaign result.`}
       </p>
       <div className={styles.actions}>
+        {onContinue ? (
+          <button type="button" className={styles.primary} onClick={onContinue}>
+            {ar ? 'إلى الصور الحقيقية' : 'Continue to real photos'}
+          </button>
+        ) : null}
         <button type="button" className={styles.primary} onClick={saveDraft}>
           {ar ? 'احفظ المسودة هنا' : 'Save the draft here'}
         </button>

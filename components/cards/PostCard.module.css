@@ -988,6 +988,20 @@
   color: #101828;
 }
 
+.listingCard .avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.listingCard .listingInfoTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.listingCard {
+  box-shadow: none;
+}
+
 .listingCard .listingHero {
   height: auto !important;
   aspect-ratio: 16 / 10;

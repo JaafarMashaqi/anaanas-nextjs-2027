@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import type { SupportedLocale } from '@/lib/localization'
+import { demoMarketEvents } from '@/lib/experience/demoMarketEvents'
 
 import styles from './HomeDiscoveryRail.module.css'
 
@@ -81,7 +82,21 @@ export default function HomeDiscoveryRail({ locale }: { locale: SupportedLocale 
           )
         })}
       </div>
-      {active ? <p className={styles.note}>{ar ? active.noteAr : active.noteEn}</p> : null}
+      {active ? (
+        <div className={styles.note}>
+          <p>{ar ? active.noteAr : active.noteEn}</p>
+          <ul>
+            {demoMarketEvents(locale)
+              .slice(0, 2)
+              .map((event) => (
+                <li key={event.id}>
+                  {ar ? event.textAr : event.textEn}
+                  <span> · {ar ? 'عيّنة' : 'Sample'}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ) : null}
     </section>
   )
 }

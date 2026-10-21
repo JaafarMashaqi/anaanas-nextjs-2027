@@ -88,3 +88,13 @@
   border-radius: 12px;
   background: #fff8de;
 }
+
+.note p,
+.note ul {
+  margin: 0;
+}
+
+.note ul {
+  margin-top: 0.35rem;
+  padding-inline-start: 1rem;
+}

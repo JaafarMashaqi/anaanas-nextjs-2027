@@ -155,6 +155,8 @@ type CreatePostHeroShellProps = {
   errorText?: string | null
   showTags: boolean
   onAddAdClick: () => void
+  onDescribe?: (value: string) => void
+  onContinue?: () => void
   limitOverlay?: ReactNode
 }
 
@@ -175,6 +177,8 @@ function CreatePostHeroShell({
   errorText,
   showTags,
   onAddAdClick,
+  onDescribe,
+  onContinue,
   limitOverlay,
 }: CreatePostHeroShellProps) {
   const shellDir = isWizardRtl ? 'rtl' : 'ltr'
@@ -483,6 +487,8 @@ function CreatePostHeroShell({
               mode={intent}
               title={title}
               onUseTitle={(value) => onChange({ target: { value } } as ChangeEvent<HTMLInputElement>)}
+              onDescribe={onDescribe}
+              onContinue={onContinue}
             />
           ) : null}
         </div>
@@ -1757,6 +1763,22 @@ const [step, setStep] = useState(1)
                 }}
                 errorText={(errors.title?.message as string | undefined) || null}
                 showTags={showHeroFeatureTags}
+                onDescribe={(value) => {
+                  setDescription(value)
+                  setValue('description', value, { shouldValidate: true })
+                }}
+                onContinue={async () => {
+                  if (isCreationBlocked) return
+                  if (!(await guardComposerEmailVerification())) return
+                  const titleValid = await trigger('title')
+                  if (!titleValid) return
+                  const descriptionValid = await trigger('description')
+                  if (!descriptionValid) {
+                    document.getElementById('create-post-description')?.focus()
+                    return
+                  }
+                  setStep(2)
+                }}
                 onAddAdClick={async () => {
                   if (isCreationBlocked) return
                   if (!(await guardComposerEmailVerification())) return
