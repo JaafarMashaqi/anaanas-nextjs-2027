@@ -10,12 +10,14 @@ import type { SupportedLocale } from '@/lib/localization'
 import type { Section } from '@/lib/api/sections'
 import type { LatestListingItem } from '@/lib/server/fetchLatestListings'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
+import PlaceLanguageBar from '@/components/layout/TopHeader/PlaceLanguageBar'
 import HomeMomentSlot from './HomeMomentSlot'
 import HomeOpportunitySlot from './HomeOpportunitySlot'
 import HomeBanner from './HomeBanner'
 import HomeDiscoveryRail from './HomeDiscoveryRail'
 import HomeGoldenMoment from './HomeGoldenMoment'
 import MarketplaceStories from './MarketplaceStories'
+import MobileSectionsSwiper from './MobileSectionsSwiper'
 
 import styles from './HomeUpperStage.module.css'
 
@@ -25,6 +27,7 @@ type Props = {
   trending: TrendingPostItem[]
   latest?: LatestListingItem[]
   sections?: Section[]
+  composer?: ReactNode
   children?: ReactNode
 }
 
@@ -59,7 +62,7 @@ function openComposer(intent: 'sale' | 'wanted') {
   window.setTimeout(retry, 60)
 }
 
-export default function HomeUpperStage({ locale, countryLabel, trending = [], latest = [], sections = [], children }: Props) {
+export default function HomeUpperStage({ locale, countryLabel, trending = [], latest = [], sections = [], composer, children }: Props) {
   const isArabic = locale === 'ar'
   const [hiddenEvents, setHiddenEvents] = useState<string[]>([])
   const events = demoMarketEvents(locale).filter((item) => !hiddenEvents.includes(item.id))
@@ -70,6 +73,7 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
   const saveEvent = (id: string) =>
     setSavedEvents((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]))
   const [note, setNote] = useState<'map' | 'matches' | null>(null)
+  const [publishShortcut, setPublishShortcut] = useState(false)
 
   useEffect(() => {
     const onQuickAction = (event: MouseEvent) => {
@@ -79,6 +83,17 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
     }
     document.addEventListener('click', onQuickAction)
     return () => document.removeEventListener('click', onQuickAction)
+  }, [])
+
+  useEffect(() => {
+    const node = document.getElementById('ananas-composer')
+    if (!node || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      ([entry]) => setPublishShortcut(!entry.isIntersecting),
+      { threshold: 0.2 },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -152,16 +167,13 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
         </p>
       ) : null}
 
+      {composer}
+
+      <MobileSectionsSwiper sections={sections} locale={locale} visibleCount={6} />
+
       <MarketplaceStories locale={locale} sections={sections} />
 
-      <div className={styles.place}>
-        <span aria-hidden>📍</span>
-        <strong>
-          {/أردن|jordan/i.test(countryLabel) ? (isArabic ? 'عمّان، ' : 'Amman, ') : ''}
-          {countryLabel}
-        </strong>
-        <span>{isArabic ? 'الحي غير مربوط' : 'Neighborhood is not connected'}</span>
-      </div>
+      <PlaceLanguageBar />
 
       <HomeBanner locale={locale} />
 
@@ -194,6 +206,11 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
       </Suspense>
 
       <HomeOpportunitySlot locale={locale} trending={trending} />
+      {publishShortcut ? (
+        <button type="button" className={styles.publishShortcut} onClick={() => openComposer('sale')}>
+          {isArabic ? 'أبيع' : 'Sell'}
+        </button>
+      ) : null}
     </div>
   )
 }

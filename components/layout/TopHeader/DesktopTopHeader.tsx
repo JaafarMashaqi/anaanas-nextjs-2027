@@ -185,9 +185,11 @@ const TopHeader = () => {
           <ProfileDropdown locale={locale} />
         </div>
       </div>
-      <div className="container placeLanguageSlot">
-        <PlaceLanguageBar />
-      </div>
+      {!isHome ? (
+        <div className="container placeLanguageSlot">
+          <PlaceLanguageBar />
+        </div>
+      ) : null}
 
       {/* ==================== MOBILE SEARCH POPUP (≤991.98px) ==================== */}
       <AnimatePresence>

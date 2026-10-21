@@ -121,7 +121,7 @@ const MobileTopHeader = () => {
             <LogoBox />
           </div>
         </div>
-        <PlaceLanguageBar />
+        {!isHome ? <PlaceLanguageBar /> : null}
         {/* <BetaBadge locale={locale} className=" d-inline-flex m-auto" /> */}
 
         {!isHome ? (

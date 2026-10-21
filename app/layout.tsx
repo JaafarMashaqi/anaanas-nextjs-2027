@@ -203,7 +203,7 @@ const RootLayout = async ({ children }: Readonly<{ children: ReactNode }>) => {
         <noscript>
           <style>{`#splash-screen{display:none!important;visibility:hidden!important;pointer-events:none!important}`}</style>
         </noscript>
-        <style>{`@media (max-width:991.98px){.ananas-desktop-only{display:none!important}}@media (min-width:992px){.ananas-mobile-only{display:none!important}}#splash-screen{pointer-events:none!important}.topNav.navbar{flex-wrap:wrap!important}.placeLanguageSlot{flex:1 0 100%!important;width:100%!important;max-width:100%!important;order:2}main{padding-top:124px!important}`}</style>
+        <style>{`@media (max-width:991.98px){.ananas-desktop-only{display:none!important}}@media (min-width:992px){.ananas-mobile-only{display:none!important}}#splash-screen{pointer-events:none!important}.topNav.navbar{flex-wrap:wrap!important}.placeLanguageSlot{flex:1 0 100%!important;width:100%!important;max-width:100%!important;order:2}main{padding-top:76px}`}</style>
         {/* Blocking load: locale CSS (RTL/LTR tweaks, container, etc.) must apply reliably — async print→all can miss onLoad when cached. */}
         <link rel="stylesheet" href={localeStylesheet} />
       </head>

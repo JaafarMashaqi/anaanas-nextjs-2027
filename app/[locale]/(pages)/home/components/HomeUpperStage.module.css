@@ -1,3 +1,18 @@
+.publishShortcut {
+  position: fixed;
+  z-index: 30;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  inset-inline-end: 16px;
+  min-height: 40px;
+  padding: 0 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: #101828;
+  color: #fffefb;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .stage {
   display: flex;
   flex-direction: column;

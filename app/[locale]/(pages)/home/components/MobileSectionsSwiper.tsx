@@ -17,6 +17,7 @@ import styles from './MobileSectionsSwiper.module.css'
 type MobileSectionsSwiperProps = {
   sections: Section[]
   locale: SupportedLocale
+  visibleCount?: number
 }
 
 function sectionIconUrl(icon?: string | null) {
@@ -230,7 +231,7 @@ const AllSectionsModal = ({ open, onClose, sections, locale }: AllSectionsModalP
 /*                              Main component                                 */
 /* -------------------------------------------------------------------------- */
 
-const MobileSectionsSwiper = ({ sections, locale }: MobileSectionsSwiperProps) => {
+const MobileSectionsSwiper = ({ sections, locale, visibleCount = DEFAULT_VISIBLE }: MobileSectionsSwiperProps) => {
   const [modalOpen, setModalOpen] = useState(false)
   const openModal = useCallback(() => setModalOpen(true), [])
   const closeModal = useCallback(() => setModalOpen(false), [])
@@ -238,8 +239,8 @@ const MobileSectionsSwiper = ({ sections, locale }: MobileSectionsSwiperProps) =
   if (!sections.length) return null
 
   const isArabic = locale === 'ar'
-  const hasMore = sections.length > DEFAULT_VISIBLE
-  const visibleSections = sections.slice(0, DEFAULT_VISIBLE)
+  const hasMore = sections.length > visibleCount
+  const visibleSections = sections.slice(0, visibleCount)
 
   const ChevronIcon = isArabic ? BsChevronLeft : BsChevronRight
 

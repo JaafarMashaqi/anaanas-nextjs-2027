@@ -18,9 +18,8 @@ import sideStyles from './homeSideCards.module.css'
 import MarketPulseCard from './home/components/MarketPulseCard'
 import TrendingAdsCard from './home/components/TrendingAdsCard'
 import FutureRoadmapCard from './home/components/FutureRoadmapCard'
-import MobileSectionsSwiper from './home/components/MobileSectionsSwiper'
-import MobileAiPromoGrid from './home/components/MobileAiPromoGrid'
 import MobileAIDashboard from './home/components/MobileAIDashboard'
+import MobileAiPromoGrid from './home/components/MobileAiPromoGrid'
 import MobileLatestAdsSection from './home/components/MobileLatestAdsSection'
 import HomeInsightsSkeleton from './home/components/HomeInsightsSkeleton'
 import FeaturedPostsStrip, { fetchFeaturedPosts } from './home/components/FeaturedPostsStrip'
@@ -119,25 +118,23 @@ const Home = async ({
             trending={trending}
             latest={latestUnique}
             sections={sections}
+            composer={<CreatePostCardLazyClient />}
           >
             <Suspense fallback={<HomeInsightsSkeleton />}>
               <MarketPulseCard locale={uiLocale} variant="rail" />
             </Suspense>
           </HomeUpperStage>
 
-          <Row className={`g-3 ${homeDiscoveryStyles.discoveryRow} d-md-none`}>
-            {showMobileAiDashboard ? (
+          {showMobileAiDashboard ? (
+            <Row className={`g-3 ${homeDiscoveryStyles.discoveryRow} d-md-none`}>
               <Col md={12} lg={5} className={homeDiscoveryStyles.discoveryAi}>
                 <MobileAIDashboard locale={uiLocale === 'en' ? 'en' : 'ar'} className="h-100" />
               </Col>
-            ) : null}
-            <Col md={12} lg={showMobileAiDashboard ? 7 : 12} className={homeDiscoveryStyles.discoverySections}>
-              <MobileSectionsSwiper sections={sections} locale={uiLocale} />
-              {showMobileAiDashboard ? <MobileAiPromoGrid locale={uiLocale} /> : null}
-            </Col>
-          </Row>
-
-          <CreatePostCardLazyClient />
+              <Col md={12} lg={7} className={homeDiscoveryStyles.discoverySections}>
+                <MobileAiPromoGrid locale={uiLocale} />
+              </Col>
+            </Row>
+          ) : null}
 
           <MobileLatestAdsSection locale={uiLocale} items={latestUnique} />
 
