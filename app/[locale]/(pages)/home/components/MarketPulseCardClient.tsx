@@ -127,10 +127,8 @@ function MetricCard({
         </span>
         {metric.level === 'live' ? figure : <strong className={styles.metricWord}>{metric.value}</strong>}
         <span className={styles.metricLabel}>{metric.label}</span>
-        {metric.level !== 'live' ? (
-          <span className={metric.level === 'demo' ? styles.stateDemo : styles.stateOff}>
-            {metric.level === 'demo' ? (ar ? 'تجريبي' : 'Demo') : ar ? 'غير متاح' : 'Unavailable'}
-          </span>
+        {metric.level === 'blocked' ? (
+          <span className={styles.stateOff}>{ar ? 'غير متاح' : 'Unavailable'}</span>
         ) : null}
       </button>
     )
@@ -417,6 +415,9 @@ export default function MarketPulseCardClient({
       <h2>
         <span className={styles.pulseMark} aria-hidden />
         {t('home.marketPulse', locale)}
+        {model.metrics.some((metric) => metric.level === 'demo') ? (
+          <small className={styles.labMark}>{isArabic ? 'مختبر' : 'Lab'}</small>
+        ) : null}
       </h2>
       <button
         type="button"

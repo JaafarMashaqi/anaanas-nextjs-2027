@@ -4,7 +4,7 @@ Sources actually opened: this conversation, the attached mobile references, and 
 
 | Requirement | Evidence | Current place | Missing | Priority | Backend | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| Header, country, language | Spec 5.1 | Top header | Signed-in badges are not live counts | High | Existing country routes | Kept |
+| Header, country, language | Spec 03 | MobileTopHeader | Unread counts for guests | High | Notifications and messaging routes | Bell and messages stay visible when signed out. Login remains an icon. |
 | Greeting above the header fold | Experience timeline | HomeMomentSlot | Gulf clothing artwork | High | No store coordinates | Greeting, then a labeled coffee moment, then a market line. Pauses on hover. |
 | One search, tools inside | Spec 5.3, screenshots | MobileHeaderSearchBar | Photo and chat search are not connected | High | Keyword search works | Verified on the page |
 | Quick actions | Spec 5.4 | HomeUpperStage | Map and matches have no service | High | None for map/matches | Honest unavailable note |

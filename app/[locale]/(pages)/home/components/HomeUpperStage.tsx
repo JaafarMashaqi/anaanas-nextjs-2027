@@ -62,6 +62,8 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
   const [hiddenEvents, setHiddenEvents] = useState<string[]>([])
   const events = demoMarketEvents(locale).filter((item) => !hiddenEvents.includes(item.id))
   const [savedEvents, setSavedEvents] = useState<string[]>([])
+  const [wireOn, setWireOn] = useState(false)
+  const [wireStep, setWireStep] = useState(0)
   const hideEvent = (id: string) => setHiddenEvents((current) => [...current, id])
   const saveEvent = (id: string) =>
     setSavedEvents((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]))
@@ -75,6 +77,38 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
     }
     document.addEventListener('click', onQuickAction)
     return () => document.removeEventListener('click', onQuickAction)
+  }, [])
+
+  useEffect(() => {
+    let showTimer = 0
+    let hideTimer = 0
+    let cancelled = false
+    const arm = (delay: number) => {
+      showTimer = window.setTimeout(() => {
+        if (cancelled) return
+        const active = document.activeElement
+        if (
+          active instanceof HTMLInputElement ||
+          active instanceof HTMLTextAreaElement ||
+          active instanceof HTMLSelectElement
+        ) {
+          arm(4000)
+          return
+        }
+        setWireOn(true)
+        hideTimer = window.setTimeout(() => {
+          setWireOn(false)
+          setWireStep((value) => value + 1)
+          arm(90000)
+        }, 10000)
+      }, delay)
+    }
+    arm(8000)
+    return () => {
+      cancelled = true
+      window.clearTimeout(showTimer)
+      window.clearTimeout(hideTimer)
+    }
   }, [])
 
   return (
@@ -118,37 +152,39 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
 
       <MarketplaceStories locale={locale} />
 
-      <section className={styles.wireBlock} aria-label={isArabic ? 'سلك السوق' : 'Market wire'}>
-        <div className={styles.wireHead}>
-          <span className={styles.liveDot} aria-hidden />
-          <h2>{isArabic ? 'سلك السوق' : 'Market wire'}</h2>
-          <span>{isArabic ? 'مختبر التجربة · ليست أحداثاً مؤكدة' : 'Experience lab · not confirmed events'}</span>
-        </div>
-        <div className={styles.wire}>
-          {events.map((item) => (
-            <span key={item.id} className={styles.wireItem} data-kind={item.kind}>
-              <Link href={item.href}>
-                <strong>{isArabic ? item.textAr : item.textEn}</strong>
-              </Link>
-              <button type="button" onClick={() => saveEvent(item.id)} aria-pressed={savedEvents.includes(item.id)}>
-                {savedEvents.includes(item.id) ? (isArabic ? 'محفوظ' : 'Saved') : isArabic ? 'احفظ' : 'Save'}
-              </button>
-              <button type="button" onClick={() => hideEvent(item.id)} aria-label={isArabic ? 'إخفاء' : 'Dismiss'}>
-                ×
-              </button>
-            </span>
-          ))}
-          {latest.length > 0 ? (
-            <Link href="#home-latest" className={styles.wireItem}>
-              <strong>{isArabic ? 'آخر الإعلانات الحقيقية' : 'Real latest listings'}</strong>
-            </Link>
-          ) : null}
-        </div>
-      </section>
+      <div className={styles.place}>
+        <span aria-hidden>📍</span>
+        <strong>
+          {/أردن|jordan/i.test(countryLabel) ? (isArabic ? 'عمّان، ' : 'Amman, ') : ''}
+          {countryLabel}
+        </strong>
+        <span>{isArabic ? 'الحي غير مربوط' : 'Neighborhood is not connected'}</span>
+      </div>
 
       <HomeBanner locale={locale} />
 
       {children}
+
+      {wireOn && events.length > 0 ? (
+        <section className={styles.opportunity} role="status" aria-label={isArabic ? 'فرصة' : 'Opportunity'}>
+          <p>{isArabic ? 'فرصة تجريبية · ليست طلباً حقيقياً' : 'Demo opportunity · not a real buyer'}</p>
+          <Link href={events[wireStep % events.length].href}>
+            {isArabic ? events[wireStep % events.length].textAr : events[wireStep % events.length].textEn}
+          </Link>
+          <button type="button" onClick={() => saveEvent(events[wireStep % events.length].id)}>
+            {savedEvents.includes(events[wireStep % events.length].id) ? (isArabic ? 'محفوظ' : 'Saved') : isArabic ? 'احفظ' : 'Save'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              hideEvent(events[wireStep % events.length].id)
+              setWireOn(false)
+            }}
+          >
+            {isArabic ? 'إخفاء' : 'Hide'}
+          </button>
+        </section>
+      ) : null}
 
       <HomeGoldenMoment locale={locale} onSell={() => openComposer('sale')} />
       <HomeDiscoveryRail locale={locale} />

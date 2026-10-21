@@ -52,27 +52,33 @@ export default function HomeMomentSlot({
   const [storeNote, setStoreNote] = useState(false)
 
   useEffect(() => {
-    setHour(new Date().getHours())
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Amman',
+      hour: 'numeric',
+      hourCycle: 'h23',
+    }).formatToParts(new Date())
+    const marketHour = Number(parts.find((part) => part.type === 'hour')?.value)
+    setHour(Number.isFinite(marketHour) ? marketHour : new Date().getHours())
     setDismissed(readDismissed())
   }, [])
 
   const name = session?.user?.name?.trim()
   const displayName = name && !name.includes('@') ? name : null
-  const night = hour != null && (hour >= 18 || hour < 6)
+  const night = hour != null && (hour >= 17 || hour < 5)
   const hello =
     hour == null
       ? ar
         ? 'أهلاً'
         : 'Hello'
       : ar
-        ? hour < 12
+        ? hour >= 5 && hour < 12
           ? 'صباح الخير'
-          : hour < 17
+          : hour >= 12 && hour < 17
             ? 'نهارك سعيد'
             : 'مساء الخير'
-        : hour < 12
+        : hour >= 5 && hour < 12
           ? 'Good morning'
-          : hour < 17
+          : hour >= 12 && hour < 17
             ? 'Good afternoon'
             : 'Good evening'
 
@@ -91,7 +97,7 @@ export default function HomeMomentSlot({
     const coffee: Slide = {
       id: 'coffee',
       kind: 'coffee',
-      title: ar ? 'القهوة أولاً' : 'Coffee first',
+      title: ar ? 'قهوة ساخنة وفرص جديدة' : 'Hot coffee, then new chances',
       line: ar
         ? 'وبعدها نقتنص الفرص. لحظة من الواجهة، وليست شراكة ولا نقطة بيع.'
         : 'Then we go after the opportunities. An interface moment, not a partnership or a store pin.',
@@ -168,11 +174,11 @@ export default function HomeMomentSlot({
     >
       <span className={styles.sky} data-sky={night ? 'night' : 'day'} aria-hidden>
         {night ? (
-          <svg viewBox="0 0 24 24" width="22" height="22">
+          <svg viewBox="0 0 24 24" width="32" height="32">
             <path fill="currentColor" d="M14.5 2.4a8.8 8.8 0 1 0 7.1 12.2A8 8 0 0 1 14.5 2.4z" />
           </svg>
         ) : (
-          <svg viewBox="0 0 24 24" width="22" height="22">
+          <svg viewBox="0 0 24 24" width="32" height="32">
             <circle cx="12" cy="12" r="4" fill="currentColor" />
           </svg>
         )}

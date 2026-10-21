@@ -30,6 +30,13 @@
   line-height: 1.4;
 }
 
+.labMark {
+  margin-inline-start: 0.35rem;
+  color: #b54708;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
 .pulseMark {
   width: 8px;
   height: 8px;

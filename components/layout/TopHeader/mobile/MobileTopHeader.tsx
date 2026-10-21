@@ -112,15 +112,9 @@ const MobileTopHeader = () => {
               <MobileSectionsDrawer locale={locale} />
 
             </div>
-            {isAuthed ? (
-              <>
-                <MobileNotificationsButton locale={locale} />
-                <MobileMessagesButton locale={locale} />
-                <MobileProfileButton locale={locale} />
-              </>
-            ) : (
-              <MobileLoginButton locale={locale} />
-            )}
+            <MobileNotificationsButton locale={locale} />
+            <MobileMessagesButton locale={locale} />
+            {isAuthed ? <MobileProfileButton locale={locale} /> : <MobileLoginButton locale={locale} />}
           </div>
 
           {/* centre brand */}

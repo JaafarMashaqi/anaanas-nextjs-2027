@@ -2,7 +2,46 @@
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+  min-width: 0;
+  max-width: 100%;
   color: #101828;
+}
+
+.place,
+.opportunity {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.4rem 0.7rem;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #101828;
+  font-size: 0.78rem;
+}
+
+.place strong,
+.opportunity a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.place span,
+.opportunity p,
+.opportunity button {
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #667085;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .greetCard {
@@ -300,21 +339,7 @@
 }
 
 .wire {
-  animation: wireDrift 32s linear infinite;
-}
-
-.wireBlock:hover .wire,
-.wireBlock:focus-within .wire {
-  animation-play-state: paused;
-}
-
-@keyframes wireDrift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-12%); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .wire { animation: none; }
+  scroll-snap-type: x mandatory;
 }
 
 .wireBlock {
