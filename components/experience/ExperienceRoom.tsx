@@ -148,6 +148,13 @@ export default function ExperienceRoom({ locale, kind }: { locale: SupportedLoca
             <input value={price} onChange={(event) => setPrice(event.target.value)} inputMode="decimal" />
           </label>
           <div className={styles.row}>
+            {(ar ? ['تويوتا كامري 2024', 'شقة في عبدون', 'آيفون'] : ['Toyota Camry 2024', 'Apartment in Abdoun', 'iPhone']).map((sample) => (
+              <button key={sample} type="button" onClick={() => setWish(sample)}>
+                {sample}
+              </button>
+            ))}
+          </div>
+          <div className={styles.row}>
             <button type="submit">{ar ? 'احفظ النية' : 'Save intent'}</button>
             <Link href={wish.trim() ? `/${locale}/search?q=${encodeURIComponent(wish.trim())}` : `/${locale}/search`}>
               {ar ? 'ابحث في الإعلانات الحقيقية' : 'Search real listings'}

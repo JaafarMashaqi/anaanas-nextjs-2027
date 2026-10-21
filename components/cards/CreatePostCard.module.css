@@ -12,8 +12,10 @@
 }
 
 /* بطاقة إنشاء المنشور — غلاف شفاف + طبقة داخلية متناسقة مع نبض السوق */
+.composerCard.card,
 .composerCard.card-body {
   padding: 0 !important;
+  margin: 0 !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -1366,10 +1368,11 @@
 }
 
 .composerHeroCollapsed {
-  padding: 0.45rem 0.7rem 0.35rem;
-  border: 1px solid #f3e7b8;
-  border-inline-start: 3px solid #ffc928;
-  background: #fffefb;
+  padding: 0.45rem 0.55rem 0.35rem;
+  border: 0;
+  border-radius: 18px;
+  background: #fff8de;
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.06);
 }
 
 .composerHeroCollapsed .composerHeroHeading {
@@ -1458,7 +1461,27 @@
   display: flex;
   align-items: center;
   gap: 0.1rem;
-  margin-top: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.composerGuide {
+  display: block;
+  width: 100%;
+  margin: 0.1rem 0 0;
+  padding: 0.15rem 0.2rem 0.05rem;
+  border: 0;
+  background: transparent;
+  color: #8a6110;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: start;
+  cursor: pointer;
+}
+
+.composerHeroShell[data-expanded='1'] .composerGuide {
+  display: none;
 }
 
 .composerIconBtn {

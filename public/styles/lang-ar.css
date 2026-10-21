@@ -260,7 +260,7 @@ main {
   background: #fff;
 }
 body {
-  background: #f3f5f9;
+  background: #fffefb;
 }
 @media (max-width: 991.98px) {
 
@@ -269,7 +269,7 @@ body {
   }
 
   body {
-    background: #f3f5f9;
+    background: #fffefb;
 }
   header {
     height: auto;

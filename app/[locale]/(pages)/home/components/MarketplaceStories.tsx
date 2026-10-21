@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import Image from 'next/image'
 
+import host from '@/assets/images/avatar/ananas-host.svg'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './MarketplaceStories.module.css'
@@ -244,8 +246,8 @@ export default function MarketplaceStories({
         </button>
         {STORIES.map((item) => (
           <button key={item.id} type="button" className={styles.item} onClick={() => setOpenId(item.id)}>
-            <span className={`${styles.ring} ${item.draft ? styles.draft : ''}`}>
-              <span className={styles.letter}>{(ar ? item.nameAr : item.nameEn).slice(0, 1)}</span>
+            <span className={`${styles.ring} ${item.draft ? styles.draft : ''}`} data-tone={item.id}>
+              <Image src={host} alt="" width={48} height={48} />
             </span>
             <span>{ar ? item.nameAr : item.nameEn}</span>
           </button>

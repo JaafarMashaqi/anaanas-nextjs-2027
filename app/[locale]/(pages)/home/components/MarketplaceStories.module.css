@@ -78,6 +78,18 @@
   overflow: hidden;
 }
 
+.ring[data-tone='homes'] {
+  border-color: #16a34a;
+}
+
+.ring[data-tone='phones'] {
+  border-color: #7c3aed;
+}
+
+.ring[data-tone='jobs'] {
+  border-color: #101828;
+}
+
 .ring img {
   width: 48px;
   height: 48px;

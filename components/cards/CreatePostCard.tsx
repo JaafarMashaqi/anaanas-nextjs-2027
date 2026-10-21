@@ -196,6 +196,25 @@ function CreatePostHeroShell({
   const [intent, setIntent] = useState<'sale' | 'wanted' | 'auction'>(queuedIntent ?? 'sale')
   const [studioOpen, setStudioOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const router = useRouter()
+  const guides = locale === 'ar'
+    ? [
+        { text: 'خلّينا نكتب إعلانك بطريقة تلفت الانتباه.', go: 'studio' },
+        { text: 'أضف صوراً واضحة لزيادة جاذبية إعلانك.', go: 'studio' },
+        { text: 'حدد المنطقة حتى يصل إعلانك للمهتمين بالقرب منك.', go: 'studio' },
+        { text: 'عنوان واضح وتفاصيل كاملة تصنع فرقاً.', go: 'studio' },
+        { text: 'دع مساعد أناناس يقترح تحسينات لإعلانك.', go: 'assistant' },
+        { text: 'مع Elite، اكتشف أدوات أكثر احترافية لنمو أعمالك.', go: 'membership' },
+      ]
+    : [
+        { text: 'Let us write an ad people actually notice.', go: 'studio' },
+        { text: 'Add clear photos so the ad feels more inviting.', go: 'studio' },
+        { text: 'Choose the area so nearby people can find it.', go: 'studio' },
+        { text: 'A clear title and complete details make the difference.', go: 'studio' },
+        { text: 'Ask the ANANAS assistant for a writing hint.', go: 'assistant' },
+        { text: 'Elite is where the professional growth tools live.', go: 'membership' },
+      ]
+  const [guideIndex, setGuideIndex] = useState(0)
   const shellRef = useRef<HTMLDivElement>(null)
   const skipInitialFocus = useRef(true)
   const tagItems = [
@@ -305,6 +324,30 @@ function CreatePostHeroShell({
     }, 4600)
     return () => window.clearInterval(timer)
   }, [expanded, prompts.length, title])
+
+  useEffect(() => {
+    if (expanded) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setInterval(() => {
+      setGuideIndex((index) => (index + 1) % guides.length)
+    }, 6400)
+    return () => window.clearInterval(timer)
+  }, [expanded, guides.length])
+
+  const openGuide = () => {
+    const guide = guides[guideIndex % guides.length]
+    if (guide.go === 'membership') {
+      router.push(`/${locale}/membership`)
+      return
+    }
+    if (guide.go === 'assistant') {
+      router.push(`/${locale}/assistant`)
+      return
+    }
+    setExpanded(true)
+    setStudioOpen(true)
+    onAddAdClick()
+  }
 
   return (
     <div
@@ -482,6 +525,11 @@ function CreatePostHeroShell({
           <BsStars aria-hidden />
         </button>
       </div>
+      {!expanded ? (
+        <button type="button" className={styles.composerGuide} onClick={openGuide}>
+          {guides[guideIndex % guides.length].text}
+        </button>
+      ) : null}
       {assistNote ? <p className={styles.composerHeroSub}>{assistNote}</p> : null}
 
       <div className={styles.composerIntentRow} role="group" aria-label={isArabic ? 'نوع الإعلان' : 'Listing intent'}>

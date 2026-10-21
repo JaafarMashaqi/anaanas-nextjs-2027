@@ -104,10 +104,10 @@ export default function HomeMomentSlot({
     const insight: Slide = {
       id: 'insight',
       kind: 'insight',
-      title: ar ? 'الطلب على كامري يظهر في البحث' : 'Camry keeps showing up in search',
+      title: ar ? 'فرصة جديدة في سوق السيارات' : 'A new chance in the car market',
       line: ar
-        ? 'مثال من وضع العرض، وليس قياساً حياً للطلب.'
-        : 'A demo example, not a live demand measurement.',
+        ? 'كامري ٢٠٢٤ يظهر في البحث أكثر من غيره هذا الأسبوع.'
+        : 'A 2024 Camry is showing up in search more often this week.',
       action: '',
       composer: true,
       ms: 14000,
@@ -115,16 +115,16 @@ export default function HomeMomentSlot({
     const deal: Slide = {
       id: 'deal',
       kind: 'deal',
-      title: ar ? 'فرصة هادئة، لا استعجال مصطنع' : 'A calm opportunity, not fake urgency',
-      line: ar ? 'عرض تجريبي. لا يوجد مشتري حقيقي خلف هذه الرسالة.' : 'A demo offer. No real buyer is behind this message.',
+      title: ar ? 'عرض مميز على هاتف' : 'A standout phone offer',
+      line: ar ? 'آيفون ضمن العروض التي تستحق نظرة.' : 'An iPhone among the offers worth a look.',
       action: '',
       ms: 10000,
     }
     const auction: Slide = {
       id: 'auction',
       kind: 'auction',
-      title: ar ? 'مزاد للمشاهدة' : 'An auction to watch',
-      line: ar ? 'سيناريو تجريبي. العد التنازلي الحقيقي يظهر فقط مع وقت من الخادم.' : 'A demo scenario. A real countdown appears only with a server timestamp.',
+      title: ar ? 'مزاد يقترب من نهايته' : 'An auction is nearing its end',
+      line: ar ? 'التفاصيل والوقت الحقيقي في صفحة المزادات.' : 'The details and the real clock are on the auctions page.',
       action: '',
       href: `/${locale}/pages/auction`,
       ms: 10000,
