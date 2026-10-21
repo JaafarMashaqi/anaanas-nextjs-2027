@@ -12,6 +12,8 @@ Sources actually opened: this conversation, the attached mobile references, and 
 | Market wire | Experience lab | demoMarketEvents | Confirmed events | High | No event stream | Demo events, labeled. A link remains to the real latest listings. |
 | Amman hero, one campaign frame | Spec 5.7 and 06 | HomeBanner | Separate scheduling service | High | /api/home/sliders | One frame. Daily banner hidden on home |
 | Market pulse | Experience lab | buildMarketPulse | Live presence and sales | High | Listings and auctions are live | Real published and auction counts, plus marked demo figures. |
-| Composer | Spec 07, historical composer screenshot | CreatePostCard hero shell | Video upload, demand count, paid tiers | High | Existing publish API. No pricing or video service | Compact cream composer on the home feed. Photos, location, and publish open the current flow. Voice uses the device. Video and AI say they are not connected. |
+| Discovery | Spec 09 | HomeDiscoveryRail | Video, live, nearby, follow, wanted services | High | Auctions, stores, and search are live routes | Live chips open those pages. Demo chips explain the missing service. |
+| Golden moment | Spec 6 | HomeGoldenMoment | Real buyer matching | High | No demand match | One labeled sample, hidden for 24 hours after dismiss. |
+| Composer | Spec 07 | CreatePostCard and AdStudioDemo | Video upload and real price intelligence | High | Existing publish API | Compact composer stays. The studio shows a labeled interface estimate, not a model result. |
 | Social cards | Spec 08 | PostCard listingCard | Follow, offer, wanted variant, opportunity score | High | Reactions and comments already on the post API | Feed image capped and cropped. Stock collage removed from the feed. |
 | Mascot family | Spec 11 | Existing pineapple assets | Distinct category characters | Later | Art, not an API | Not newly drawn |

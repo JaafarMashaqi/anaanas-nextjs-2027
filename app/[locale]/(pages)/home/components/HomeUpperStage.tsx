@@ -5,13 +5,15 @@ import { useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 
 import type { TrendingPostItem } from '@/lib/api/homeInsights'
-import { demoMarketEvents, type DemoMarketEvent } from '@/lib/experience/demoMarketEvents'
+import { demoMarketEvents } from '@/lib/experience/demoMarketEvents'
 import type { SupportedLocale } from '@/lib/localization'
 import type { LatestListingItem } from '@/lib/server/fetchLatestListings'
 import MobileHeaderSearchBar from '@/components/layout/TopHeader/mobile/MobileHeaderSearchBar'
 import HomeMomentSlot from './HomeMomentSlot'
 import HomeOpportunitySlot from './HomeOpportunitySlot'
 import HomeBanner from './HomeBanner'
+import HomeDiscoveryRail from './HomeDiscoveryRail'
+import HomeGoldenMoment from './HomeGoldenMoment'
 import MarketplaceStories from './MarketplaceStories'
 
 import styles from './HomeUpperStage.module.css'
@@ -59,7 +61,10 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
   const isArabic = locale === 'ar'
   const [hiddenEvents, setHiddenEvents] = useState<string[]>([])
   const events = demoMarketEvents(locale).filter((item) => !hiddenEvents.includes(item.id))
-  const hideEvent = (item: DemoMarketEvent) => setHiddenEvents((current) => [...current, item.id])
+  const [savedEvents, setSavedEvents] = useState<string[]>([])
+  const hideEvent = (id: string) => setHiddenEvents((current) => [...current, id])
+  const saveEvent = (id: string) =>
+    setSavedEvents((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]))
   const [note, setNote] = useState<'map' | 'matches' | null>(null)
 
   useEffect(() => {
@@ -125,7 +130,10 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
               <Link href={item.href}>
                 <strong>{isArabic ? item.textAr : item.textEn}</strong>
               </Link>
-              <button type="button" onClick={() => hideEvent(item)} aria-label={isArabic ? 'إخفاء' : 'Dismiss'}>
+              <button type="button" onClick={() => saveEvent(item.id)} aria-pressed={savedEvents.includes(item.id)}>
+                {savedEvents.includes(item.id) ? (isArabic ? 'محفوظ' : 'Saved') : isArabic ? 'احفظ' : 'Save'}
+              </button>
+              <button type="button" onClick={() => hideEvent(item.id)} aria-label={isArabic ? 'إخفاء' : 'Dismiss'}>
                 ×
               </button>
             </span>
@@ -141,6 +149,9 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
       <HomeBanner locale={locale} />
 
       {children}
+
+      <HomeGoldenMoment locale={locale} onSell={() => openComposer('sale')} />
+      <HomeDiscoveryRail locale={locale} />
 
       <HomeOpportunitySlot locale={locale} trending={trending} />
     </div>

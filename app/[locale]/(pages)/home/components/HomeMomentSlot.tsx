@@ -93,8 +93,8 @@ export default function HomeMomentSlot({
       kind: 'coffee',
       title: ar ? 'القهوة أولاً' : 'Coffee first',
       line: ar
-        ? 'لحظة واجهة. ليست شراكة، ولا توجد نقطة بيع مربوطة.'
-        : 'An interface moment. Not a partnership, and no store pin is connected.',
+        ? 'وبعدها نقتنص الفرص. لحظة من الواجهة، وليست شراكة ولا نقطة بيع.'
+        : 'Then we go after the opportunities. An interface moment, not a partnership or a store pin.',
       action: ar ? 'أقرب نقطة' : 'Nearest cup',
       store: true,
       ms: 8000,

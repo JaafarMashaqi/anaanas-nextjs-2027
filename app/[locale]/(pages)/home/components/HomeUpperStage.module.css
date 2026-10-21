@@ -299,6 +299,24 @@
   scrollbar-width: none;
 }
 
+.wire {
+  animation: wireDrift 32s linear infinite;
+}
+
+.wireBlock:hover .wire,
+.wireBlock:focus-within .wire {
+  animation-play-state: paused;
+}
+
+@keyframes wireDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-12%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire { animation: none; }
+}
+
 .wireBlock {
   display: flex;
   flex-direction: column;

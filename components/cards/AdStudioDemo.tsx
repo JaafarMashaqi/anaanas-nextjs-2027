@@ -63,6 +63,8 @@ export default function AdStudioDemo({
     )
   }
 
+  const sampleReach = Number(budget) * Number(days) * 40
+
   return (
     <div className={styles.studio}>
       <p className={styles.banner}>
@@ -130,8 +132,8 @@ export default function AdStudioDemo({
       </div>
       <p className={styles.hint}>
         {ar
-          ? `لا يوجد نموذج يحسب نتيجة لميزانية ${budget} لمدة ${days} أيام. عضويات Gold وPro غير مربوطة.`
-          : `No model estimates an outcome for a budget of ${budget} over ${days} days. Gold and Pro memberships are not connected.`}
+          ? `تقدير الواجهة: ${sampleReach.toLocaleString('ar-JO')} ظهور تجريبي لميزانية ${budget} خلال ${days} أيام. ليست نتيجة نموذج ولا تحليل سوق.`
+          : `Interface estimate: ${sampleReach.toLocaleString('en-US')} demo impressions for a budget of ${budget} over ${days} days. Not a model result and not market analysis.`}
       </p>
       <div className={styles.actions}>
         {mode === 'sale' ? null : (
