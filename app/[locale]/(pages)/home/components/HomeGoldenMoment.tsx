@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 import type { SupportedLocale } from '@/lib/localization'
 
@@ -16,6 +17,7 @@ export default function HomeGoldenMoment({
   onSell: () => void
 }) {
   const ar = locale === 'ar'
+  void onSell
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -39,19 +41,33 @@ export default function HomeGoldenMoment({
   }
 
   return (
-    <section className={styles.card} aria-label={ar ? 'لحظة فرصة' : 'Opportunity moment'}>
-      <span className={styles.coin} aria-hidden />
+    <section className={styles.card} aria-label={ar ? 'فرصة السوق' : 'Market opportunity'}>
+      <span className={styles.mark} aria-hidden />
       <div>
-        <p className={styles.kicker}>{ar ? 'مختبر التجربة · ليس طلباً حقيقياً' : 'Experience lab · not real demand'}</p>
-        <h2 className={styles.title}>{ar ? 'فرصة بيع حارة' : 'A hot selling moment'}</h2>
-        <p className={styles.line}>{ar ? '١٩ مشترياً في العينة يبحثون عن منتج مشابه. لا يوجد تطابق مع إعلانك.' : '19 sample buyers want something similar. Nothing is matched to your listing.'}</p>
+        <p className={styles.kicker}>{ar ? 'مثال' : 'Example'}</p>
+        <h2 className={styles.title}>{ar ? 'طلب متزايد على سيارات تويوتا في عمّان' : 'Rising interest in Toyota cars in Amman'}</h2>
+        <p className={styles.line}>{ar ? 'اكتشف الإعلانات المرتبطة، أو احفظ تنبيهاً على هذا الجهاز.' : 'Explore the related listings, or save an alert on this device.'}</p>
       </div>
       <div className={styles.actions}>
-        <button type="button" className={styles.go} onClick={onSell}>
-          {ar ? 'أبيع' : 'Sell'}
+        <Link className={styles.go} href={`/${locale}/search?q=${encodeURIComponent('تويوتا')}`}>
+          {ar ? 'استكشف' : 'Explore'}
+        </Link>
+        <button
+          type="button"
+          className={styles.quiet}
+          onClick={() => {
+            try {
+              window.localStorage.setItem('ananas-alert-toyota', '1')
+            } catch {
+              /* this view only */
+            }
+            hide()
+          }}
+        >
+          {ar ? 'نبهني' : 'Alert me'}
         </button>
         <button type="button" className={styles.quiet} onClick={hide}>
-          {ar ? 'ليس الآن' : 'Not now'}
+          {ar ? 'إخفاء' : 'Hide'}
         </button>
       </div>
     </section>

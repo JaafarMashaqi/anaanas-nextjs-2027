@@ -33,7 +33,6 @@ export default function HomeOpportunitySlot({
   const ar = locale === 'ar'
   const [index, setIndex] = useState(0)
   const [feedback, setFeedback] = useState<Record<string, Feedback>>({})
-  const [why, setWhy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const events = trending.filter((item) => item.post_id && item.title)
   const hidden = events.filter((item) => feedback[`trend-${item.post_id}`] === 'out')
@@ -51,7 +50,6 @@ export default function HomeOpportunitySlot({
       const active = document.activeElement
       if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return
       setIndex((value) => value + 1)
-      setWhy(false)
       setNotice(null)
     }, 9000)
     return () => window.clearInterval(timer)
@@ -71,7 +69,7 @@ export default function HomeOpportunitySlot({
     <section className={styles.card} aria-label={ar ? 'عنوان رائج' : 'Trending title'}>
       <div className={styles.head}>
         <span className={styles.dot} aria-hidden />
-        <h2>{ar ? 'عنوان رائج' : 'Trending title'}</h2>
+        <h2>{ar ? 'طلب رائج' : 'Trending demand'}</h2>
         <span>{ar ? 'من الخادم · ليس تقديراً' : 'From the server · not an estimate'}</span>
       </div>
       {!item ? (
@@ -86,59 +84,32 @@ export default function HomeOpportunitySlot({
         </p>
       ) : (
         <>
-          <p className={styles.kicker}>{ar ? 'مقاس · عنوان رائج' : 'Measured · trending title'}</p>
+          <p className={styles.kicker}>{ar ? 'من قائمة الخادم' : 'From the server list'}</p>
           <Link href={`/${locale}/post/${item.post_id}`} className={styles.title}>
             {plainListingText(item.title)}
           </Link>
           <p className={styles.meta}>{item.section_name ? plainListingText(item.section_name) : ar ? 'من قائمة الرائج' : 'From the trending list'}</p>
-          {why ? (
-            <p className={styles.why}>
-              {ar
-                ? 'ظهر لأن الخادم أعاد هذا العنوان ضمن الإعلانات الرائجة. ليس بحثك السابق، وليس توقعاً.'
-                : 'It appeared because the server returned this title in the trending list. It is not your past search, and it is not a forecast.'}
-            </p>
-          ) : null}
           {notice ? <p className={styles.why}>{notice}</p> : null}
           <div className={styles.actions}>
-            <Link href={`/${locale}/post/${item.post_id}`}>{ar ? 'شاهد الإعلان' : 'View listing'}</Link>
+            <Link href={`/${locale}/post/${item.post_id}`}>{ar ? 'استكشف' : 'Explore'}</Link>
             <button
               type="button"
               onClick={() => {
                 save(`trend-${item.post_id}`, 'in')
-                setNotice(
-                  ar
-                    ? 'حُفظ «يهمني» على هذا الجهاز فقط. لم يُدرَّب نموذج.'
-                    : '“Interested” is saved on this device only. No model was trained.',
-                )
+                setNotice(ar ? 'التنبيه محفوظ على هذا الجهاز. لا إرسال من الخادم.' : 'The alert is saved on this device. Nothing is sent.')
               }}
             >
-              {ar ? 'يهمني' : 'Interested'}
+              {ar ? 'نبهني' : 'Alert me'}
             </button>
             <button
               type="button"
               onClick={() => {
                 save(`trend-${item.post_id}`, 'out')
-                setWhy(false)
                 setNotice(null)
                 setIndex(0)
               }}
             >
-              {ar ? 'لا يهمني' : 'Not interested'}
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setNotice(
-                  ar
-                    ? 'لا يوجد اشتراك تنبيه في الخادم.'
-                    : 'The server has no alert subscription.',
-                )
-              }
-            >
-              {ar ? 'نبهني' : 'Alert me'}
-            </button>
-            <button type="button" onClick={() => setWhy((value) => !value)}>
-              {ar ? 'لماذا ظهر لي؟' : 'Why this?'}
+              {ar ? 'إخفاء' : 'Hide'}
             </button>
           </div>
         </>
