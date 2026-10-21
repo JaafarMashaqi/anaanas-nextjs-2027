@@ -115,11 +115,30 @@
   border-radius: 12px;
 }
 
-.rail {
-  background: transparent;
+.face {
+  min-height: 74px;
+}
+
+.faceCopy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.7rem;
+  min-height: 74px;
+  padding: 0.35rem 0.1rem;
+}
+
+.faceCopy p,
+.faceCopy strong {
+  margin: 0;
+}
+
+.faceCopy button {
   border: 0;
-  box-shadow: none;
-  padding: 0;
+  background: transparent;
+  color: #101828;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .rail .stamp {

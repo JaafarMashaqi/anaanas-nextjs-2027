@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 
@@ -35,11 +34,10 @@ function readDismissed(): string[] {
 export default function HomeMomentSlot({
   locale,
   countryLabel,
-  onOpenComposer,
 }: {
   locale: SupportedLocale
   countryLabel: string
-  onOpenComposer: () => void
+  onOpenComposer?: () => void
 }) {
   const ar = locale === 'ar'
   const { data: session } = useSession()
@@ -47,7 +45,6 @@ export default function HomeMomentSlot({
   const [index, setIndex] = useState(0)
   const [dismissed, setDismissed] = useState<string[]>([])
   const [paused, setPaused] = useState(false)
-  const [storeNote, setStoreNote] = useState(false)
 
   useEffect(() => {
     const parts = new Intl.DateTimeFormat('en-GB', {
@@ -62,6 +59,7 @@ export default function HomeMomentSlot({
 
   const name = session?.user?.name?.trim()
   const displayName = name && !name.includes('@') ? name : null
+  const morning = hour != null && hour >= 5 && hour < 12
   const night = hour != null && (hour >= 17 || hour < 5)
   const hello =
     hour == null
@@ -88,7 +86,7 @@ export default function HomeMomentSlot({
       line: ar
         ? 'نتمنى أن تجد ما تبحث عنه أسرع مما تتوقع.'
         : 'We hope you find it sooner than you expect.',
-      action: ar ? 'أبيع' : 'Sell',
+      action: '',
       composer: true,
       ms: 12000,
     }
@@ -97,9 +95,9 @@ export default function HomeMomentSlot({
       kind: 'coffee',
       title: ar ? 'قهوة ساخنة وفرص جديدة' : 'Hot coffee, then new chances',
       line: ar
-        ? 'وبعدها نقتنص الفرص. لحظة من الواجهة، وليست شراكة ولا نقطة بيع.'
-        : 'Then we go after the opportunities. An interface moment, not a partnership or a store pin.',
-      action: ar ? 'أقرب نقطة' : 'Nearest cup',
+        ? 'صار بدها فنجان قهوة. لحظة من الواجهة، وليست شراكة مع العميد.'
+        : 'Time for a cup. An interface moment, not a partnership.',
+      action: '',
       store: true,
       ms: 8000,
     }
@@ -110,7 +108,7 @@ export default function HomeMomentSlot({
       line: ar
         ? `${countryLabel}. الأرقام الحية في النبض، والأرقام التجريبية موسومة.`
         : `${countryLabel}. Live figures are in the pulse. Demo figures are marked.`,
-      action: ar ? 'أبيع' : 'Sell',
+      action: '',
       composer: true,
       ms: 10000,
     }
@@ -128,24 +126,11 @@ export default function HomeMomentSlot({
       const active = document.activeElement
       if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return
       setIndex((value) => value + 1)
-      setStoreNote(false)
     }, slide.ms)
     return () => window.clearTimeout(timer)
   }, [paused, slide, visible.length])
 
   if (!slide) return null
-
-  const dismiss = () => {
-    if (slide.id === 'greet') return
-    const next = [...dismissed, slide.id]
-    setDismissed(next)
-    setStoreNote(false)
-    try {
-      window.localStorage.setItem(DISMISS_KEY, JSON.stringify(next))
-    } catch {
-      /* preference stays for this view only */
-    }
-  }
 
   const kicker =
     slide.kind === 'greeting'
@@ -170,6 +155,7 @@ export default function HomeMomentSlot({
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
+      {slide.kind === 'greeting' && (morning || night) ? (
       <span className={styles.sky} data-sky={night ? 'night' : 'day'} aria-hidden>
         {night ? (
           <svg viewBox="0 0 24 24" width="32" height="32">
@@ -181,6 +167,7 @@ export default function HomeMomentSlot({
           </svg>
         )}
       </span>
+      ) : null}
       {slide.kind === 'coffee' ? (
         <span className={styles.cup} aria-hidden>
           <span className={styles.steam} />
@@ -192,34 +179,6 @@ export default function HomeMomentSlot({
         <p className={styles.kicker}>{kicker}</p>
         <h2>{slide.title}</h2>
         <p>{slide.line}</p>
-        {storeNote ? (
-          <p className={styles.note}>
-            {ar
-              ? 'أقرب نقطة بيع غير متاحة. لا توجد إحداثيات متاجر.'
-              : 'The nearest store is unavailable. No store coordinates are connected.'}
-          </p>
-        ) : null}
-      </div>
-      <div className={styles.actions}>
-        {slide.composer ? (
-          <button type="button" className={styles.go} onClick={onOpenComposer}>
-            {slide.action}
-          </button>
-        ) : (
-          <Link className={styles.go} href={slide.href || `/${locale}/search`}>
-            {slide.action}
-          </Link>
-        )}
-        {slide.store ? (
-          <button type="button" className={styles.quiet} onClick={() => setStoreNote((value) => !value)}>
-            {ar ? 'أقرب نقطة' : 'Nearest store'}
-          </button>
-        ) : null}
-        {slide.id !== 'greet' ? (
-          <button type="button" className={styles.quiet} onClick={dismiss}>
-            {ar ? 'إخفاء' : 'Hide'}
-          </button>
-        ) : null}
       </div>
       {visible.length > 1 ? (
         <div className={styles.dots} role="tablist" aria-label={ar ? 'الشرائح' : 'Slides'}>
@@ -230,10 +189,7 @@ export default function HomeMomentSlot({
               role="tab"
               aria-selected={itemIndex === safeIndex}
               className={itemIndex === safeIndex ? styles.dotOn : styles.dot}
-              onClick={() => {
-                setIndex(itemIndex)
-                setStoreNote(false)
-              }}
+              onClick={() => setIndex(itemIndex)}
             />
           ))}
         </div>

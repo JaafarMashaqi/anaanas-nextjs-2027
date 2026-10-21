@@ -9,7 +9,6 @@ import LogoBox from '@/components/LogoBox'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
 import type { SupportedLocale } from '@/lib/localization'
 
-import CountryDropdown from '../CountryDropdown'
 import LocaleDropdown from '../LocaleDropdown'
 import MobileSectionsDrawer from '../MobileSectionsDrawer'
 import StyledHeader from '../StyledHeader'
@@ -122,10 +121,9 @@ const MobileTopHeader = () => {
             <LogoBox />
           </div>
 
-          {/* logical-end cluster — language switcher + country picker */}
+          {/* logical-end cluster — one language control */}
           <div className={styles.end}>
             <LocaleDropdown compact />
-            <CountryDropdown locale={locale} compact />
           </div>
         </div>
         {/* <BetaBadge locale={locale} className=" d-inline-flex m-auto" /> */}

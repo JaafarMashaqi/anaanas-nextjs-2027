@@ -1,13 +1,13 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap'
 import { BsCheck2, BsChevronDown, BsTranslate } from 'react-icons/bs'
 
 import {
   DEFAULT_LOCALE,
-  SUPPORTED_LOCALES,
+  LANGUAGE_MENU,
   isSupportedLocale,
   type SupportedLocale,
 } from '@/lib/localization'
@@ -17,14 +17,13 @@ type Props = {
   compact?: boolean
 }
 
-const NATIVE_NAMES: Record<SupportedLocale, string> = {
-  ar: 'العربية',
-  en: 'English',
-}
-
-const SHORT_CODES: Record<SupportedLocale, string> = {
+const SHORT_CODES: Record<string, string> = {
   ar: 'AR',
   en: 'EN',
+  tr: 'TR',
+  es: 'ES',
+  zh: '中',
+  fr: 'FR',
 }
 
 /**
@@ -47,6 +46,8 @@ const LocaleDropdown = ({ compact = false }: Props) => {
     return DEFAULT_LOCALE
   }, [params])
 
+  const activeName = LANGUAGE_MENU.find((item) => item.code === activeLocale)?.native || SHORT_CODES[activeLocale]
+  const [pendingNote, setPendingNote] = useState<string | null>(null)
   const isArabic = activeLocale === 'ar'
 
   /** Build a path that replaces (or prepends) the locale segment, preserving the query string. */
@@ -87,7 +88,7 @@ const LocaleDropdown = ({ compact = false }: Props) => {
         type="button"
         className="localeDropdown__toggle"
         aria-label={toggleAria}
-        title={NATIVE_NAMES[activeLocale]}
+        title={activeName}
       >
         <span className="localeDropdown__badge" aria-hidden>
           <span className="localeDropdown__badgeIcon">
@@ -97,7 +98,7 @@ const LocaleDropdown = ({ compact = false }: Props) => {
         </span>
 
         {!compact && (
-          <span className="localeDropdown__label">{NATIVE_NAMES[activeLocale]}</span>
+          <span className="localeDropdown__label">{activeName}</span>
         )}
 
         <BsChevronDown size={10} className="localeDropdown__chevron" />
@@ -115,28 +116,65 @@ const LocaleDropdown = ({ compact = false }: Props) => {
           </span>
         </div>
 
-        {SUPPORTED_LOCALES.map((locale) => {
-          const isActive = locale === activeLocale
-          const href = buildLocaleUrl(locale)
+        {LANGUAGE_MENU.map((item) => {
+          const isActive = item.code === activeLocale
+          if (!item.ready || !isSupportedLocale(item.code)) {
+            return (
+              <DropdownItem
+                key={item.code}
+                as="button"
+                type="button"
+                className="localeDropdown__item"
+                onClick={() => {
+                  try {
+                    window.localStorage.setItem('ananas.languageChoice', item.code)
+                  } catch {
+                    /* the note still explains the limit */
+                  }
+                  setPendingNote(
+                    isArabic
+                      ? `${item.native}: القاموس غير جاهز، والصفحة تبقى كما هي.`
+                      : `${item.native}: the dictionary is not ready, so this page stays as it is.`,
+                  )
+                }}
+              >
+                <span className="localeDropdown__itemBadge" aria-hidden>
+                  {SHORT_CODES[item.code]}
+                </span>
+                <span className="localeDropdown__itemName">{item.native}</span>
+                <span className="localeDropdown__itemHint">{isArabic ? 'لاحقاً' : 'Later'}</span>
+              </DropdownItem>
+            )
+          }
+          const href = buildLocaleUrl(item.code)
           return (
             <DropdownItem
-              key={locale}
+              key={item.code}
               href={href}
               active={isActive}
               className="localeDropdown__item"
+              onClick={() => {
+                try {
+                  window.localStorage.setItem('ananas.languageChoice', item.code)
+                  window.localStorage.setItem('ananas.languageExplicit', '1')
+                } catch {
+                  /* navigation still changes the locale */
+                }
+              }}
             >
               <span className="localeDropdown__itemBadge" aria-hidden>
-                {SHORT_CODES[locale]}
+                {SHORT_CODES[item.code]}
               </span>
-              <span className="localeDropdown__itemName">{NATIVE_NAMES[locale]}</span>
+              <span className="localeDropdown__itemName">{item.native}</span>
               {isActive ? (
                 <BsCheck2 size={16} className="text-success" />
               ) : (
-                <span className="localeDropdown__itemHint">{SHORT_CODES[locale]}</span>
+                <span className="localeDropdown__itemHint">{SHORT_CODES[item.code]}</span>
               )}
             </DropdownItem>
           )
         })}
+        {pendingNote ? <p className="localeDropdown__itemHint px-2 mb-0">{pendingNote}</p> : null}
       </DropdownMenu>
 
       <style jsx global>{`

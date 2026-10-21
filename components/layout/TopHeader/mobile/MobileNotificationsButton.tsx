@@ -64,7 +64,7 @@ const MobileNotificationsButton = ({ locale }: Props) => {
   return (
     <Link
       href={`/${locale}/notifications`}
-      className={styles.btn}
+      className={unread > 0 ? `${styles.btn} ${styles.btnLive}` : styles.btn}
       aria-label={ariaOpen}
       title={ariaOpen}
     >

@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Swiper as SwiperClass } from 'swiper'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, Keyboard, A11y } from 'swiper/modules'
-import { BsChevronLeft, BsChevronRight } from 'react-icons/bs'
 
 import { useAppData } from '@/context/AppDataContext'
 import { API_BASE_URL } from '@/lib/api/config'
@@ -207,8 +206,8 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
             <SwiperSlide key={`admin-${slide.id}`}>
               <div className={styles.adminSlide}>
                 <span className={styles.badge}>{isArabic ? 'حملة إدارية' : 'Admin campaign'}</span>
-                <button type="button" className={styles.hide} onClick={() => hideId(`admin-${slide.id}`)}>
-                  {isArabic ? 'إخفاء' : 'Hide'}
+                <button type="button" className={styles.hide} onClick={() => hideId(`admin-${slide.id}`)} aria-label={isArabic ? 'إخفاء' : 'Hide'}>
+                  ×
                 </button>
                 <SlideMedia slide={slide} isArabic={isArabic} priority={index === 0} />
               </div>
@@ -218,8 +217,8 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
             <SwiperSlide key={fixture.id}>
               <div className={styles.fixture} data-tone={fixture.tone}>
                 <span className={styles.badge}>{fixture.kicker}</span>
-                <button type="button" className={styles.hide} onClick={() => hideId(fixture.id)}>
-                  {isArabic ? 'إخفاء' : 'Hide'}
+                <button type="button" className={styles.hide} onClick={() => hideId(fixture.id)} aria-label={isArabic ? 'إخفاء' : 'Hide'}>
+                  ×
                 </button>
                 <div className={styles.stageCopy}>
                   <h2>{fixture.title}</h2>
@@ -239,16 +238,6 @@ export default function HomeBanner({ locale }: HomeBannerProps) {
             </SwiperSlide>
           ))}
         </Swiper>
-        {deckCount > 1 ? (
-          <>
-            <button type="button" className={`${styles.bannerNav} ${styles.bannerNavPrev}`} onClick={() => swiperRef.current?.slidePrev()} aria-label={isArabic ? 'السابق' : 'Previous'}>
-              {isArabic ? <BsChevronRight aria-hidden /> : <BsChevronLeft aria-hidden />}
-            </button>
-            <button type="button" className={`${styles.bannerNav} ${styles.bannerNavNext}`} onClick={() => swiperRef.current?.slideNext()} aria-label={isArabic ? 'التالي' : 'Next'}>
-              {isArabic ? <BsChevronLeft aria-hidden /> : <BsChevronRight aria-hidden />}
-            </button>
-          </>
-        ) : null}
       </div>
       {adminSlides.length > 0 ? (
         <button type="button" className={styles.adminOff} onClick={hideAdmin}>

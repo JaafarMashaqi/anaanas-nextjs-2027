@@ -384,13 +384,37 @@ export default function MarketPulseCardClient({
   const scroller = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
   const [focus, setFocus] = useState<PulseMetricId | null>(null)
+  const [face, setFace] = useState(0)
+  const [facePaused, setFacePaused] = useState(false)
   const drawerId = variant === 'rail' ? 'market-pulse-drawer-rail' : 'market-pulse-drawer-stack'
   const isArabic = locale === 'ar'
   const railOrder = ['listings', 'online', 'searching', 'hot', 'auctions', 'commerce', 'sold']
   const railMetrics = model.metrics
     .filter((metric) => railOrder.includes(metric.id) && (metric.level === 'live' ? metric.raw != null : metric.level === 'demo'))
     .sort((a, b) => railOrder.indexOf(a.id) - railOrder.indexOf(b.id))
-  const detailsLabel = open ? (isArabic ? 'إخفاء' : 'Hide') : isArabic ? 'التفاصيل' : 'Details'
+  const detailsLabel = open ? (isArabic ? 'أقل' : 'Less') : isArabic ? 'التفاصيل' : 'Details'
+
+  useEffect(() => {
+    if (facePaused || variant !== 'rail') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const timer = window.setTimeout(() => setFace((value) => (value + 1) % 3), 9000)
+    return () => window.clearTimeout(timer)
+  }, [face, facePaused, variant])
+
+  const sampleFace =
+    face === 1
+      ? {
+          title: isArabic ? 'اهتمامات مذكورة كعيّنة' : 'Sample interests',
+          lines: isArabic
+            ? ['سيارات، ثم جوالات، في قائمة الواجهة', 'لا حجم بحث من الخادم']
+            : ['Cars, then phones, in the interface list', 'No search volume from the server'],
+        }
+      : {
+          title: isArabic ? 'فرص مذكورة كعيّنة' : 'Sample chances',
+          lines: isArabic
+            ? ['لا مطابقات محفوظة', 'المزادات الحية تبقى رقمها في الشريط']
+            : ['No saved matches', 'Live auctions stay as the rail number'],
+        }
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
@@ -438,6 +462,12 @@ export default function MarketPulseCardClient({
     <section className={variant === 'rail' ? styles.rail : styles.stack} aria-label={t('home.marketPulse', locale)}>
       {head}
       <div
+        className={styles.face}
+        onMouseEnter={() => setFacePaused(true)}
+        onMouseLeave={() => setFacePaused(false)}
+      >
+        {face === 0 ? (
+      <div
         ref={scroller}
         className={styles.railTrack}
         tabIndex={0}
@@ -450,6 +480,18 @@ export default function MarketPulseCardClient({
             <MetricCard compact metric={metric} locale={locale} pressed={open && focus === metric.id} onOpen={openMetric} />
           </div>
         ))}
+      </div>
+        ) : (
+          <div className={styles.faceCopy}>
+            <strong>{sampleFace.title}</strong>
+            {sampleFace.lines.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+            <button type="button" onClick={() => setFace(0)}>
+              {isArabic ? 'الأرقام' : 'Numbers'}
+            </button>
+          </div>
+        )}
       </div>
       {open ? (
         <PulseDrawer

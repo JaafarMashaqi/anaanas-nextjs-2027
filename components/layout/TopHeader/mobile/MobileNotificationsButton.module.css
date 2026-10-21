@@ -26,6 +26,10 @@
   border-radius: 8px;
 }
 
+.btnLive {
+  color: #b58100;
+}
+
 .iconWrap {
   display: inline-flex;
   align-items: center;

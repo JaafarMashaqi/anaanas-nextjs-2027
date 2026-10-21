@@ -15,7 +15,6 @@ import NotificationsBell from './NotificationsBell'
 import ProfileDropdown from './ProfileDropdown'
 import StyledHeader from './StyledHeader'
 import MobileSectionsDrawer from './MobileSectionsDrawer'
-import CountryDropdown from './CountryDropdown'
 import LocaleDropdown from './LocaleDropdown'
 import BetaBadge from './BetaBadge'
 import { DEFAULT_LOCALE, isSupportedLocale } from '@/lib/localization'
@@ -170,15 +169,6 @@ const TopHeader = () => {
           </button>
           ) : null}
 
-          {/* Country picker — full on desktop, compact on mobile */}
-          <div className="d-none d-lg-inline-flex">
-            <CountryDropdown locale={locale} />
-          </div>
-          <div className="d-lg-none">
-            <CountryDropdown locale={locale} compact />
-          </div>
-
-          {/* Language picker — full on desktop, compact on mobile */}
           <div className="d-none d-lg-inline-flex">
             <LocaleDropdown />
           </div>

@@ -10,9 +10,10 @@ import type { SupportedLocale } from '@/lib/localization'
 import styles from './LanguageSelectorModal.module.css'
 
 const PLANNED_NAMES: Record<(typeof PLANNED_LOCALES)[number], { ar: string; en: string }> = {
-  tr: { ar: 'التركية', en: 'Turkish' },
-  fr: { ar: 'الفرنسية', en: 'French' },
-  es: { ar: 'الإسبانية', en: 'Spanish' },
+  tr: { ar: 'Türkçe', en: 'Türkçe' },
+  es: { ar: 'Español', en: 'Español' },
+  zh: { ar: '中文', en: '中文' },
+  fr: { ar: 'Français', en: 'Français' },
 }
 
 type LocaleCopy = {
@@ -109,8 +110,8 @@ export default function LanguageSelectorModal({
         </div>
         <p className={styles.hint}>
           {currentLocale === 'ar'
-            ? `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].ar).join('، ')} غير مفعّلة. اللغة السادسة لم تُحدَّد بعد.`
-            : `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].en).join(', ')} are not enabled. The sixth language is not chosen yet.`}
+            ? `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].ar).join('، ')} ظاهرة بالاسم، والقاموس غير جاهز.`
+            : `${PLANNED_LOCALES.map((code) => PLANNED_NAMES[code].en).join(', ')} are listed by name. Their dictionaries are not ready.`}
         </p>
       </Modal.Body>
 
