@@ -209,10 +209,14 @@
 .title {
   margin: 0 0 0.2rem;
   font-size: 0.98rem;
-  font-weight: 900;
-  color: #151515;
-  letter-spacing: -0.02em;
-  line-height: 1.3;
+  font-weight: 800;
+  color: #101828;
+  letter-spacing: 0;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .caption {

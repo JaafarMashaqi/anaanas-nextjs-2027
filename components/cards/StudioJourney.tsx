@@ -98,13 +98,6 @@ export default function StudioJourney({
   const currency = resolveCurrencyForCountry(iso2ForCountryId(catalog?.countryId))
   const cityName = catalog?.cities.find((city) => String(city.id) === catalog.cityId)?.name || ''
   const estimate = simulateCampaign({ objective, placement, tier, budget, days })
-  const checklist = [
-    title.trim() ? (ar ? 'العنوان موجود' : 'Title is set') : ar ? 'العنوان ناقص' : 'Title is missing',
-    description.trim() ? (ar ? 'الوصف موجود' : 'Description is set') : ar ? 'الوصف ناقص' : 'Description is missing',
-    catalog?.sectionId ? (ar ? 'القسم محدد' : 'Section is set') : ar ? 'القسم ناقص' : 'Section is missing',
-    catalog?.cityId ? (ar ? 'المدينة محددة' : 'City is set') : ar ? 'المدينة ناقصة' : 'City is missing',
-    files.length ? (ar ? 'هناك صور للرفع' : 'Photos are ready') : ar ? 'لا صور بعد' : 'No photos yet',
-  ]
 
   const addPhotos = (list: FileList | null) => {
     if (!list || !onFilesChange) return
@@ -377,25 +370,19 @@ export default function StudioJourney({
 
       {current.id === 'insight' ? (
         <section className={styles.panel}>
-          <h3>{ar ? 'تقدير واجهة، ليس رصد سوق' : 'An interface estimate, not market observation'}</h3>
-          <ul className={styles.list}>
-            {checklist.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          <h3>{ar ? 'جهّز الحملة' : 'Prepare the campaign'}</h3>
           <p className={styles.hint}>
             {ar
-              ? 'هذه قائمة نقص. ليست درجة جودة ولا طلب مشترين.'
-              : 'This is a missing-pieces list. It is not a quality score and not buyer demand.'}
+              ? `${[title.trim(), description.trim(), catalog?.sectionId, catalog?.cityId, files.length].filter(Boolean).length} من ٥ عناصر جاهزة. هذا اكتمال المسودة، وليس درجة طلب.`
+              : `${[title.trim(), description.trim(), catalog?.sectionId, catalog?.cityId, files.length].filter(Boolean).length} of 5 pieces are ready. This is draft completeness, not demand.`}
           </p>
           <p className={styles.hint}>
-            {cityName
-              ? ar
-                ? `لا طلب جغرافي لـ ${cityName}.`
-                : `There is no geographic demand for ${cityName}.`
-              : ar
-                ? 'لا مدينة، لذلك لا تقدير جغرافي.'
-                : 'No city, so there is no geographic estimate.'}
+            {ar
+              ? `الجمهور الظاهر: ${cityName || 'المدينة التي تختارها'} · ${catalog?.sections.find((section) => section.id === catalog.sectionId)?.name || 'القسم الذي تختاره'}. النشر المسائي اقتراح للواجهة.`
+              : `Visible audience: ${cityName || 'the city you choose'} · ${catalog?.sections.find((section) => section.id === catalog.sectionId)?.name || 'the section you choose'}. Evening is an interface suggestion.`}
+          </p>
+          <p className={styles.hint}>
+            <Link href={`/${locale}/membership`}>{ar ? 'ميزة Elite: أدوات الحملات المتقدمة من صفحة العضوية.' : 'Elite: the advanced campaign tools live on the membership page.'}</Link>
           </p>
           {title.trim() ? (
             <Link href={`/${locale}/search?q=${encodeURIComponent(title.trim())}`}>

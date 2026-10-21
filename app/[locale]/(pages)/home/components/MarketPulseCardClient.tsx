@@ -404,16 +404,16 @@ export default function MarketPulseCardClient({
   const sampleFace =
     face === 1
       ? {
-          title: isArabic ? 'اهتمامات مذكورة كعيّنة' : 'Sample interests',
-          lines: isArabic
-            ? ['سيارات، ثم جوالات، في قائمة الواجهة', 'لا حجم بحث من الخادم']
-            : ['Cars, then phones, in the interface list', 'No search volume from the server'],
+          title: isArabic ? 'الطلب يرتفع على تويوتا في عمّان' : 'Toyota interest is rising in Amman',
+          lines: isArabic ? ['عيّنة واحدة للواجهة، وليست إحصائية اليوم.'] : ['One interface sample, not today’s statistic.'],
+          href: `/${locale}/search?q=${encodeURIComponent('تويوتا')}`,
+          action: isArabic ? 'اعرض الإعلانات' : 'See listings',
         }
       : {
-          title: isArabic ? 'فرص مذكورة كعيّنة' : 'Sample chances',
-          lines: isArabic
-            ? ['لا مطابقات محفوظة', 'المزادات الحية تبقى رقمها في الشريط']
-            : ['No saved matches', 'Live auctions stay as the rail number'],
+          title: isArabic ? 'مزاد على جهاز يقترب من نهايته' : 'An electronics auction is nearing its end',
+          lines: isArabic ? ['الوقت الحقيقي يبقى في المزادات.'] : ['The real clock stays on the auctions page.'],
+          href: `/${locale}/pages/auction`,
+          action: isArabic ? 'افتح المزادات' : 'Open auctions',
         }
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -487,6 +487,7 @@ export default function MarketPulseCardClient({
             {sampleFace.lines.map((line) => (
               <p key={line}>{line}</p>
             ))}
+            <Link href={sampleFace.href}>{sampleFace.action}</Link>
             <button type="button" onClick={() => setFace(0)}>
               {isArabic ? 'الأرقام' : 'Numbers'}
             </button>
