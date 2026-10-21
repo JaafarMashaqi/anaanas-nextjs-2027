@@ -57,8 +57,8 @@ const MobileProfileButton = ({ locale }: Props) => {
         <div className={styles.panel} role="menu">
           <Link href={`/${locale}/profile/feed`} role="menuitem">{ar ? 'الملف الشخصي' : 'Profile'}</Link>
           <Link href={`/${locale}/my-posts`} role="menuitem">{ar ? 'إعلاناتي' : 'My listings'}</Link>
-          <Link href={`/${locale}/settings/account`} role="menuitem">{ar ? 'المحفوظات' : 'Saved'}</Link>
-          <Link href={`/${locale}/settings/account`} role="menuitem">{ar ? 'عضويتي' : 'Membership'}</Link>
+          <Link href={`/${locale}/saved`} role="menuitem">{ar ? 'المحفوظات' : 'Saved'}</Link>
+          <Link href={`/${locale}/membership`} role="menuitem">{ar ? 'عضويتي' : 'Membership'}</Link>
           <Link href={`/${locale}/settings/account`} role="menuitem">{ar ? 'الإعدادات' : 'Settings'}</Link>
           <button type="button" role="menuitem" onClick={() => void logout()} disabled={loggingOut}>
             {loggingOut ? (ar ? 'جارٍ الخروج' : 'Signing out') : ar ? 'تسجيل الخروج' : 'Log out'}

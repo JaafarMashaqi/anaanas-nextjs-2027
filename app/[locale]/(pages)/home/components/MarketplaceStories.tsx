@@ -1,12 +1,8 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import { getApiUrl } from '@/lib/api/config'
-import { resolveMediaUrl } from '@/lib/media/resolveMediaUrl'
 import type { SupportedLocale } from '@/lib/localization'
 
 import styles from './MarketplaceStories.module.css'
@@ -29,61 +25,54 @@ type Story = {
 const STORIES: Story[] = [
   {
     id: 'cars',
-    nameAr: 'سيارات',
-    nameEn: 'Cars',
-    kindAr: 'قسم',
-    kindEn: 'Category',
-    bodyAr: 'قصة واجهة للسيارات. ليست حساب بائع، وتفتح البحث الحقيقي عن السيارات.',
-    bodyEn: 'A cars interface story. It is not a seller account, and it opens a real car search.',
+    nameAr: 'متجر النخبة',
+    nameEn: 'Nokhba Store',
+    kindAr: 'قصة متجر · تجريبي',
+    kindEn: 'Store story · demo',
+    bodyAr: 'عرض واجهة لمتجر. ليس بثاً، ولا حساباً حقيقياً.',
+    bodyEn: 'A store-story preview. It is not a broadcast or a real account.',
     expiresAr: 'معاينة واجهة',
     expiresEn: 'Interface preview',
     image: 'sit',
   },
   {
     id: 'homes',
-    nameAr: 'عقارات',
-    nameEn: 'Homes',
-    kindAr: 'قسم',
-    kindEn: 'Category',
-    bodyAr: 'قصة واجهة للعقارات. لا يوجد بث، ولا تُعرض كحساب حقيقي.',
-    bodyEn: 'A homes interface story. There is no live stream, and it is not shown as a real account.',
+    nameAr: 'عرض جديد',
+    nameEn: 'New offer',
+    kindAr: 'عرض · تجريبي',
+    kindEn: 'Offer · demo',
+    bodyAr: 'تمييز لعرض جديد. لا يغيّر إعلانات السوق الحقيقية.',
+    bodyEn: 'A highlight for a new offer. It does not change real listings.',
     expiresAr: 'معاينة واجهة',
     expiresEn: 'Interface preview',
     image: 'alt',
   },
   {
     id: 'phones',
-    nameAr: 'موبايلات',
-    nameEn: 'Phones',
-    kindAr: 'قسم',
-    kindEn: 'Category',
-    bodyAr: 'قصة واجهة للموبايلات. ليست إعلاناً منشوراً.',
-    bodyEn: 'A phones interface story. It is not a published listing.',
+    nameAr: 'مزاد اليوم',
+    nameEn: 'Today’s auction',
+    kindAr: 'مزاد · تجريبي',
+    kindEn: 'Auction · demo',
+    bodyAr: 'قصة مزاد للواجهة. المزايدة الحقيقية تبقى في صفحة المزادات.',
+    bodyEn: 'An auction story for the interface. Real bidding stays on the auctions page.',
     expiresAr: 'معاينة واجهة',
     expiresEn: 'Interface preview',
     image: 'sit',
   },
   {
     id: 'jobs',
-    nameAr: 'وظائف',
-    nameEn: 'Jobs',
-    kindAr: 'قسم',
-    kindEn: 'Category',
-    bodyAr: 'قصة واجهة للوظائف. المسودة تبقى على هذا الجهاز.',
-    bodyEn: 'A jobs interface story. A draft stays on this device.',
+    nameAr: 'بائع موثّق',
+    nameEn: 'Verified seller',
+    kindAr: 'بائع · تجريبي',
+    kindEn: 'Seller · demo',
+    bodyAr: 'مثال لقصة بائع. الشارة لا تمنح توثيقاً حقيقياً.',
+    bodyEn: 'A seller-story example. The badge does not grant real verification.',
     draft: true,
     expiresAr: 'لن تُنشر حتى يتوفر مسار القصص',
     expiresEn: 'It will not publish until a stories route exists',
     image: 'alt',
   },
 ]
-
-function sectionIcon(icon?: string | null) {
-  if (!icon) return null
-  if (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('//')) return resolveMediaUrl(icon)
-  const path = icon.startsWith('/') ? icon : `/${icon}`
-  return resolveMediaUrl(getApiUrl(path))
-}
 
 export default function MarketplaceStories({
   locale,
@@ -92,6 +81,7 @@ export default function MarketplaceStories({
   locale: SupportedLocale
   sections?: { id: number; slug: string; name: string; icon: string | null }[]
 }) {
+  void sections
   const ar = locale === 'ar'
   const [openId, setOpenId] = useState<string | null>(null)
   const [liked, setLiked] = useState(false)
@@ -245,38 +235,21 @@ export default function MarketplaceStories({
   return (
     <section className={styles.wrap} aria-label={ar ? 'قصص السوق' : 'Marketplace stories'}>
       <div className={styles.head}>
-        <h2>{ar ? 'قصص الأقسام' : 'Category stories'}</h2>
+        <h2>{ar ? 'قصص' : 'Stories'}</h2>
       </div>
       <div className={styles.row}>
         <button type="button" className={styles.item} onClick={add}>
           <span className={`${styles.ring} ${styles.add}`}>+</span>
           <span>{ar ? 'أضف قصة' : 'Add story'}</span>
         </button>
-        {sections.slice(0, 8).map((section) => {
-          const icon = sectionIcon(section.icon)
-          return (
-            <Link key={section.id} href={`/${locale}/sections/${section.slug}`} className={styles.item}>
-              <span className={styles.ring}>
-                {icon ? (
-                  <Image src={icon} alt="" width={52} height={52} unoptimized />
-                ) : (
-                  <span className={styles.letter}>{(section.name || 'أ').slice(0, 1)}</span>
-                )}
-              </span>
-              <span>{section.name}</span>
-            </Link>
-          )
-        })}
-        {sections.length === 0
-          ? STORIES.map((item) => (
-              <button key={item.id} type="button" className={styles.item} onClick={() => setOpenId(item.id)}>
-                <span className={`${styles.ring} ${item.draft ? styles.draft : ''}`}>
-                  <span className={styles.letter}>{(ar ? item.nameAr : item.nameEn).slice(0, 1)}</span>
-                </span>
-                <span>{ar ? item.nameAr : item.nameEn}</span>
-              </button>
-            ))
-          : null}
+        {STORIES.map((item) => (
+          <button key={item.id} type="button" className={styles.item} onClick={() => setOpenId(item.id)}>
+            <span className={`${styles.ring} ${item.draft ? styles.draft : ''}`}>
+              <span className={styles.letter}>{(ar ? item.nameAr : item.nameEn).slice(0, 1)}</span>
+            </span>
+            <span>{ar ? item.nameAr : item.nameEn}</span>
+          </button>
+        ))}
       </div>
       {viewer}
     </section>

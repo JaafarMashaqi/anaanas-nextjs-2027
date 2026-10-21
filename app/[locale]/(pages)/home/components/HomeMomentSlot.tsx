@@ -8,8 +8,8 @@ import type { SupportedLocale } from '@/lib/localization'
 import styles from './HomeMomentSlot.module.css'
 
 type Slide = {
-  id: 'greet' | 'coffee' | 'insight'
-  kind: 'greeting' | 'coffee' | 'insight'
+  id: 'greet' | 'coffee' | 'insight' | 'deal' | 'auction'
+  kind: 'greeting' | 'coffee' | 'insight' | 'deal' | 'auction'
   title: string
   line: string
   action: string
@@ -88,31 +88,48 @@ export default function HomeMomentSlot({
         : 'We hope you find it sooner than you expect.',
       action: '',
       composer: true,
-      ms: 12000,
+      ms: 9000,
     }
     const coffee: Slide = {
       id: 'coffee',
       kind: 'coffee',
-      title: ar ? 'قهوة ساخنة وفرص جديدة' : 'Hot coffee, then new chances',
+      title: ar ? 'صار بدها فنجان قهوة' : 'Time for a cup of coffee',
       line: ar
-        ? 'صار بدها فنجان قهوة. لحظة من الواجهة، وليست شراكة مع العميد.'
-        : 'Time for a cup. An interface moment, not a partnership.',
+        ? 'لحظة من الواجهة. ليست شراكة مع بن العميد.'
+        : 'An interface moment. Not a partnership.',
       action: '',
       store: true,
-      ms: 8000,
+      ms: 12000,
     }
     const insight: Slide = {
       id: 'insight',
       kind: 'insight',
-      title: ar ? 'السوق أمامك' : 'The market is here',
+      title: ar ? 'الطلب على كامري يظهر في البحث' : 'Camry keeps showing up in search',
       line: ar
-        ? `${countryLabel}. الأرقام الحية في النبض، والأرقام التجريبية موسومة.`
-        : `${countryLabel}. Live figures are in the pulse. Demo figures are marked.`,
+        ? 'مثال من وضع العرض، وليس قياساً حياً للطلب.'
+        : 'A demo example, not a live demand measurement.',
       action: '',
       composer: true,
+      ms: 14000,
+    }
+    const deal: Slide = {
+      id: 'deal',
+      kind: 'deal',
+      title: ar ? 'فرصة هادئة، لا استعجال مصطنع' : 'A calm opportunity, not fake urgency',
+      line: ar ? 'عرض تجريبي. لا يوجد مشتري حقيقي خلف هذه الرسالة.' : 'A demo offer. No real buyer is behind this message.',
+      action: '',
       ms: 10000,
     }
-    return [greeting, coffee, insight].filter((slide) => slide.id === 'greet' || !dismissed.includes(slide.id))
+    const auction: Slide = {
+      id: 'auction',
+      kind: 'auction',
+      title: ar ? 'مزاد للمشاهدة' : 'An auction to watch',
+      line: ar ? 'سيناريو تجريبي. العد التنازلي الحقيقي يظهر فقط مع وقت من الخادم.' : 'A demo scenario. A real countdown appears only with a server timestamp.',
+      action: '',
+      href: `/${locale}/pages/auction`,
+      ms: 10000,
+    }
+    return [greeting, coffee, insight, deal, auction].filter((slide) => slide.id === 'greet' || !dismissed.includes(slide.id))
   }, [ar, countryLabel, dismissed, displayName, hello])
 
   const visible = slides
@@ -124,7 +141,13 @@ export default function HomeMomentSlot({
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const timer = window.setTimeout(() => {
       const active = document.activeElement
-      if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return
+      if (
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        document.getElementById('ananas-composer')?.getAttribute('data-expanded') === '1'
+      ) {
+        return
+      }
       setIndex((value) => value + 1)
     }, slide.ms)
     return () => window.clearTimeout(timer)
@@ -141,9 +164,17 @@ export default function HomeMomentSlot({
         ? ar
           ? 'مختبر التجربة · ليست شراكة'
           : 'Experience lab · not a partnership'
-        : ar
-          ? 'بعد القهوة'
-          : 'After coffee'
+        : slide.kind === 'deal'
+          ? ar
+            ? 'وضع العرض'
+            : 'Demo mode'
+          : slide.kind === 'auction'
+            ? ar
+              ? 'سيناريو تجريبي'
+              : 'Demo scenario'
+            : ar
+              ? 'وضع العرض'
+              : 'Demo mode'
 
   return (
     <section
@@ -175,25 +206,11 @@ export default function HomeMomentSlot({
           <span className={styles.cupBody} />
         </span>
       ) : null}
-      <div className={styles.copy}>
-        <p className={styles.kicker}>{kicker}</p>
+      <div key={slide.id} className={styles.copy} data-tone={slide.kind}>
+        {slide.kind === 'greeting' ? null : <p className={styles.kicker}>{kicker}</p>}
         <h2>{slide.title}</h2>
         <p>{slide.line}</p>
       </div>
-      {visible.length > 1 ? (
-        <div className={styles.dots} role="tablist" aria-label={ar ? 'الشرائح' : 'Slides'}>
-          {visible.map((item, itemIndex) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={itemIndex === safeIndex}
-              className={itemIndex === safeIndex ? styles.dotOn : styles.dot}
-              onClick={() => setIndex(itemIndex)}
-            />
-          ))}
-        </div>
-      ) : null}
     </section>
   )
 }

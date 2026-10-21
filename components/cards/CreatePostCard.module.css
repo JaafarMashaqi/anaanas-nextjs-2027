@@ -22,12 +22,12 @@
 /* بدون صندوق خارجي: لا خلفية ولا حد ولا ظل — الصف الداخلي (الكبسولة) يحمل المظهر */
 .composerCardAtmosphere {
   position: relative;
-  background: #fff8de;
+  background: transparent;
   border: none;
   box-shadow: none;
-  border-radius: 18px;
+  border-radius: 0;
   overflow: visible;
-  padding: 0.45rem;
+  padding: 0;
 }
 
 .composerSrOnly {
@@ -1358,10 +1358,18 @@
   display: flex;
 }
 
+.composerHeroCollapsed .composerHeroInlineShell {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  min-height: 38px;
+}
+
 .composerHeroCollapsed {
-  padding: 0.55rem 0.7rem 0.4rem;
+  padding: 0.45rem 0.7rem 0.35rem;
+  border: 1px solid #f3e7b8;
   border-inline-start: 3px solid #ffc928;
-  background: linear-gradient(180deg, #fffefb 0%, #fff8de 100%);
+  background: #fffefb;
 }
 
 .composerHeroCollapsed .composerHeroHeading {

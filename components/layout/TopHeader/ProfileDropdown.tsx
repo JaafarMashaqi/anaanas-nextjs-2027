@@ -153,10 +153,10 @@ const ProfileDropdown = ({ locale = 'ar' }: { locale?: SupportedLocale }) => {
           <BsStars aria-hidden />
           <span>{locale === 'ar' ? 'إعلاناتي' : 'My listings'}</span>
         </DropdownItem>
-        <DropdownItem as={Link} href={`/${locale}/settings/account`} className={styles.item}>
+        <DropdownItem as={Link} href={`/${locale}/saved`} className={styles.item}>
           <span>{locale === 'ar' ? 'المحفوظات' : 'Saved'}</span>
         </DropdownItem>
-        <DropdownItem as={Link} href={`/${locale}/settings/account`} className={styles.item}>
+        <DropdownItem as={Link} href={`/${locale}/membership`} className={styles.item}>
           <span>{locale === 'ar' ? 'عضويتي' : 'Membership'}</span>
         </DropdownItem>
 

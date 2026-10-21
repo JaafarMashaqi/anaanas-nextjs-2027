@@ -2,10 +2,53 @@
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  min-height: 0;
+  min-height: 72px;
   padding: 0.15rem 0;
   background: transparent;
   color: #101828;
+}
+
+.copy {
+  min-width: 0;
+  flex: 1 1 auto;
+  animation: moment-arrive 680ms ease both;
+}
+
+.copy[data-tone='deal'],
+.copy[data-tone='auction'],
+.copy[data-tone='coffee'] {
+  animation: moment-arrive 680ms ease both, moment-tone 1.4s ease 680ms 2;
+}
+
+@keyframes moment-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes moment-tone {
+  0%,
+  100% {
+    filter: none;
+  }
+  45% {
+    filter: saturate(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy,
+  .copy[data-tone='deal'],
+  .copy[data-tone='auction'],
+  .copy[data-tone='coffee'],
+  .sky[data-sky='day'] {
+    animation: none;
+  }
 }
 
 .card[data-kind='greeting'] .actions,

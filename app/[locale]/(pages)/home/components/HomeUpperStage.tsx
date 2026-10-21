@@ -136,11 +136,15 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
         <MobileHeaderSearchBar locale={locale} />
       </div>
 
+      <PlaceLanguageBar />
+
+      {composer}
+
+      <MobileSectionsSwiper sections={sections} locale={locale} visibleCount={6} />
+
+      <MarketplaceStories locale={locale} sections={sections} />
+
       <div className={styles.actions} role="group" aria-label={isArabic ? 'إجراءات سريعة' : 'Quick actions'}>
-        <button type="button" data-composer-intent="sale" className={styles.action} onClick={() => openComposer('sale')}>
-          <SellIcon />
-          {isArabic ? 'أبيع' : 'Sell'}
-        </button>
         <button type="button" data-composer-intent="wanted" className={styles.actionWanted} onClick={() => openComposer('wanted')}>
           <WantedIcon />
           {isArabic ? 'مطلوب الآن' : 'Wanted now'}
@@ -166,14 +170,6 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
               : 'Matches are not connected to a service yet. Use search for current listings.'}
         </p>
       ) : null}
-
-      {composer}
-
-      <MobileSectionsSwiper sections={sections} locale={locale} visibleCount={6} />
-
-      <MarketplaceStories locale={locale} sections={sections} />
-
-      <PlaceLanguageBar />
 
       <HomeBanner locale={locale} />
 
@@ -212,14 +208,6 @@ export default function HomeUpperStage({ locale, countryLabel, trending = [], la
         </button>
       ) : null}
     </div>
-  )
-}
-
-function SellIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden>
-      <path fill="currentColor" d="M12 4.2 13.6 8l4.2.4-3.2 2.8.9 4.1L12 13.4 8.5 15.3l.9-4.1L6.2 8.4 10.4 8 12 4.2z" />
-    </svg>
   )
 }
 
