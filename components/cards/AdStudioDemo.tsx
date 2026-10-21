@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 
 import styles from './AdStudioDemo.module.css'
 
@@ -18,6 +19,8 @@ export default function AdStudioDemo({
   onUseTitle,
   onDescribe,
   onContinue,
+  files = [],
+  onFilesChange,
 }: {
   locale: string
   mode: Mode
@@ -25,6 +28,8 @@ export default function AdStudioDemo({
   onUseTitle: (value: string) => void
   onDescribe?: (value: string) => void
   onContinue?: () => void
+  files?: File[]
+  onFilesChange?: (files: File[]) => void
 }) {
   const ar = locale === 'ar'
   const storageKey = `ananas.demoComposer.${mode}`
@@ -54,6 +59,7 @@ export default function AdStudioDemo({
     const checks = [title.trim(), description.trim(), price.trim(), place.trim(), category.trim()]
     return Math.round((checks.filter(Boolean).length / checks.length) * 100)
   }, [title, description, price, place, category])
+  const sampleReach = Number(budget) * Number(days) * 40
 
   const saveDraft = () => {
     sessionStorage.setItem(
@@ -67,21 +73,45 @@ export default function AdStudioDemo({
     )
   }
 
-  const [photos, setPhotos] = useState<{ id: string; url: string; name: string }[]>([])
+  const [objective, setObjective] = useState('messages')
+  const [placement, setPlacement] = useState('home')
+  const previews = useMemo(() => files.map((file) => ({ file, url: URL.createObjectURL(file) })), [files])
+
+  useEffect(() => {
+    return () => {
+      previews.forEach((item) => URL.revokeObjectURL(item.url))
+    }
+  }, [previews])
 
   const addPhotos = (list: FileList | null) => {
-    if (!list) return
-    const next = [...list].slice(0, 6).map((file) => ({
-      id: `${file.name}-${file.size}-${file.lastModified}`,
-      url: URL.createObjectURL(file),
-      name: file.name,
-    }))
-    setPhotos((current) => [...current, ...next].slice(0, 6))
+    if (!list || !onFilesChange) return
+    const accepted: File[] = []
+    for (const file of [...list]) {
+      const okType = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)
+      if (!okType || file.size > 5 * 1024 * 1024) continue
+      accepted.push(file)
+    }
+    const next = [...files, ...accepted].slice(0, 5)
+    onFilesChange(next)
     setStatus(
-      ar
-        ? 'معاينة محلية فقط. الرفع الحقيقي يبدأ في خطوة الصور بعد اكتمال العنوان والوصف.'
-        : 'Local preview only. The real upload starts on the photo step after the title and description are valid.',
+      accepted.length === 0
+        ? ar
+          ? 'لم تُقبل الصور. المسموح JPEG أو PNG أو WebP حتى 5 ميغابايت، وبحد 5 صور.'
+          : 'No photos were accepted. JPEG, PNG, or WebP up to 5 MB, and at most 5 photos.'
+        : ar
+          ? 'هذه الملفات نفسها ستُرفع في خطوة الصور. لم تُنشر بعد.'
+          : 'These are the same files the photo step will upload. They are not published yet.',
     )
+  }
+
+  const movePhoto = (index: number, direction: -1 | 1) => {
+    if (!onFilesChange) return
+    const target = index + direction
+    if (target < 0 || target >= files.length) return
+    const next = [...files]
+    const [item] = next.splice(index, 1)
+    next.splice(target, 0, item)
+    onFilesChange(next)
   }
 
   return (
@@ -180,10 +210,10 @@ export default function AdStudioDemo({
         </label>
       </div>
       <label className={styles.field}>
-        <span>{ar ? 'صور للمعاينة' : 'Preview photos'}</span>
+        <span>{ar ? 'صور الإعلان' : 'Listing photos'}</span>
         <input
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           multiple
           onChange={(event) => {
             addPhotos(event.target.files)
@@ -191,28 +221,73 @@ export default function AdStudioDemo({
           }}
         />
       </label>
-      {photos.length > 0 ? (
-        <div className={styles.suggestions}>
-          {photos.map((photo, index) => (
-            <button
-              key={photo.id}
-              type="button"
-              onClick={() => setPhotos((current) => current.filter((item) => item.id !== photo.id))}
-            >
-              {index + 1}. {photo.name} · {ar ? 'إزالة' : 'Remove'}
-            </button>
+      {previews.length > 0 ? (
+        <div className={styles.thumbs}>
+          {previews.map((photo, index) => (
+            <div key={`${photo.file.name}-${photo.file.size}-${index}`} className={styles.thumb}>
+              <img src={photo.url} alt="" />
+              <div>
+                <button type="button" onClick={() => movePhoto(index, -1)} aria-label={ar ? 'تقديم' : 'Move earlier'}>
+                  ‹
+                </button>
+                <button type="button" onClick={() => movePhoto(index, 1)} aria-label={ar ? 'تأخير' : 'Move later'}>
+                  ›
+                </button>
+                <button type="button" onClick={() => onFilesChange?.(files.filter((_, item) => item !== index))}>
+                  {ar ? 'إزالة' : 'Remove'}
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       ) : null}
-      <p className={styles.hint}>
-        {ar
-          ? `اكتمال المسودة ${progress}٪. هذا ليس تقييم جودة من نموذج. أفضل نافذة مقترحة من الواجهة: مساءً بعد السادسة بتوقيت عمّان، وليست نتيجة حملات.`
-          : `Draft completeness ${progress}%. This is not a model quality score. The interface suggests evenings after 18:00 Amman time, not a campaign result.`}
-      </p>
+      <section className={styles.panel}>
+        <h3>{ar ? 'ذكاء معلّم كتجربة' : 'Labeled intelligence'}</h3>
+        <p>
+          {ar
+            ? 'لا طلب ولا أسعار مشابهة من الخادم. لن يُحسب سعر مقترح.'
+            : 'The server has no demand and no similar prices. No price is suggested.'}
+        </p>
+        <p>
+          {ar
+            ? `وصول افتراضي: ${sampleReach.toLocaleString('ar-JO')}. الحساب هو الميزانية × الأيام × 40. الرقم 40 ثابت هنا وليس من حملات.`
+            : `Assumed reach: ${sampleReach.toLocaleString('en-US')}. The sum is budget × days × 40. The 40 is fixed here and does not come from campaigns.`}
+        </p>
+        <p>{ar ? 'لا سجل لأوقات النشر، لذلك لا توجد ساعة أفضل.' : 'There is no posting-time history, so there is no best hour.'}</p>
+        {title.trim() ? (
+          <Link href={`/${locale}/search?q=${encodeURIComponent(title.trim())}`}>
+            {ar ? 'ابحث عن إعلانات بهذا العنوان' : 'Search listings with this title'}
+          </Link>
+        ) : null}
+      </section>
+      <section className={styles.panel}>
+        <h3>{ar ? 'حملة غير مربوطة' : 'Unconnected campaign'}</h3>
+        <div className={styles.row}>
+          <label className={styles.field}>
+            <span>{ar ? 'الهدف' : 'Objective'}</span>
+            <select value={objective} onChange={(event) => setObjective(event.target.value)}>
+              <option value="messages">{ar ? 'رسائل' : 'Messages'}</option>
+              <option value="views">{ar ? 'مشاهدات' : 'Views'}</option>
+            </select>
+          </label>
+          <label className={styles.field}>
+            <span>{ar ? 'الموضع' : 'Placement'}</span>
+            <select value={placement} onChange={(event) => setPlacement(event.target.value)}>
+              <option value="home">{ar ? 'الرئيسية' : 'Home'}</option>
+              <option value="search">{ar ? 'البحث' : 'Search'}</option>
+            </select>
+          </label>
+        </div>
+        <p>
+          {ar
+            ? 'لا أسعار للباقات ولا استهداف مدينة. الاختيار يبقى في هذا المتصفح.'
+            : 'There are no package prices and no city targeting. The choice stays in this browser.'}
+        </p>
+      </section>
       <div className={styles.actions}>
         {onContinue ? (
           <button type="button" className={styles.primary} onClick={onContinue}>
-            {ar ? 'إلى الصور الحقيقية' : 'Continue to real photos'}
+            {ar ? 'إلى خطوة الصور' : 'Continue to the photo step'}
           </button>
         ) : null}
         <button type="button" className={styles.primary} onClick={saveDraft}>

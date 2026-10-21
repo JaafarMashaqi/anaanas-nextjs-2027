@@ -1,10 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import type { SupportedLocale } from '@/lib/localization'
-import { demoMarketEvents } from '@/lib/experience/demoMarketEvents'
 
 import styles from './HomeDiscoveryRail.module.css'
 
@@ -85,16 +85,18 @@ export default function HomeDiscoveryRail({ locale }: { locale: SupportedLocale 
       {active ? (
         <div className={styles.note}>
           <p>{ar ? active.noteAr : active.noteEn}</p>
-          <ul>
-            {demoMarketEvents(locale)
-              .slice(0, 2)
-              .map((event) => (
-                <li key={event.id}>
-                  {ar ? event.textAr : event.textEn}
-                  <span> · {ar ? 'عيّنة' : 'Sample'}</span>
-                </li>
-              ))}
-          </ul>
+          {active.id === 'auctions' || active.id === 'stores' ? null : (
+            <p>{ar ? 'لا طبقة إضافية فوق الإعلانات الحقيقية.' : 'There is no extra layer on top of the real listings.'}</p>
+          )}
+          <Link href={active.id === 'nearby' ? '#home-latest' : `/${locale}${active.href || ''}`}>
+            {active.kind === 'route'
+              ? ar
+                ? 'افتح الصفحة'
+                : 'Open the page'
+              : ar
+                ? 'ارجع إلى الإعلانات الحقيقية'
+                : 'Back to the real listings'}
+          </Link>
         </div>
       ) : null}
     </section>

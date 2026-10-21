@@ -40,6 +40,64 @@
   background: #7c3aed;
 }
 
+.thumbs {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+}
+
+.thumb {
+  flex: 0 0 auto;
+  width: 84px;
+}
+
+.thumb img {
+  display: block;
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #eceaf3;
+}
+
+.thumb div {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.thumb button {
+  border: 0;
+  background: transparent;
+  color: #5b21b6;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.panel h3,
+.panel p {
+  margin: 0;
+}
+
+.panel h3 {
+  font-size: 0.78rem;
+}
+
+.panel p,
+.panel a {
+  font-size: 0.72rem;
+  color: #667085;
+}
+
 .suggestions,
 .actions,
 .row {

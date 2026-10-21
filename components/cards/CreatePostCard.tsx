@@ -157,6 +157,8 @@ type CreatePostHeroShellProps = {
   onAddAdClick: () => void
   onDescribe?: (value: string) => void
   onContinue?: () => void
+  files?: File[]
+  onFilesChange?: (files: File[]) => void
   limitOverlay?: ReactNode
 }
 
@@ -179,14 +181,17 @@ function CreatePostHeroShell({
   onAddAdClick,
   onDescribe,
   onContinue,
+  files,
+  onFilesChange,
   limitOverlay,
 }: CreatePostHeroShellProps) {
   const shellDir = isWizardRtl ? 'rtl' : 'ltr'
   const rowDir = isWizardRtl ? 'rtl' : 'ltr'
   const queuedIntent = readQueuedComposerIntent()
   const [intent, setIntent] = useState<'sale' | 'wanted' | 'auction'>(queuedIntent ?? 'sale')
-  const [studioOpen, setStudioOpen] = useState(false)
-  const [expanded, setExpanded] = useState(queuedIntent !== null || title.trim().length > 0)
+  const [studioOpen, setStudioOpen] = useState(true)
+  const [expanded, setExpanded] = useState(true)
+  const skipInitialFocus = useRef(true)
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
     { Icon: BsBrush, label: t('createPost.heroTagDesc', locale as any) },
@@ -207,6 +212,10 @@ function CreatePostHeroShell({
   }, [])
 
   useEffect(() => {
+    if (skipInitialFocus.current) {
+      skipInitialFocus.current = false
+      return
+    }
     if (!expanded) return
     let cancelled = false
     let tries = 0
@@ -276,7 +285,15 @@ function CreatePostHeroShell({
                   : prompts[promptIndex % prompts.length]}
               </p>
             </div>
-            <button type="button" className={styles.composerCampaign} onClick={onAddAdClick}>
+            <button
+              type="button"
+              className={styles.composerCampaign}
+              onClick={() => {
+                setExpanded(true)
+                setStudioOpen(true)
+                onAddAdClick()
+              }}
+            >
               {isArabic ? 'ابدأ حملتك الآن' : 'Start your campaign'}
             </button>
           </div>
@@ -481,7 +498,7 @@ function CreatePostHeroShell({
               {isArabic ? 'استوديو متقدم' : 'Advanced studio'}
             </button>
           ) : null}
-          {intent !== 'sale' || studioOpen ? (
+          {expanded || intent !== 'sale' || studioOpen ? (
             <AdStudioDemo
               locale={locale}
               mode={intent}
@@ -489,6 +506,8 @@ function CreatePostHeroShell({
               onUseTitle={(value) => onChange({ target: { value } } as ChangeEvent<HTMLInputElement>)}
               onDescribe={onDescribe}
               onContinue={onContinue}
+              files={files}
+              onFilesChange={onFilesChange}
             />
           ) : null}
         </div>
@@ -1779,6 +1798,8 @@ const [step, setStep] = useState(1)
                   }
                   setStep(2)
                 }}
+                files={images}
+                onFilesChange={setImages}
                 onAddAdClick={async () => {
                   if (isCreationBlocked) return
                   if (!(await guardComposerEmailVerification())) return
