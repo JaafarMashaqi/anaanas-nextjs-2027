@@ -1036,8 +1036,10 @@
 
 @media (min-width: 768px) {
   .listingHero {
-    height: clamp(260px, 34vw, 360px);
-    border-radius: 20px;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    max-height: 240px;
+    border-radius: 16px;
   }
 
   .statsStrip {
