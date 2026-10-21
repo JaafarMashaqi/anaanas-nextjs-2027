@@ -40,7 +40,7 @@ import LoginRequiredDialog from '@/components/dialogs/LoginRequiredDialog'
 import PostSuccessCelebrationModal from '@/components/dialogs/PostSuccessCelebrationModal'
 import { dispatchPostCreated } from '@/lib/postCreated'
 import WizardPostPhotosStep from './WizardPostPhotosStep'
-import AdStudioDemo, { type StudioCatalog } from './AdStudioDemo'
+import StudioJourney, { type StudioCatalog } from './StudioJourney'
 import clsx from 'clsx'
 import {
   BsBullseye,
@@ -191,8 +191,8 @@ function CreatePostHeroShell({
   const rowDir = isWizardRtl ? 'rtl' : 'ltr'
   const queuedIntent = readQueuedComposerIntent()
   const [intent, setIntent] = useState<'sale' | 'wanted' | 'auction'>(queuedIntent ?? 'sale')
-  const [studioOpen, setStudioOpen] = useState(true)
-  const [expanded, setExpanded] = useState(true)
+  const [studioOpen, setStudioOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const skipInitialFocus = useRef(true)
   const tagItems = [
     { Icon: BsPencilSquare, label: t('createPost.heroTagTitle', locale as any) },
@@ -501,7 +501,7 @@ function CreatePostHeroShell({
             </button>
           ) : null}
           {expanded || intent !== 'sale' || studioOpen ? (
-            <AdStudioDemo
+            <StudioJourney
               locale={locale}
               mode={intent}
               title={title}
@@ -1026,16 +1026,16 @@ const [step, setStep] = useState(1)
   useEffect(() => {
     if (isEdit) return
     if (selectedSection) {
-      setFormValues({})
-      setNestedFields({})
       reset({
         title: (getValues('title') as string | undefined) ?? title ?? '',
         description: (getValues('description') as string | undefined) ?? description ?? '',
         section_id: selectedSection.id,
         category_id: undefined,
-        city: undefined,
-        price: undefined,
+        city: getValues('city'),
+        price: getValues('price'),
       })
+      setNestedFields({})
+      setFormValues((prev) => ({ city: getValues('city') ?? prev.city, price: getValues('price') ?? prev.price }))
       setSubStep(1)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- يشغّل عند تغيير معرّف القسم فقط؛ title/description من آخر إغلاق للـ effect
@@ -1044,16 +1044,16 @@ const [step, setStep] = useState(1)
   useEffect(() => {
     if (isEdit) return
     if (selectedCategory) {
-      setFormValues({})
-      setNestedFields({})
       reset({
         title: (getValues('title') as string | undefined) ?? title ?? '',
         description: (getValues('description') as string | undefined) ?? description ?? '',
         section_id: selectedSection?.id,
         category_id: selectedCategory.id,
-        city: undefined,
-        price: undefined,
+        city: getValues('city'),
+        price: getValues('price'),
       })
+      setNestedFields({})
+      setFormValues((prev) => ({ city: getValues('city') ?? prev.city, price: getValues('price') ?? prev.price }))
       setSubStep(1)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- يشغّل عند تغيير معرّف الفئة فقط
@@ -1113,22 +1113,27 @@ const [step, setStep] = useState(1)
 
   // جلب الحقول عند الوصول لـ step 4
   useEffect(() => {
-    if (step === 5 && selectedSection && selectedCategory) {
-      const loadFields = async () => {
-        setLoadingFields(true)
-        try {
-          const fieldsData = await fetchFields(selectedSection.id, selectedCategory.id, locale)
+    if (!selectedSection || !selectedCategory) return
+    let cancelled = false
+    const loadFields = async () => {
+      setLoadingFields(true)
+      try {
+        const fieldsData = await fetchFields(selectedSection.id, selectedCategory.id, locale)
+        if (!cancelled) {
           setFields(fieldsData)
-          setSubStep(1) // إعادة تعيين sub-step عند تحميل الحقول
-        } catch (error) {
-          console.error('Error fetching fields:', error)
-        } finally {
-          setLoadingFields(false)
+          setSubStep(1)
         }
+      } catch (error) {
+        console.error('Error fetching fields:', error)
+      } finally {
+        if (!cancelled) setLoadingFields(false)
       }
-      loadFields()
     }
-  }, [step, selectedSection, selectedCategory])
+    void loadFields()
+    return () => {
+      cancelled = true
+    }
+  }, [selectedSection, selectedCategory, locale])
 
   // Prefill dynamic attribute fields in edit mode once fields are loaded (including nested sub-fields)
   useEffect(() => {
@@ -1726,11 +1731,25 @@ const [step, setStep] = useState(1)
     sections: (sections || []).map((section) => ({ id: section.id, name: section.name })),
     categories: sectionCategories.map((category) => ({ id: category.id, name: category.name })),
     cities: (Array.isArray(cities) ? cities : []).map((city) => ({ id: city.id, name: city.name })),
+    countries: (countries || []).map((country) => ({ id: country.id, name: country.name })),
     sectionId: selectedSection?.id ?? null,
     categoryId: selectedCategory?.id ?? null,
     cityId: formValues.city ? String(formValues.city) : null,
+    countryId: selectedCountry?.id ?? null,
     price: formValues.price != null && formValues.price !== '' ? String(formValues.price) : '',
     countryName: selectedCountry?.name || '',
+    fields: fields
+      .filter((field) => Array.isArray(field.attributeOptions) && field.attributeOptions.length > 0 && !field.multi_level)
+      .map((field) => ({
+        key: field.key_name,
+        name: field.name,
+        options: (field.attributeOptions || []).map((option) => ({ id: option.id, name: option.name })),
+      })),
+    attributeValues: Object.fromEntries(
+      Object.entries(formValues)
+        .filter(([, value]) => typeof value === 'string' || typeof value === 'number')
+        .map(([key, value]) => [key, String(value)]),
+    ),
     onSection: (id) => {
       const sectionItem = (sections || []).find((section) => section.id === id)
       if (!sectionItem) return
@@ -1751,6 +1770,16 @@ const [step, setStep] = useState(1)
     onPrice: (value) => {
       handleFieldChange('price', value, '', false)
       setValue('price', value ? parseFloat(value) : undefined, { shouldValidate: true })
+    },
+    onCountry: (id) => {
+      const country = (countries || []).find((item) => item.id === id)
+      if (!country || country.id === selectedCountry?.id) return
+      handleFieldChange('city', null, '', false)
+      setValue('city', null, { shouldValidate: true })
+      setSelectedCountry(country)
+    },
+    onAttribute: (key, value) => {
+      handleFieldChange(key, value, '', false)
     },
   }
 

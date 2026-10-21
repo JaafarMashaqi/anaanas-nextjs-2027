@@ -1,0 +1,159 @@
+.studio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.45rem;
+  min-width: 0;
+}
+
+.steps,
+.row,
+.nav,
+.thumbs {
+  display: flex;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.steps,
+.thumbs {
+  overflow-x: auto;
+}
+
+.step,
+.stepOn,
+.quiet,
+.primary {
+  border-radius: 999px;
+  min-height: 32px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.step,
+.quiet {
+  border: 1px solid #e7e9ee;
+  background: #ffffff;
+  color: #101828;
+}
+
+.stepOn,
+.primary {
+  border: 0;
+  background: #101828;
+  color: #ffffff;
+}
+
+.primary:disabled,
+.quiet:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.panel,
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e7e9ee;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1 1 8rem;
+}
+
+.field span,
+.hint,
+.note,
+.kicker {
+  color: #667085;
+  font-size: 0.72rem;
+}
+
+.field textarea,
+.field input,
+.field select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #e7e9ee;
+  border-radius: 12px;
+  background: #fffefb;
+  color: #101828;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+}
+
+.panel h3,
+.preview h3,
+.hint,
+.note,
+.kicker {
+  margin: 0;
+}
+
+.preview h3 {
+  font-size: 1rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.list {
+  margin: 0;
+  padding-inline-start: 1rem;
+  color: #101828;
+  font-size: 0.78rem;
+}
+
+.thumb {
+  flex: 0 0 auto;
+  width: 84px;
+}
+
+.thumb img {
+  display: block;
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #f4f1ea;
+}
+
+.thumb div {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.thumb button {
+  border: 0;
+  background: transparent;
+  color: #101828;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nav {
+  justify-content: space-between;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step,
+  .primary {
+    transition: none;
+  }
+}
