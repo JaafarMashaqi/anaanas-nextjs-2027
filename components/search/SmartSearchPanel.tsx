@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, type KeyboardEvent, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 
 import { useAppData } from '@/context/AppDataContext'
@@ -199,7 +200,7 @@ export function SmartSearchPanel({
     }
   }, [open, anchorRef, suggestions.length])
 
-  if (!open || !box || suggestions.length === 0) return null
+  if (!open || !box || suggestions.length === 0 || typeof document === 'undefined') return null
 
   let lastGroup = ''
   const groupLabel = (group: SmartSuggestion['group']) => {
@@ -211,10 +212,11 @@ export function SmartSearchPanel({
     return isArabic ? 'بحث' : 'Search'
   }
 
-  return (
+  return createPortal(
     <div
       className={styles.panel}
       id={listId}
+      data-search-panel=""
       role="listbox"
       dir={isArabic ? 'rtl' : 'ltr'}
       style={{ top: box.top, left: box.left, width: box.width }}
@@ -267,7 +269,8 @@ export function SmartSearchPanel({
           ? 'أمثلة الرواج للعرض فقط وليست حجم بحث حقيقياً. الأقسام والمدن وعمليات هذا الجهاز حقيقية.'
           : 'Trend examples are for demonstration, not measured search volume. Sections, cities, and this device’s searches are real.'}
       </p>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

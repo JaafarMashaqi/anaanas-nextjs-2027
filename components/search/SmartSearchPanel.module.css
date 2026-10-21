@@ -1,6 +1,6 @@
 .panel {
   position: fixed;
-  z-index: 80;
+  z-index: 1200;
   max-height: min(280px, 46vh);
   overflow: auto;
   padding: 6px;
